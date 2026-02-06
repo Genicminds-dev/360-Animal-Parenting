@@ -7,9 +7,10 @@ import Layout from './components/Layout/Layout';
 // Pages
 import Login from './pages/Auth/Login';
 import Dashboard from './pages/Dashboard/Dashboard';
-import FarmerRegistration from './pages/procurement/FarmerRegistration';
+import SellerRegistration from './pages/procurement/SellerRegistration';
 import AnimalRegistration from './pages/procurement/AnimalRegistration';
 import HealthCheck from './pages/procurement/HealthCheck';
+import AgentRegistration from './pages/procurement/AgentRegistration';
 
 function App() {
   return (
@@ -29,12 +30,14 @@ function App() {
             <Route path="dashboard" element={<Dashboard />} />
             
             {/* Procurement Routes */}
-            <Route path="procurement/farmer-registration" element={<FarmerRegistration />} />
+            <Route path="procurement/agent-registration" element={<AgentRegistration />} />
+            <Route path="procurement/seller-registration" element={<SellerRegistration />} />
             <Route path="procurement/animal-registration" element={<AnimalRegistration />} />
             <Route path="procurement/health-check" element={<HealthCheck />} />
             
             {/* Placeholder routes for other pages */}
-            <Route path="farmers" element={<Placeholder title="Farmers" />} />
+            <Route path="commission-agents" element={<Placeholder title="Agents" />} />
+            <Route path="sellers" element={<Placeholder title="Sellers" />} />
             <Route path="animals" element={<Placeholder title="Animals" />} />
             <Route path="transporters" element={<Placeholder title="Transporters" />} />
             <Route path="suppliers" element={<Placeholder title="Suppliers" />} />
