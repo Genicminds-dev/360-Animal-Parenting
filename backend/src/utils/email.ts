@@ -1,0 +1,98 @@
+import nodemailer from "nodemailer";
+ 
+export const sendResetEmail = async (
+  email: string,
+  token: string,
+  name: string
+) => {
+  const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+ 
+  const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+ 
+ 
+  const mailOptions = {
+    from: `"Animal Parenting" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: "Reset Your Password",
+    html: `
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body style="margin:0;padding:0;background-color:#f5f7fb;font-family:Arial, sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0">
+<tr>
+<td align="center" style="padding:40px 0;">
+<table width="100%" style="max-width:600px;background:#ffffff;border-radius:6px;padding:40px;">
+<!-- Top Line -->
+<tr>
+<td style="border-top:4px solid #6366f1;"></td>
+</tr>
+ 
+          <!-- Content -->
+<tr>
+<td style="padding-top:30px;color:#111827;">
+<h1 style="font-size:26px;margin-bottom:20px;">
+                Reset Your Password
+</h1>
+ 
+              <p style="font-size:16px;margin-bottom:12px;">
+                Hi ${name},
+</p>
+ 
+              <p style="font-size:15px;line-height:1.6;color:#374151;">
+                Tap the button below to reset your account password.
+                If you didn't request a new password, you can safely ignore this email.
+</p>
+ 
+              <p style="font-size:14px;line-height:1.6;color:#ef4444;margin-top:10px;">
+                ⚠️ This reset link will expire in <strong>1 hour</strong> for security reasons.
+</p>
+ 
+              <div style="text-align:center;margin:35px 0;">
+<a href="${resetLink}"
+                   style="background:#6366f1;color:#ffffff;
+                          padding:14px 36px;font-size:16px;
+                          text-decoration:none;border-radius:6px;
+                          display:inline-block;">
+                  Reset Password
+</a>
+</div>
+ 
+              <p style="font-size:14px;color:#6b7280;">
+                If that doesn’t work, copy and paste the following link in your browser:
+</p>
+ 
+              <p style="word-break:break-all;">
+<a href="${resetLink}" style="color:#6366f1;">
+                  ${resetLink}
+</a>
+</p>
+ 
+              <p style="font-size:14px;color:#374151;margin-top:30px;">
+                — Animal Parenting Team
+</p>
+</td>
+</tr>
+ 
+        </table>
+</td>
+</tr>
+</table>
+</body>
+</html>
+    `,
+  };
+ 
+  await transporter.sendMail(mailOptions);
+};
