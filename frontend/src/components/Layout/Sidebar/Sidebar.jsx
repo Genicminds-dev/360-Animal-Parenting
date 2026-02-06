@@ -1,11 +1,11 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
-import { 
-  LayoutDashboard, 
-  Users,  
-  FileText, 
-  DollarSign, 
+import {
+  LayoutDashboard,
+  Users,
+  FileText,
+  DollarSign,
   Truck,
   Settings,
   LogOut,
@@ -21,12 +21,13 @@ const Sidebar = () => {
 
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
-    { 
-      path: '/procurement', 
-      label: 'Animal Procurement', 
+    {
+      path: '/procurement',
+      label: 'Animal Procurement',
       icon: <GiCow size={20} />,
       subItems: [
-        { path: '/procurement/farmer-registration', label: 'Farmer Registration' },
+        { path: '/procurement/Agent-registration', label: 'Agent Registration' },
+        { path: '/procurement/seller-registration', label: 'Seller Registration' },
         { path: '/procurement/animal-registration', label: 'Animal Registration' },
         { path: '/procurement/health-check', label: 'Health Check' },
         { path: '/procurement/price-approval', label: 'Price & Approval' },
@@ -34,6 +35,7 @@ const Sidebar = () => {
         { path: '/procurement/animal-transfer', label: 'Animal Transfer' },
       ]
     },
+    { path: '/commission-agents', label: 'Commission Agents', icon: <Users size={20} /> },
     { path: '/farmers', label: 'Farmers', icon: <Users size={20} /> },
     { path: '/animals', label: 'Animals', icon: <GiCow size={20} /> },
     { path: '/transporters', label: 'Transporters', icon: <Truck size={20} /> },
@@ -52,7 +54,7 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="w-64 bg-white border-r border-gray-200 flex flex-col h-screen fixed left-0 top-0">
+    <div className="w-70 bg-white border-r border-gray-200 flex flex-col h-screen fixed left-0 top-0">
       {/* Logo */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center space-x-3">
@@ -80,14 +82,14 @@ const Sidebar = () => {
                 {item.icon}
                 <span>{item.label}</span>
               </NavLink>
-              
+
               {/* Sub items */}
               {item.subItems && item.subItems.map((subItem) => (
                 <NavLink
                   key={subItem.path}
                   to={subItem.path}
                   className={({ isActive }) =>
-                    `ml-10 pl-4 sidebar-item ${isActive ? 'active' : 'text-gray-600'}`
+                    `mt-1 ml-10 pl-4 sidebar-item ${isActive ? 'active' : 'text-gray-600'}`
                   }
                 >
                   <span className="text-sm">{subItem.label}</span>
