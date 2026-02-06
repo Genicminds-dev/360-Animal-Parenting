@@ -11,6 +11,7 @@ import SellerRegistration from './pages/procurement/SellerRegistration';
 import AnimalRegistration from './pages/procurement/AnimalRegistration';
 import HealthCheck from './pages/procurement/HealthCheck';
 import AgentRegistration from './pages/procurement/AgentRegistration';
+import ForgetPassword from './pages/Auth/ForgotPassword';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgetPassword />} /> {/* Add this route */}
           
           {/* Protected Routes */}
           <Route path="/" element={

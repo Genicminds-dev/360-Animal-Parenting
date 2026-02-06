@@ -10,15 +10,22 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!email || !password) {
       setError('Please fill in all fields');
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address');
       return;
     }
 
@@ -26,7 +33,7 @@ const Login = () => {
       setError('');
       setLoading(true);
       const result = await login(email, password);
-      
+
       if (!result.success) {
         setError(result.error);
       }
@@ -36,17 +43,6 @@ const Login = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const loadDemoCredentials = (role) => {
-    const credentials = {
-      admin: { email: 'admin@360animal.com', password: 'admin123' },
-      procurement: { email: 'procurement@360animal.com', password: 'procurement123' },
-      vet: { email: 'vet@360animal.com', password: 'vet123' }
-    };
-    
-    setEmail(credentials[role].email);
-    setPassword(credentials[role].password);
   };
 
   return (
@@ -85,7 +81,10 @@ const Login = () => {
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setError(''); // Clear error when user starts typing
+                  }}
                   className="input-field pl-10"
                   placeholder="Enter your email"
                   required
@@ -103,7 +102,10 @@ const Login = () => {
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setError(''); // Clear error when user starts typing
+                  }}
                   className="input-field pl-10 pr-10"
                   placeholder="Enter your password"
                   required
@@ -124,9 +126,13 @@ const Login = () => {
                 <input type="checkbox" className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" />
                 <span className="ml-2 text-sm text-gray-700">Remember me</span>
               </label>
-              <a href="#" className="text-sm text-primary-600 hover:text-primary-700 font-medium">
+              <button
+                type="button"
+                className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+                onClick={() => navigate('/forgot-password')} // ये line change करें
+              >
                 Forgot password?
-              </a>
+              </button>
             </div>
 
             {/* Submit Button */}
@@ -143,40 +149,6 @@ const Login = () => {
               ) : 'Sign In'}
             </button>
           </form>
-
-          {/* Demo Credentials */}
-          <div className="mt-8 pt-8 border-t border-gray-200">
-            <h3 className="text-sm font-medium text-gray-700 mb-4 text-center">Demo Credentials</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <button
-                type="button"
-                onClick={() => loadDemoCredentials('admin')}
-                className="bg-primary-50 text-primary-700 py-2 px-4 rounded-lg text-sm font-medium hover:bg-primary-100 transition-colors"
-              >
-                Admin
-              </button>
-              <button
-                type="button"
-                onClick={() => loadDemoCredentials('procurement')}
-                className="bg-secondary-50 text-secondary-700 py-2 px-4 rounded-lg text-sm font-medium hover:bg-secondary-100 transition-colors"
-              >
-                Procurement
-              </button>
-              <button
-                type="button"
-                onClick={() => loadDemoCredentials('vet')}
-                className="bg-green-50 text-green-700 py-2 px-4 rounded-lg text-sm font-medium hover:bg-green-100 transition-colors"
-              >
-                Veterinary
-              </button>
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div className="mt-8 text-center text-sm text-gray-500">
-            <p>© {new Date().getFullYear()} 360 Animal Parenting. All rights reserved.</p>
-            <p className="mt-1">Need help? Contact support@360animal.com</p>
-          </div>
         </div>
       </div>
     </div>
