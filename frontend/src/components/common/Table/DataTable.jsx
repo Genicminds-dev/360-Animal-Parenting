@@ -23,12 +23,13 @@ const DataTable = ({
   columns,
   data,
   loading,
-  
+
   // Pagination
   itemsPerPageOptions = [5, 10, 20, 30],
   enablePagination = true,
   
   // Features
+  getSelectedItems,
   enableSelection = true,
   
   // Callbacks

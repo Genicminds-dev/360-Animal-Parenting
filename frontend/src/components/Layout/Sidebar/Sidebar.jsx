@@ -37,12 +37,12 @@ const Sidebar = () => {
     },
 
     { path: '/management/sellers', label: 'Sellers', icon: <Users size={20} /> },
+    { path: '/management/commission-agents', label: 'Commission Agents', icon: <Users size={20} /> },
+    // { path: '/agents', label: 'Commission Agents', icon: <Shield size={20} /> },
     
-    { path: '/commission-agents', label: 'Commission Agents', icon: <Users size={20} /> },
     { path: '/animals', label: 'Animals', icon: <GiCow size={20} /> },
     { path: '/transporters', label: 'Transporters', icon: <Truck size={20} /> },
     { path: '/suppliers', label: 'Suppliers', icon: <UserCircle size={20} /> },
-    { path: '/agents', label: 'Commission Agents', icon: <Shield size={20} /> },
     { path: '/beneficiaries', label: 'Beneficiaries', icon: <Users size={20} /> },
     { path: '/team', label: 'Team Members', icon: <Users size={20} /> },
     { path: '/reports', label: 'Reports', icon: <FileText size={20} /> },

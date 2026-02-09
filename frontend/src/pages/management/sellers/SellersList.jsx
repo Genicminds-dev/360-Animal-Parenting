@@ -138,6 +138,7 @@ const MOCK_SELLERS = [
 const SellersList = () => {
   const navigate = useNavigate();
   const [sellers, setSellers] = useState(MOCK_SELLERS);
+  const [selectedSellers, setSelectedSellers] = useState([]);
   const [filteredSellers, setFilteredSellers] = useState(MOCK_SELLERS);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({});
@@ -634,6 +635,7 @@ const SellersList = () => {
         columns={columns}
         data={filteredSellers}
         loading={loading}
+        getSelectedItems={() => Array.from(selectedSellers)}
         onEdit={handleEdit}
         onView={handleView}
         onDelete={handleDelete}
