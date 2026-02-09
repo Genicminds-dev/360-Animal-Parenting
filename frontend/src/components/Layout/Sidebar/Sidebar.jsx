@@ -35,8 +35,10 @@ const Sidebar = () => {
         { path: '/procurement/animal-transfer', label: 'Animal Transfer' },
       ]
     },
+
+    { path: '/management/sellers', label: 'Sellers', icon: <Users size={20} /> },
+    
     { path: '/commission-agents', label: 'Commission Agents', icon: <Users size={20} /> },
-    { path: '/farmers', label: 'Farmers', icon: <Users size={20} /> },
     { path: '/animals', label: 'Animals', icon: <GiCow size={20} /> },
     { path: '/transporters', label: 'Transporters', icon: <Truck size={20} /> },
     { path: '/suppliers', label: 'Suppliers', icon: <UserCircle size={20} /> },
