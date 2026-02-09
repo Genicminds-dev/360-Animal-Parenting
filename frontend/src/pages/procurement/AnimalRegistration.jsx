@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Camera, Tag, Scale, Calendar, MapPin, Upload, X, Search, ChevronDown, Video, RotateCw } from 'lucide-react';
+import { Camera, Tag, Scale, Calendar, MapPin, Upload, X, Search, ChevronDown, Video, RotateCw, User } from 'lucide-react';
 import { GiCow } from 'react-icons/gi';
 
 const AnimalRegistration = () => {
@@ -26,6 +26,8 @@ const AnimalRegistration = () => {
       milkPerDay: '',
       calfAgeYears: '',
       calfAgeMonths: '',
+      commissionAgentName: '',
+      commissionAgentId: '',
       // Media
       frontPhoto: null,
       sidePhoto: null,
@@ -38,6 +40,8 @@ const AnimalRegistration = () => {
 
   const [vendorDropdownOpen, setVendorDropdownOpen] = useState(false);
   const [vendorSearch, setVendorSearch] = useState('');
+  const [commissionAgentDropdownOpen, setCommissionAgentDropdownOpen] = useState({});
+  const [commissionAgentSearch, setCommissionAgentSearch] = useState({});
   const [animalTypeDropdownOpen, setAnimalTypeDropdownOpen] = useState({});
   const [animalTypeSearch, setAnimalTypeSearch] = useState({});
   const [breedDropdownOpen, setBreedDropdownOpen] = useState({});
@@ -46,6 +50,7 @@ const AnimalRegistration = () => {
 
   // Refs for dropdown closing
   const vendorRef = useRef(null);
+  const commissionAgentRefs = useRef([]);
   const animalTypeRefs = useRef([]);
   const breedRefs = useRef([]);
   const pregnancyStatusRefs = useRef([]);
@@ -59,6 +64,19 @@ const AnimalRegistration = () => {
     { id: 'V005', name: 'Vikram Verma', mobile: '9876543214' },
     { id: 'V006', name: 'Ramesh Gupta', mobile: '9876543215' },
     { id: 'V007', name: 'Harish Joshi', mobile: '9876543216' }
+  ];
+
+  const commissionAgents = [
+    { id: 'CA001', name: 'Amit Singh', mobile: '9876543220' },
+    { id: 'CA002', name: 'Ravi Kumar', mobile: '9876543221' },
+    { id: 'CA003', name: 'Sunil Mehta', mobile: '9876543222' },
+    { id: 'CA004', name: 'Prakash Jain', mobile: '9876543223' },
+    { id: 'CA005', name: 'Deepak Sharma', mobile: '9876543224' },
+    { id: 'CA006', name: 'Kunal Verma', mobile: '9876543225' },
+    { id: 'CA007', name: 'Vishal Gupta', mobile: '9876543226' },
+    { id: 'CA008', name: 'Nitin Patel', mobile: '9876543227' },
+    { id: 'CA009', name: 'Manish Yadav', mobile: '9876543228' },
+    { id: 'CA010', name: 'Sandeep Mishra', mobile: '9876543229' }
   ];
 
   const animalTypes = [
@@ -103,6 +121,14 @@ const AnimalRegistration = () => {
     vendor.mobile.includes(vendorSearch)
   );
 
+  const getFilteredCommissionAgents = (index) => {
+    const search = commissionAgentSearch[index] || '';
+    return commissionAgents.filter(agent => 
+      agent.name.toLowerCase().includes(search.toLowerCase()) ||
+      agent.mobile.includes(search)
+    );
+  };
+
   const getFilteredAnimalTypes = (index) => {
     const search = animalTypeSearch[index] || '';
     return animalTypes.filter(type => 
@@ -125,6 +151,12 @@ const AnimalRegistration = () => {
       if (vendorRef.current && !vendorRef.current.contains(event.target)) {
         setVendorDropdownOpen(false);
       }
+
+      commissionAgentRefs.current.forEach((ref, index) => {
+        if (ref && !ref.contains(event.target)) {
+          setCommissionAgentDropdownOpen(prev => ({ ...prev, [index]: false }));
+        }
+      });
 
       animalTypeRefs.current.forEach((ref, index) => {
         if (ref && !ref.contains(event.target)) {
@@ -157,6 +189,18 @@ const AnimalRegistration = () => {
     }));
     setVendorDropdownOpen(false);
     setVendorSearch('');
+  };
+
+  const handleCommissionAgentSelect = (index, agent) => {
+    const updatedAnimals = [...formData.animals];
+    updatedAnimals[index] = {
+      ...updatedAnimals[index],
+      commissionAgentName: agent.name,
+      commissionAgentId: agent.id
+    };
+    setFormData(prev => ({ ...prev, animals: updatedAnimals }));
+    setCommissionAgentDropdownOpen(prev => ({ ...prev, [index]: false }));
+    setCommissionAgentSearch(prev => ({ ...prev, [index]: '' }));
   };
 
   const handleAnimalChange = (index, field, value) => {
@@ -286,6 +330,8 @@ const AnimalRegistration = () => {
         milkPerDay: '',
         calfAgeYears: '',
         calfAgeMonths: '',
+        commissionAgentName: '',
+        commissionAgentId: '',
         frontPhoto: null,
         sidePhoto: null,
         backPhoto: null,
@@ -404,6 +450,8 @@ const AnimalRegistration = () => {
         milkPerDay: '',
         calfAgeYears: '',
         calfAgeMonths: '',
+        commissionAgentName: '',
+        commissionAgentId: '',
         frontPhoto: null,
         sidePhoto: null,
         backPhoto: null,
@@ -415,6 +463,7 @@ const AnimalRegistration = () => {
     
     setPreviewMedia([{}]);
     setVendorSearch('');
+    setCommissionAgentSearch({});
     setAnimalTypeSearch({});
     setBreedSearch({});
   };
@@ -568,6 +617,60 @@ const AnimalRegistration = () => {
                     />
                   </div>
 
+                  {/* Commission Agent */}
+                  <div className="relative" ref={el => commissionAgentRefs.current[index] = el}>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Commission Agent
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={animal.commissionAgentName}
+                        readOnly
+                        className="input-field w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 cursor-pointer"
+                        placeholder="Select commission agent"
+                        onClick={() => setCommissionAgentDropdownOpen(prev => ({ ...prev, [index]: !prev[index] }))}
+                      />
+                      <ChevronDown 
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer"
+                        onClick={() => setCommissionAgentDropdownOpen(prev => ({ ...prev, [index]: !prev[index] }))}
+                      />
+                      
+                      {commissionAgentDropdownOpen[index] && (
+                        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-hidden">
+                          <div className="p-2 border-b border-gray-200">
+                            <input
+                              type="text"
+                              value={commissionAgentSearch[index] || ''}
+                              onChange={(e) => setCommissionAgentSearch(prev => ({ ...prev, [index]: e.target.value }))}
+                              placeholder="Search agent by name or mobile..."
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                              autoFocus
+                            />
+                          </div>
+                          <div className="max-h-48 overflow-y-auto">
+                            {getFilteredCommissionAgents(index).length > 0 ? (
+                              getFilteredCommissionAgents(index).map(agent => (
+                                <div
+                                  key={agent.id}
+                                  className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                  onClick={() => handleCommissionAgentSelect(index, agent)}
+                                >
+                                  <div className="font-medium text-gray-900">{agent.name}</div>
+                                  <div className="text-sm text-gray-500">{agent.mobile}</div>
+                                </div>
+                              ))
+                            ) : (
+                              <div className="px-4 py-3 text-gray-500 text-center">
+                                No commission agents found
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
                   {/* Animal Type */}
                   <div className="relative" ref={el => animalTypeRefs.current[index] = el}>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -674,7 +777,10 @@ const AnimalRegistration = () => {
                       )}
                     </div>
                   </div>
+                </div>
 
+                {/* Second Row - Pricing and Age Fields */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                   {/* Pricing */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -695,57 +801,7 @@ const AnimalRegistration = () => {
                       required
                     />
                   </div>
-                </div>
 
-                {/* Pregnancy Status */}
-                <div className="mb-8">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Pregnancy Status <RequiredStar />
-                  </label>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {pregnancyOptions.map(option => (
-                      <label
-                        key={option.value}
-                        className={`flex items-center p-4 border rounded-lg cursor-pointer transition-colors ${
-                          animal.pregnancyStatus === option.value
-                            ? 'border-primary-500 bg-primary-50'
-                            : 'border-gray-300 hover:border-gray-400'
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name={`pregnancyStatus-${index}`}
-                          value={option.value}
-                          checked={animal.pregnancyStatus === option.value}
-                          onChange={(e) => handleAnimalChange(index, 'pregnancyStatus', e.target.value)}
-                          className="mr-3 text-primary-600 focus:ring-primary-500"
-                          required
-                        />
-                        <span className="text-gray-900">{option.label}</span>
-                      </label>
-                    ))}
-                  </div>
-
-                  {/* Calf Tag ID (Conditional) */}
-                  {animal.pregnancyStatus === 'milking' && (
-                    <div className="mt-6">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Calf Tag ID <RequiredStar />
-                      </label>
-                      <input
-                        type="text"
-                        value={animal.calfTagId}
-                        onChange={(e) => handleAnimalChange(index, 'calfTagId', e.target.value)}
-                        className="input-field w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                        placeholder="Enter Calf Tag ID"
-                        required
-                      />
-                    </div>
-                  )}
-                </div>
-
-                {/* Additional Information */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                   {/* Number of Pregnancies */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -830,7 +886,10 @@ const AnimalRegistration = () => {
                       max="700"
                     />
                   </div>
+                </div>
 
+                {/* Third Row - Milk per Day and Pregnancy Status */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                   {/* Milk per Day */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -852,49 +911,98 @@ const AnimalRegistration = () => {
                       required
                     />
                   </div>
+
+                  {/* Pregnancy Status */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Pregnancy Status <RequiredStar />
+                    </label>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {pregnancyOptions.map(option => (
+                        <label
+                          key={option.value}
+                          className={`flex items-center p-4 border rounded-lg cursor-pointer transition-colors ${
+                            animal.pregnancyStatus === option.value
+                              ? 'border-primary-500 bg-primary-50'
+                              : 'border-gray-300 hover:border-gray-400'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name={`pregnancyStatus-${index}`}
+                            value={option.value}
+                            checked={animal.pregnancyStatus === option.value}
+                            onChange={(e) => handleAnimalChange(index, 'pregnancyStatus', e.target.value)}
+                            className="mr-3 text-primary-600 focus:ring-primary-500"
+                            required
+                          />
+                          <span className="text-gray-900">{option.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
                 </div>
 
-                {/* Calf Age (Conditional) */}
+                {/* Calf Tag ID (Conditional) */}
                 {animal.pregnancyStatus === 'milking' && (
                   <div className="mb-8">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Calf Age
-                    </label>
-                    <div className="flex space-x-2">
-                      <select
-                        value={animal.calfAgeYears}
-                        onChange={(e) => handleAnimalChange(index, 'calfAgeYears', e.target.value)}
-                        className="input-field flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 appearance-none"
-                        style={{ 
-                          backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
-                          backgroundPosition: 'right 0.5rem center',
-                          backgroundRepeat: 'no-repeat',
-                          backgroundSize: '1.5em 1.5em',
-                          paddingRight: '2.5rem'
-                        }}
-                      >
-                        <option value="">Years</option>
-                        {calfAgeYears.map(year => (
-                          <option key={year} value={year}>{year} Year{year !== 1 ? 's' : ''}</option>
-                        ))}
-                      </select>
-                      <select
-                        value={animal.calfAgeMonths}
-                        onChange={(e) => handleAnimalChange(index, 'calfAgeMonths', e.target.value)}
-                        className="input-field flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 appearance-none"
-                        style={{ 
-                          backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
-                          backgroundPosition: 'right 0.5rem center',
-                          backgroundRepeat: 'no-repeat',
-                          backgroundSize: '1.5em 1.5em',
-                          paddingRight: '2.5rem'
-                        }}
-                      >
-                        <option value="">Months</option>
-                        {calfAgeMonths.map(month => (
-                          <option key={month} value={month}>{month} Month{month !== 1 ? 's' : ''}</option>
-                        ))}
-                      </select>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Calf Tag ID <RequiredStar />
+                        </label>
+                        <input
+                          type="text"
+                          value={animal.calfTagId}
+                          onChange={(e) => handleAnimalChange(index, 'calfTagId', e.target.value)}
+                          className="input-field w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                          placeholder="Enter Calf Tag ID"
+                          required
+                        />
+                      </div>
+
+                      {/* Calf Age */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Calf Age
+                        </label>
+                        <div className="flex space-x-2">
+                          <select
+                            value={animal.calfAgeYears}
+                            onChange={(e) => handleAnimalChange(index, 'calfAgeYears', e.target.value)}
+                            className="input-field flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 appearance-none"
+                            style={{ 
+                              backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                              backgroundPosition: 'right 0.5rem center',
+                              backgroundRepeat: 'no-repeat',
+                              backgroundSize: '1.5em 1.5em',
+                              paddingRight: '2.5rem'
+                            }}
+                          >
+                            <option value="">Years</option>
+                            {calfAgeYears.map(year => (
+                              <option key={year} value={year}>{year} Year{year !== 1 ? 's' : ''}</option>
+                            ))}
+                          </select>
+                          <select
+                            value={animal.calfAgeMonths}
+                            onChange={(e) => handleAnimalChange(index, 'calfAgeMonths', e.target.value)}
+                            className="input-field flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 appearance-none"
+                            style={{ 
+                              backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                              backgroundPosition: 'right 0.5rem center',
+                              backgroundRepeat: 'no-repeat',
+                              backgroundSize: '1.5em 1.5em',
+                              paddingRight: '2.5rem'
+                            }}
+                          >
+                            <option value="">Months</option>
+                            {calfAgeMonths.map(month => (
+                              <option key={month} value={month}>{month} Month{month !== 1 ? 's' : ''}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
