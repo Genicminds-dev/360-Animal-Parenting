@@ -4,7 +4,7 @@ import fs from "fs";
 import { Request, Response, NextFunction } from "express";
 
 const IMAGE_LIMIT = 5 * 1024 * 1024;
-const PDF_LIMIT   = 5 * 1024 * 1024;
+const PDF_LIMIT = 5 * 1024 * 1024;
 const VIDEO_LIMIT = 50 * 1024 * 1024;
 const TOTAL_LIMIT = 150 * 1024 * 1024;
 
@@ -21,6 +21,23 @@ const allowedVideoMime = [
 
 const allowedPdfExt = [".pdf"];
 const allowedPdfMime = ["application/pdf"];
+
+export const FIELD_RULES: Record<
+  string,
+  {
+    label: string;
+    types: ("image" | "pdf" | "video")[];
+  }
+> = {
+  profileImg: {
+    label: "Profile image",
+    types: ["image"],
+  },
+  aadhaarFile: {
+    label: "Aadhaar file",
+    types: ["image", "pdf"],
+  },
+};
 
 const isValidImage = (file: Express.Multer.File) =>
   allowedImageExt.includes(path.extname(file.originalname).toLowerCase()) &&
@@ -69,11 +86,30 @@ export const upload = multer({
       return cb(new Error("PSD files are not allowed"));
     }
 
-    if (isValidImage(file) || isValidPdf(file) || isValidVideo(file)) {
-      return cb(null, true);
+    const rule = FIELD_RULES[file.fieldname];
+
+    if (!rule) {
+      return cb(
+        new Error(`Upload not allowed for field: ${file.fieldname}`)
+      );
     }
 
-    cb(new Error("Only images, PDFs, and videos are allowed"));
+    const { label, types } = rule;
+
+    const isValid =
+      (types.includes("image") && isValidImage(file)) ||
+      (types.includes("pdf") && isValidPdf(file)) ||
+      (types.includes("video") && isValidVideo(file));
+
+    if (!isValid) {
+      return cb(
+        new Error(
+          `Invalid file type for ${label}. Allowed types: ${types.join(", ")}`
+        )
+      );
+    }
+
+    cb(null, true);
   },
 });
 
@@ -118,7 +154,7 @@ export const validateUploadedFiles = (
   next();
 };
 
-const cleanupFiles = (req: Request) => {
+export const cleanupFiles = (req: Request) => {
   const files = req.files as Record<string, Express.Multer.File[]>;
   if (!files) return;
 
@@ -137,8 +173,20 @@ export const handleMulterError = (
   res: Response,
   next: NextFunction
 ) => {
-  if (err instanceof multer.MulterError || err) {
-    return res.status(400).json({ message: err.message });
+  if (err) {
+    const files = req.files as Record<string, Express.Multer.File[]>;
+    if (files) {
+      Object.values(files).flat().forEach((file) => {
+        if (file?.path && fs.existsSync(file.path)) {
+          fs.unlinkSync(file.path);
+        }
+      });
+    }
+
+    return res.status(400).json({
+      success: false,
+      message: err.message,
+    });
   }
   next();
 };
