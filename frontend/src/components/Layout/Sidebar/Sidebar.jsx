@@ -38,7 +38,7 @@ const Sidebar = ({ toggleSidebar, onLogout, isMobile }) => {
         { path: '/procurement/agent-registration', label: 'Agent Registration', roles: [1, 2] },
         { path: '/procurement/seller-registration', label: 'Seller Registration', roles: [1, 2] },
         { path: '/procurement/animal-registration', label: 'Animal Registration', roles: [1, 2, 3] },
-        { path: '/procurement/health-check', label: 'Health Check', roles: [3] },
+        { path: '/procurement/health-check', label: 'Health Check', roles: [1,2,3]},
         { path: '/procurement/price-approval', label: 'Price & Approval', roles: [1, 2] },
         { path: '/procurement/payment', label: 'Payment', roles: [1] },
         { path: '/procurement/animal-transfer', label: 'Animal Transfer', roles: [1, 2] },

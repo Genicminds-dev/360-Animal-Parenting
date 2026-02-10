@@ -2,9 +2,9 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { Plus, RefreshCw } from "lucide-react";
-import DataTable from "../../components/common/Table/DataTable";
-import FilterSection from "../../components/common/Filter/FilterSection";
+import { Eye, Pencil, Plus, RefreshCw, Search } from "lucide-react";
+import FilterSection from "../../../components/common/Filter/FilterSection";
+import DataTable from "../../../components/common/Table/DataTable";
 
 // Mock data for health checkups
 const MOCK_HEALTH_CHECKUPS = [
@@ -151,7 +151,7 @@ const HealthCheckupList = () => {
     }
   };
 
-  // Table columns - Only Animal ID and Seller Name (NO custom actions column)
+  // Table columns - Only Animal ID, Seller Name, and Actions
   const columns = [
     { 
       key: "animalId", 
@@ -167,7 +167,28 @@ const HealthCheckupList = () => {
         <div className="font-medium text-gray-900">{item.sellerName}</div>
       )
     },
-    // REMOVED the custom "actions" column
+    { 
+      key: "actions", 
+      label: "Actions",
+      render: (item) => (
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => handleView(item)}
+            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            title="View Details"
+          >
+            <Eye size={18} />
+          </button>
+          <button
+            onClick={() => handleEdit(item)}
+            className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+            title="Edit Checkup"
+          >
+            <Pencil size={18} />
+          </button>
+        </div>
+      )
+    },
   ];
 
   // Filter configuration
@@ -204,35 +225,35 @@ const HealthCheckupList = () => {
     });
   };
 
-  // const handleDelete = async (id) => {
-  //   try {
-  //     // Simulate API call
-  //     await new Promise(resolve => setTimeout(resolve, 500));
+  const handleDelete = async (id) => {
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500));
       
-  //     // Remove from local state
-  //     setHealthCheckups(prev => prev.filter(checkup => checkup.id !== id));
-  //     setFilteredCheckups(prev => prev.filter(checkup => checkup.id !== id));
+      // Remove from local state
+      setHealthCheckups(prev => prev.filter(checkup => checkup.id !== id));
+      setFilteredCheckups(prev => prev.filter(checkup => checkup.id !== id));
       
-  //     toast.success("Health checkup deleted successfully!");
-  //   } catch (error) {
-  //     toast.error("Failed to delete health checkup");
-  //   }
-  // };
+      toast.success("Health checkup deleted successfully!");
+    } catch (error) {
+      toast.error("Failed to delete health checkup");
+    }
+  };
 
-  // const handleBulkDelete = async (ids) => {
-  //   try {
-  //     // Simulate API call
-  //     await new Promise(resolve => setTimeout(resolve, 800));
+  const handleBulkDelete = async (ids) => {
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 800));
       
-  //     // Remove from local state
-  //     setHealthCheckups(prev => prev.filter(checkup => !ids.includes(checkup.id)));
-  //     setFilteredCheckups(prev => prev.filter(checkup => !ids.includes(checkup.id)));
+      // Remove from local state
+      setHealthCheckups(prev => prev.filter(checkup => !ids.includes(checkup.id)));
+      setFilteredCheckups(prev => prev.filter(checkup => !ids.includes(checkup.id)));
       
-  //     toast.success(`${ids.length} health checkups deleted successfully!`);
-  //   } catch (error) {
-  //     toast.error("Failed to delete health checkups");
-  //   }
-  // };
+      toast.success(`${ids.length} health checkups deleted successfully!`);
+    } catch (error) {
+      toast.error("Failed to delete health checkups");
+    }
+  };
 
   const handleExport = () => {
     // CSV Export
@@ -351,7 +372,7 @@ const HealthCheckupList = () => {
         onClearFilters={clearFilters}
         onExport={handleExport}
         onPrint={handlePrint}
-        // onBulkDelete={() => handleBulkDelete(Array.from(new Set()))}
+        onBulkDelete={() => handleBulkDelete(Array.from(new Set()))}
         selectedCount={0}
         initialFilters={filters}
         searchPlaceholder="Search by Animal ID or Seller Name..."
@@ -361,15 +382,15 @@ const HealthCheckupList = () => {
         enableBulkDelete={true}
       />
 
-      {/* Data Table - This will show Animal ID, Seller Name, and DataTable's built-in actions column */}
+      {/* Data Table */}
       <DataTable
         columns={columns}
         data={filteredCheckups}
         loading={loading}
         onEdit={handleEdit}
         onView={handleView}
-        // onDelete={handleDelete}
-        // onBulkDelete={handleBulkDelete}
+        onDelete={handleDelete}
+        onBulkDelete={handleBulkDelete}
         addButtonLabel="New Health Checkup"
         onAdd={handleAddNew}
         emptyStateMessage="No health checkups found. Try adjusting your filters or add new checkups."
