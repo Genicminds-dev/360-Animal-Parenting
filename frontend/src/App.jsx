@@ -1,7 +1,11 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
-import ProtectedRoute from './routes/PrivateRoute';
+import React, { useState, useEffect, useCallback } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
+
+// Import Context Provider
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+
+// Import Layout component
 import Layout from './components/Layout/Layout';
 
 // Pages
@@ -11,59 +15,69 @@ import SellerRegistration from './pages/procurement/SellerRegistration';
 import AnimalRegistration from './pages/procurement/AnimalRegistration';
 import HealthCheck from './pages/procurement/HealthCheck';
 import AgentRegistration from './pages/procurement/AgentRegistration';
-import ForgetPassword from './pages/Auth/ForgotPassword';
+import ForgotPassword from './pages/Auth/ForgotPassword';
+import ResetPassword from './pages/Auth/ResetPassword';
 import SellersList from './pages/management/sellers/SellersList';
 import AgentsList from './pages/management/agents/AgentsList';
 import AnimalsList from './pages/management/animals/AnimalsList';
 import AnimalDetails from './pages/management/animals/AnimalDetails';
 
-function App() {
+// Import path routes
+import { PATHROUTES } from './routes/pathRoutes';
+
+// Import API and endpoints
+import api from "./services/api/api";
+import { Endpoints } from "./services/api/EndPoint";
+import SessionTimeoutModal from './components/SessionTimeoutModal';
+
+// ProtectedRoute Component
+const ProtectedRoute = ({ children, allowedRoles = [1, 2, 3] }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // If no specific roles required, allow access
+  if (allowedRoles.length === 0) {
+    return children;
+  }
+
+  // Check if user has required role
+  if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
+};
+
+// PublicRoute Component
+const PublicRoute = ({ children, restricted = false }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
+  if (restricted && user) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
+};
+
+// Loading Spinner Component
+const LoadingSpinner = () => {
   return (
-    <Router>
-      <AuthProvider>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/forgot-password" element={<ForgetPassword />} /> {/* Add this route */}
-          
-          {/* Protected Routes */}
-          <Route path="/" element={
-            <ProtectedRoute>
-              <Layout />
-            </ProtectedRoute>
-          }>
-            <Route index element={<Navigate to="/dashboard" replace />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            
-            {/* Procurement Routes */}
-            <Route path="procurement/agent-registration" element={<AgentRegistration />} />
-            <Route path="procurement/seller-registration" element={<SellerRegistration />} />
-            <Route path="procurement/animal-registration" element={<AnimalRegistration />} />
-            <Route path="procurement/health-check" element={<HealthCheck />} />
-
-            {/* Management Menu Routes */}
-            <Route path="management/sellers" element={<SellersList/>} />
-            <Route path="management/commission-agents" element={<AgentsList/>} />
-            <Route path="management/animals" element={<AnimalsList/>} />
-            <Route path="management/animal-details/:uid" element={<AnimalDetails/>}/>
-
-            {/* Placeholder routes for other pages */}
-            <Route path="transporters" element={<Placeholder title="Transporters" />} />
-            <Route path="suppliers" element={<Placeholder title="Suppliers" />} />
-            <Route path="agents" element={<Placeholder title="Commission Agents" />} />
-            <Route path="beneficiaries" element={<Placeholder title="Beneficiaries" />} />
-            <Route path="team" element={<Placeholder title="Team Members" />} />
-            <Route path="reports" element={<Placeholder title="Reports" />} />
-            <Route path="settings" element={<Placeholder title="Settings" />} />
-          </Route>
-          
-          {/* Catch all route */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
-      </AuthProvider>
-    </Router>
+    <div className="fixed inset-0 flex items-center justify-center bg-white">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#f48563]"></div>
+    </div>
   );
-}
+};
 
 // Placeholder component for incomplete pages
 const Placeholder = ({ title }) => (
@@ -74,5 +88,270 @@ const Placeholder = ({ title }) => (
     <p className="text-gray-500 text-sm mt-4">Coming soon with complete functionality</p>
   </div>
 );
+
+// Main App Component
+const AppContent = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user, isAuthenticated, loginSuccess, logout } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
+  const [sessionExpired, setSessionExpired] = useState(false);
+
+  const checkAuthStatus = useCallback(() => {
+    const authToken = localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
+    if (authToken) {
+      try {
+        const decoded = jwtDecode(authToken);
+        // AuthContext already handles user state
+        setSessionExpired(false);
+      } catch (error) {
+        console.error("Invalid Token", error);
+        handleLogout();
+      }
+    }
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    checkAuthStatus();
+  }, [location.pathname, checkAuthStatus]);
+
+  const handleLogout = async (isSessionExpired = false) => {
+    try {
+      const authToken = localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
+      if (authToken) {
+        await api.post(
+          Endpoints.LOGOUT,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
+        );
+      }
+    } catch (err) {
+      console.error("Error during logout:", err);
+    } finally {
+      // Call AuthContext logout
+      logout();
+      if (isSessionExpired) {
+        setSessionExpired(true);
+      }
+      navigate(PATHROUTES.login, { replace: true });
+    }
+  };
+
+  return (
+    <>
+      <Routes>
+        {/* Public Routes */}
+        <Route
+          path={PATHROUTES.login}
+          element={
+            <PublicRoute restricted>
+              <Login />
+            </PublicRoute>
+          }
+        />
+
+        <Route
+          path="/forgot-password"
+          element={
+            <PublicRoute>
+              <ForgotPassword />
+            </PublicRoute>
+          }
+        />
+
+        <Route
+          path="/reset-password"
+          element={
+            <PublicRoute>
+              <ResetPassword />
+            </PublicRoute>
+          }
+        />
+
+        {/* Protected Routes with Layout */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Layout onLogout={handleLogout} />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Navigate to={PATHROUTES.dashboard} replace />} />
+          <Route path={PATHROUTES.dashboard.replace('/', '')} element={<Dashboard />} />
+
+          {/* Procurement Routes with Role-based Access */}
+          <Route
+            path={PATHROUTES.agentRegistration.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1, 2]}>
+                <AgentRegistration />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={PATHROUTES.sellerRegistration.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1, 2]}>
+                <SellerRegistration />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={PATHROUTES.animalRegistration.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1, 2, 3]}>
+                <AnimalRegistration />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={PATHROUTES.healthCheck.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[3]}>
+                <HealthCheck />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Management Menu Routes */}
+          <Route
+            path={PATHROUTES.sellersList.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1, 2]}>
+                <SellersList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={PATHROUTES.agentsList.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1, 2]}>
+                <AgentsList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={PATHROUTES.animalsList.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1, 2, 3]}>
+                <AnimalsList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={PATHROUTES.animalDetails.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1, 2, 3]}>
+                <AnimalDetails />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Commission Agents */}
+          <Route
+            path={PATHROUTES.commissionAgents.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1, 2]}>
+                <Placeholder title="Commission Agents" />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Animals */}
+          <Route
+            path={PATHROUTES.animals.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1, 2, 3]}>
+                <Placeholder title="Animals" />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Transporters */}
+          <Route
+            path={PATHROUTES.transporters.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1, 2]}>
+                <Placeholder title="Transporters" />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Suppliers */}
+          <Route
+            path={PATHROUTES.suppliers.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1, 2]}>
+                <Placeholder title="Suppliers" />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Beneficiaries */}
+          <Route
+            path={PATHROUTES.beneficiaries.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1]}>
+                <Placeholder title="Beneficiaries" />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Team Members */}
+          <Route
+            path={PATHROUTES.team.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1]}>
+                <Placeholder title="Team Members" />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Reports */}
+          <Route
+            path={PATHROUTES.reports.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1, 2]}>
+                <Placeholder title="Reports" />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Settings */}
+          <Route
+            path={PATHROUTES.settings.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1]}>
+                <Placeholder title="Settings" />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
+
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+
+      <SessionTimeoutModal isAuthenticated={isAuthenticated} />
+    </>
+  );
+};
+
+// Main App Component with Router and AuthProvider
+function App() {
+  return (
+    <Router>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </Router>
+  );
+}
 
 export default App;
