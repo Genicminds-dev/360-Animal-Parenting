@@ -95,53 +95,18 @@ const Dashboard = () => {
         }
     ];
 
-    const recentActivities = [
-        {
-            id: 1,
-            type: 'animal_registration',
-            title: 'New Animal Registered',
-            description: 'Buffalo ID #AP-2345 registered by Farmer Rajesh',
-            time: '10 minutes ago',
-            user: 'Officer Kumar'
-        },
-        {
-            id: 2,
-            type: 'payment',
-            title: 'Payment Processed',
-            description: '₹45,000 paid to Farmer Singh for 2 cows',
-            time: '1 hour ago',
-            user: 'Admin'
-        },
-        {
-            id: 3,
-            type: 'health_check',
-            title: 'Health Check Completed',
-            description: 'Vaccination completed for 15 animals',
-            time: '2 hours ago',
-            user: 'Dr. Sharma'
-        },
-        {
-            id: 4,
-            type: 'transport',
-            title: 'Animals Transported',
-            description: '25 animals transferred to Holding Station #3',
-            time: '3 hours ago',
-            user: 'Transport Manager'
-        },
-        {
-            id: 5,
-            type: 'farmer_registration',
-            title: 'New Farmer Registered',
-            description: 'Farmer Gupta registered with 8 animals',
-            time: '5 hours ago',
-            user: 'Officer Patel'
-        }
-    ];
 
     const quickActions = [
         {
-            title: 'Register Farmer',
-            description: 'Add new farmer details',
+            title: 'Register Agents',
+            description: 'Add new agents details',
+            icon: <Users size={20} />,
+            link: '/procurement/agent-registration',
+            color: 'from-blue-500 to-blue-600'
+        },
+        {
+            title: 'Register Sellers',
+            description: 'Add new sellers details',
             icon: <Users size={20} />,
             link: '/procurement/farmer-registration',
             color: 'from-blue-500 to-blue-600'
@@ -217,7 +182,7 @@ const Dashboard = () => {
             {/* Quick Actions & Recent Activities */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Quick Actions */}
-                <div className="lg:col-span-2">
+                <div className="lg:col-span-3">
                     <div className="card">
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
@@ -225,7 +190,7 @@ const Dashboard = () => {
                                 View All
                             </Link>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {quickActions.map((action, index) => (
                                 <Link
                                     key={index}
@@ -244,39 +209,6 @@ const Dashboard = () => {
                                 </Link>
                             ))}
                         </div>
-                    </div>
-                </div>
-
-                {/* Recent Activities */}
-                <div className="card">
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-lg font-semibold text-gray-900">Recent Activities</h2>
-                        <Link to="/activities" className="text-primary-600 text-sm font-medium hover:text-primary-700">
-                            View All
-                        </Link>
-                    </div>
-                    <div className="space-y-4">
-                        {recentActivities.map((activity) => (
-                            <div key={activity.id} className="pb-4 border-b border-gray-100 last:border-0 last:pb-0">
-                                <div className="flex items-start space-x-3">
-                                    <div className="mt-1">
-                                        {activity.type === 'animal_registration' && <GiCow className="text-green-500" size={16} />}
-                                        {activity.type === 'payment' && <DollarSign className="text-blue-500" size={16} />}
-                                        {activity.type === 'health_check' && <FileText className="text-purple-500" size={16} />}
-                                        {activity.type === 'transport' && <Truck className="text-orange-500" size={16} />}
-                                        {activity.type === 'farmer_registration' && <Users className="text-cyan-500" size={16} />}
-                                    </div>
-                                    <div className="flex-1">
-                                        <h4 className="font-medium text-gray-900">{activity.title}</h4>
-                                        <p className="text-sm text-gray-600 mt-1">{activity.description}</p>
-                                        <div className="flex items-center justify-between mt-2">
-                                            <span className="text-xs text-gray-500">{activity.time}</span>
-                                            <span className="text-xs font-medium text-gray-700">{activity.user}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
                     </div>
                 </div>
             </div>
