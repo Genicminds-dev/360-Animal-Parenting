@@ -13,6 +13,7 @@ import HealthCheck from './pages/procurement/HealthCheck';
 import AgentRegistration from './pages/procurement/AgentRegistration';
 import ForgetPassword from './pages/Auth/ForgotPassword';
 import SellersList from './pages/management/sellers/SellersList';
+import AgentsList from './pages/management/agents/AgentsList';
 
 function App() {
   return (
@@ -40,9 +41,9 @@ function App() {
 
             {/* Management Menu Routes */}
             <Route path="management/sellers" element={<SellersList/>} />
-            
+            <Route path="management/commission-agents" element={<AgentsList/>} />
+
             {/* Placeholder routes for other pages */}
-            <Route path="commission-agents" element={<Placeholder title="Agents" />} />
             <Route path="animals" element={<Placeholder title="Animals" />} />
             <Route path="transporters" element={<Placeholder title="Transporters" />} />
             <Route path="suppliers" element={<Placeholder title="Suppliers" />} />
