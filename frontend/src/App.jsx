@@ -14,6 +14,8 @@ import AgentRegistration from './pages/procurement/AgentRegistration';
 import ForgetPassword from './pages/Auth/ForgotPassword';
 import SellersList from './pages/management/sellers/SellersList';
 import AgentsList from './pages/management/agents/AgentsList';
+import AnimalsList from './pages/management/animals/AnimalsList';
+import AnimalDetails from './pages/management/animals/AnimalDetails';
 
 function App() {
   return (
@@ -42,9 +44,10 @@ function App() {
             {/* Management Menu Routes */}
             <Route path="management/sellers" element={<SellersList/>} />
             <Route path="management/commission-agents" element={<AgentsList/>} />
+            <Route path="management/animals" element={<AnimalsList/>} />
+            <Route path="management/animal-details/:uid" element={<AnimalDetails/>}/>
 
             {/* Placeholder routes for other pages */}
-            <Route path="animals" element={<Placeholder title="Animals" />} />
             <Route path="transporters" element={<Placeholder title="Transporters" />} />
             <Route path="suppliers" element={<Placeholder title="Suppliers" />} />
             <Route path="agents" element={<Placeholder title="Commission Agents" />} />

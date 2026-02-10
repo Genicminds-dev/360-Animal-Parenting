@@ -254,9 +254,6 @@ const SellersList = () => {
       label: "Seller ID",
       render: (item) => (
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-            <Store size={14} className="text-blue-600" />
-          </div>
           <span className="font-medium text-gray-900">{item.sellerId}</span>
         </div>
       )
@@ -266,9 +263,6 @@ const SellersList = () => {
       label: "Full Name",
       render: (item) => (
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-            <User size={14} className="text-green-600" />
-          </div>
           <span className="font-medium text-gray-900">{item.fullName}</span>
         </div>
       )
@@ -278,8 +272,8 @@ const SellersList = () => {
       label: "Mobile Number",
       render: (item) => (
         <div className="flex items-center gap-2">
-          <Phone size={14} className="text-gray-400" />
-          <span className="font-medium text-gray-900">{item.mobileNumber}</span>
+          {/* <Phone size={14} className="text-gray-400" /> */}
+          <span className="font-medium text-center text-gray-900">{item.mobileNumber}</span>
         </div>
       )
     },
@@ -310,7 +304,7 @@ const SellersList = () => {
       label: "State",
       render: (item) => (
         <div className="flex items-center gap-2">
-          <MapPin size={14} className="text-gray-400" />
+          {/* <MapPin size={14} className="text-gray-400" /> */}
           <span className="font-medium">{item.state}</span>
         </div>
       )
