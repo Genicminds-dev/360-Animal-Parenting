@@ -3,7 +3,6 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 
-
 import {
   MapPin,
   TrendingUp,
@@ -20,12 +19,13 @@ import {
 } from "lucide-react";
 import FilterSection from "../../../components/common/Filter/FilterSection";
 import DataTable from "../../../components/common/Table/DataTable";
+import { PATHROUTES } from "../../../routes/pathRoutes";
 
-// Mock data - FRONTEND ONLY
+// Mock data - FRONTEND ONLY with uid as primary identifier
 const MOCK_SELLERS = [
   {
     id: 1,
-    sellerId: "SELL001",
+    uid: "SEL001",
     fullName: "Rajesh Kumar",
     mobileNumber: "9876543210",
     gender: "Male",
@@ -36,7 +36,7 @@ const MOCK_SELLERS = [
   },
   {
     id: 2,
-    sellerId: "SELL002",
+    uid: "SEL002",
     fullName: "Priya Sharma",
     mobileNumber: "8765432109",
     gender: "Female",
@@ -47,7 +47,7 @@ const MOCK_SELLERS = [
   },
   {
     id: 3,
-    sellerId: "SELL003",
+    uid: "SEL003",
     fullName: "Mohan Singh",
     mobileNumber: "7654321098",
     gender: "Male",
@@ -58,7 +58,7 @@ const MOCK_SELLERS = [
   },
   {
     id: 4,
-    sellerId: "SELL004",
+    uid: "SEL004",
     fullName: "Anita Reddy",
     mobileNumber: "6543210987",
     gender: "Female",
@@ -69,7 +69,7 @@ const MOCK_SELLERS = [
   },
   {
     id: 5,
-    sellerId: "SELL005",
+    uid: "SEL005",
     fullName: "Vikram Joshi",
     mobileNumber: "5432109876",
     gender: "Male",
@@ -80,7 +80,7 @@ const MOCK_SELLERS = [
   },
   {
     id: 6,
-    sellerId: "SELL006",
+    uid: "SEL006",
     fullName: "Suresh Patel",
     mobileNumber: "4321098765",
     gender: "Male",
@@ -91,7 +91,7 @@ const MOCK_SELLERS = [
   },
   {
     id: 7,
-    sellerId: "SELL007",
+    uid: "SEL007",
     fullName: "Neha Gupta",
     mobileNumber: "3210987654",
     gender: "Female",
@@ -102,7 +102,7 @@ const MOCK_SELLERS = [
   },
   {
     id: 8,
-    sellerId: "SELL008",
+    uid: "SEL008",
     fullName: "Ramesh Iyer",
     mobileNumber: "2109876543",
     gender: "Male",
@@ -113,7 +113,7 @@ const MOCK_SELLERS = [
   },
   {
     id: 9,
-    sellerId: "SELL009",
+    uid: "SEL009",
     fullName: "Smita Malhotra",
     mobileNumber: "1098765432",
     gender: "Female",
@@ -124,7 +124,7 @@ const MOCK_SELLERS = [
   },
   {
     id: 10,
-    sellerId: "SELL010",
+    uid: "SEL010",
     fullName: "Ajay Kapoor",
     mobileNumber: "0987654321",
     gender: "Male",
@@ -195,7 +195,7 @@ const SellersList = () => {
       const searchTerm = newFilters.search.toLowerCase();
       filtered = filtered.filter(seller =>
         seller.fullName.toLowerCase().includes(searchTerm) ||
-        seller.sellerId.toLowerCase().includes(searchTerm) ||
+        seller.uid.toLowerCase().includes(searchTerm) ||
         seller.mobileNumber.includes(searchTerm) ||
         seller.state.toLowerCase().includes(searchTerm)
       );
@@ -247,14 +247,14 @@ const SellersList = () => {
     setFilteredSellers(MOCK_SELLERS);
   }, []);
 
-  // Table columns - ONLY THE SPECIFIED ONES
+  // Table columns - UPDATED to use uid instead of sellerId
   const columns = [
     { 
-      key: "sellerId", 
+      key: "uid", 
       label: "Seller ID",
       render: (item) => (
         <div className="flex items-center gap-2">
-          <span className="font-medium text-gray-900">{item.sellerId}</span>
+          <span className="font-medium text-gray-900">{item.uid}</span>
         </div>
       )
     },
@@ -272,7 +272,6 @@ const SellersList = () => {
       label: "Mobile Number",
       render: (item) => (
         <div className="flex items-center gap-2">
-          {/* <Phone size={14} className="text-gray-400" /> */}
           <span className="font-medium text-center text-gray-900">{item.mobileNumber}</span>
         </div>
       )
@@ -304,7 +303,6 @@ const SellersList = () => {
       label: "State",
       render: (item) => (
         <div className="flex items-center gap-2">
-          {/* <MapPin size={14} className="text-gray-400" /> */}
           <span className="font-medium">{item.state}</span>
         </div>
       )
@@ -389,23 +387,47 @@ const SellersList = () => {
     dateRange: true,
   };
 
-  // Event handlers
-  const handleEdit = (seller) => {
-    toast.success(`Editing seller: ${seller.fullName}`);
-    // In real app: navigate(PATHROUTES.editSeller, { state: { seller } });
-  };
+  
+// Event handlers - FIXED for DataTable
+const handleView = (item) => {
+  // If DataTable passes just the ID
+  if (typeof item === 'string' || typeof item === 'number') {
+    const seller = sellers.find(s => s.uid === item || s.id === item);
+    if (seller) {
+      navigate(`${PATHROUTES.sellerDetails}/${seller.uid}`, { 
+        state: { seller } 
+      });
+    }
+  } 
+  // If DataTable passes the entire item
+  else if (item?.uid) {
+    navigate(`${PATHROUTES.sellerDetails}/${item.uid}`, { 
+      state: { seller: item } 
+    });
+  }
+};
 
-  const handleView = (seller) => {
-    toast.success(`Viewing seller: ${seller.fullName}`);
-    // In real app: navigate(`${PATHROUTES.viewSeller}/${seller.sellerId}`);
-  };
+const handleEdit = (item) => {
+  if (typeof item === 'string' || typeof item === 'number') {
+    const seller = sellers.find(s => s.uid === item || s.id === item);
+    if (seller) {
+      navigate(`${PATHROUTES.editSeller}/${seller.uid}`, { 
+        state: { seller } 
+      });
+    }
+  } else if (item?.uid) {
+    navigate(`${PATHROUTES.editSeller}/${item.uid}`, { 
+      state: { seller: item } 
+    });
+  }
+};
 
   const handleDelete = async (id) => {
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      // Remove from local state
+      // Remove from local state using id for deletion
       setSellers(prev => prev.filter(seller => seller.id !== id));
       setFilteredSellers(prev => prev.filter(seller => seller.id !== id));
       
@@ -420,7 +442,7 @@ const SellersList = () => {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 800));
       
-      // Remove from local state
+      // Remove from local state using id for deletion
       setSellers(prev => prev.filter(seller => !ids.includes(seller.id)));
       setFilteredSellers(prev => prev.filter(seller => !ids.includes(seller.id)));
       
@@ -431,11 +453,11 @@ const SellersList = () => {
   };
 
   const handleExport = () => {
-    // CSV Export
+    // CSV Export - UPDATED to use uid instead of sellerId
     const csvContent = [
-      ["Seller ID", "Full Name", "Mobile Number", "Gender", "State", "Transaction ID", "UPI ID"],
+      ["UID", "Full Name", "Mobile Number", "Gender", "State", "Transaction ID", "UPI ID"],
       ...filteredSellers.map(s => [
-        s.sellerId, 
+        s.uid, 
         s.fullName, 
         s.mobileNumber, 
         s.gender, 
@@ -456,7 +478,7 @@ const SellersList = () => {
   };
 
   const handlePrint = () => {
-    // Print functionality
+    // Print functionality - UPDATED to use uid instead of sellerId
     const printWindow = window.open('', '_blank');
     printWindow.document.write(`
       <html>
@@ -488,7 +510,7 @@ const SellersList = () => {
           <table>
             <thead>
               <tr>
-                <th>Seller ID</th>
+                <th>UID</th>
                 <th>Full Name</th>
                 <th>Mobile Number</th>
                 <th>Gender</th>
@@ -499,7 +521,7 @@ const SellersList = () => {
             <tbody>
               ${filteredSellers.map(seller => `
                 <tr>
-                  <td>${seller.sellerId}</td>
+                  <td>${seller.uid}</td>
                   <td>${seller.fullName}</td>
                   <td>${seller.mobileNumber}</td>
                   <td>${seller.gender}</td>
@@ -609,27 +631,27 @@ const SellersList = () => {
         </div>
       </div>
 
-    <FilterSection
+      <FilterSection
         filterConfig={filterConfig}
         onApplyFilters={applyFilters}
         onClearFilters={clearFilters}
         onExport={handleExport}
         onPrint={handlePrint}  
         onBulkDelete={handleBulkDelete}
-        selectedCount={0}  
+        selectedCount={selectedSellers.length}  
         initialFilters={filters}
-        searchPlaceholder="Search by Seller ID, Name, Mobile, State..."
+        searchPlaceholder="Search by UID, Name, Mobile, State..."
         enableSearch={true}
         enableExport={true}      
         enablePrint={true}       
         enableBulkDelete={true}
-    />
+      />
 
       <DataTable
         columns={columns}
         data={filteredSellers}
         loading={loading}
-        getSelectedItems={() => Array.from(selectedSellers)}
+        getSelectedItems={() => selectedSellers}
         onEdit={handleEdit}
         onView={handleView}
         onDelete={handleDelete}
