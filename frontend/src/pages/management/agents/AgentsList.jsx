@@ -309,20 +309,15 @@ const AgentsList = () => {
   };
 
   const handleEdit = (agent) => {
-    toast.success(`Editing agent: ${agent.fullName}`);
-    navigate(`/agents/edit/${agent.uid}`, { state: { agent } });
+    navigate(`/management/edit-agent/${agent.uid}`, { 
+    state: { agent }  });
   };
 
-//   const handleView = (agent) => {
-//     toast.success(`Viewing agent: ${agent.fullName}`);
-//     navigate(`/agents/view/${agent.uid}`, { state: { agent } });
-//   };
-const handleView = (agent) => {
-    navigate(`/management/agent-details/${agent.uid}`, { 
-      state: { agent } 
-    });
-  };
-
+    const handleView = (agent) => {
+        navigate(`/management/agent-details/${agent.uid}`, { 
+        state: { agent } 
+        });
+    };
 
   const handleDelete = async (id) => {
     try {
