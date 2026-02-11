@@ -232,7 +232,15 @@ const AgentRegistration = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-8">
-                <div className="flex flex-col items-center justify-center mb-8">
+                <div className="card">
+                    <div className="flex items-center space-x-3 mb-6">
+                        <div className="p-2 bg-blue-50 rounded-lg">
+                            <User className="text-blue-600" size={20} />
+                        </div>
+                        <h2 className="text-lg font-semibold text-gray-900">Personal Details</h2>
+                    </div>
+
+                <div className="mb-8 flex flex-col items-center justify-center">
                     <div className="relative w-32 h-32 mb-4">
                         <div className="w-full h-full rounded-full border-4 border-gray-200 overflow-hidden bg-gray-100 flex items-center justify-center">
                             {formData.profilePhoto ? (
@@ -277,14 +285,6 @@ const AgentRegistration = () => {
                         )}
                     </div>
                 </div>
-
-                <div className="card">
-                    <div className="flex items-center space-x-3 mb-6">
-                        <div className="p-2 bg-blue-50 rounded-lg">
-                            <User className="text-blue-600" size={20} />
-                        </div>
-                        <h2 className="text-lg font-semibold text-gray-900">Personal Details</h2>
-                    </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
