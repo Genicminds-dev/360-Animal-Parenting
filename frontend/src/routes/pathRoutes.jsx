@@ -19,7 +19,7 @@ export const PATHROUTES = {
   sellersList: "/management/sellers",
   
   // Placeholder Routes
-  commissionAgents: "/commission-agents",
+  commissionAgents: "/management/commission-agents",
   animals: "/animals",
   transporters: "/transporters",
   suppliers: "/suppliers",
