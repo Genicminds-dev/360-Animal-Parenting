@@ -309,14 +309,15 @@ const AgentsList = () => {
   };
 
   const handleEdit = (agent) => {
-    toast.success(`Editing agent: ${agent.fullName}`);
-    navigate(`/agents/edit/${agent.uid}`, { state: { agent } });
+    navigate(`/management/edit-agent/${agent.uid}`, { 
+    state: { agent }  });
   };
 
-  const handleView = (agent) => {
-    toast.success(`Viewing agent: ${agent.fullName}`);
-    navigate(`/agents/view/${agent.uid}`, { state: { agent } });
-  };
+    const handleView = (agent) => {
+        navigate(`/management/agent-details/${agent.uid}`, { 
+        state: { agent } 
+        });
+    };
 
   const handleDelete = async (id) => {
     try {
@@ -459,18 +460,11 @@ const AgentsList = () => {
             <span>Refresh</span>
             <ArrowRight size={16} />
           </button>
-          <button 
-            onClick={handleAddNew}
-            className="px-4 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:opacity-90 transition-colors font-medium flex items-center space-x-2"
-          >
-            <User size={16} />
-            <span>Add New Agent</span>
-          </button>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
           <div className="flex items-start justify-between">
             <div className="p-3 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100">
@@ -512,7 +506,7 @@ const AgentsList = () => {
           <h3 className="text-2xl font-bold text-gray-900 mt-4">{stats.withoutAadhar}</h3>
           <p className="text-gray-600">Without Aadhar</p>
         </div>
-      </div>
+      </div> */}
 
       {/* Filter Section */}
       <FilterSection
