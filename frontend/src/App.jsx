@@ -32,6 +32,8 @@ import SessionTimeoutModal from './components/SessionTimeoutModal';
 import HealthCheckupList from './pages/management/health/HealthCheckupList';
 import AgentDetails from './pages/management/agents/AgentDetails';
 import EditAgent from './pages/management/agents/EditAgent';
+import SellerDetails from './pages/management/sellers/SellerDetails';
+import EditSeller from './pages/management/sellers/EditSeller';
 
 // ProtectedRoute Component
 const ProtectedRoute = ({ children, allowedRoles = [1, 2, 3] }) => {
@@ -242,9 +244,25 @@ const AppContent = () => {
             }
           />
           <Route
+            path={PATHROUTES.editSeller.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1, 2]}>
+                <EditSeller/>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={PATHROUTES.sellerDetails.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1, 2]}>
+                <SellerDetails/>
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path={PATHROUTES.agentsList.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1, 2, 3]}>
+              <ProtectedRoute allowedRoles={[1, 2]}>
                 <AgentsList />
               </ProtectedRoute>
             }
@@ -252,7 +270,7 @@ const AppContent = () => {
            <Route
             path={PATHROUTES.agentDetails.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1, 2, 3]}>
+              <ProtectedRoute allowedRoles={[1, 2]}>
                 <AgentDetails/>
               </ProtectedRoute>
             }
@@ -260,7 +278,7 @@ const AppContent = () => {
             <Route
             path={PATHROUTES.editAgent.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1, 2, 3]}>
+              <ProtectedRoute allowedRoles={[1, 2]}>
                 <EditAgent/>
               </ProtectedRoute>
             }

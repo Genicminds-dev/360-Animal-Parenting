@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { toast, Toaster } from "react-hot-toast";
-import { User, Phone, Camera, Upload, FileText, X, Eye, File, ArrowLeft, Save } from 'lucide-react';
+import { User, Phone, Camera, Upload, FileText, X, Eye, FileIcon, ArrowLeft, Save } from 'lucide-react';
 
 const EditAgent = () => {
     const navigate = useNavigate();
@@ -98,6 +98,16 @@ const EditAgent = () => {
         };
 
         loadAgentData();
+
+        // Cleanup function for preview URLs
+        return () => {
+            if (previewUrl && previewUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(previewUrl);
+            }
+            if (profilePreview && profilePreview.startsWith('blob:')) {
+                URL.revokeObjectURL(profilePreview);
+            }
+        };
     }, [uid, location.state, navigate]);
 
     // Fetch agent data function
@@ -143,8 +153,13 @@ const EditAgent = () => {
             return file.fileName;
         }
         
-        const extension = file.name?.split('.').pop().toLowerCase();
-        return `Aadhaar.${extension}`;
+        // Handle File objects
+        if (file?.name && file?.size){
+            const extension = file.name.split('.').pop().toLowerCase();
+            return `Aadhaar.${extension}`;
+        }
+        
+        return 'Aadhaar Document';
     };
 
     const handleChange = (e) => {
@@ -153,20 +168,23 @@ const EditAgent = () => {
             const file = files[0];
             setFormData(prev => ({ ...prev, [name]: file }));
             
-            // Handle previews
+            // Clean up previous preview URLs
             if (name === 'profilePhoto') {
+                if (profilePreview && profilePreview.startsWith('blob:')) {
+                    URL.revokeObjectURL(profilePreview);
+                    setProfilePreview(null);
+                }
                 setProfilePreview(URL.createObjectURL(file));
             } else if (name === 'aadharDocument') {
                 // Clear previous preview
-                if (previewUrl) {
+                if (previewUrl && previewUrl.startsWith('blob:')) {
                     URL.revokeObjectURL(previewUrl);
                     setPreviewUrl(null);
                 }
                 
-                // If it's an image, set preview
-                if (file.type.startsWith('image/')) {
-                    setPreviewUrl(URL.createObjectURL(file));
-                }
+                // Create preview URL for BOTH images and PDFs
+                // This is the key fix for the blank URL issue
+                setPreviewUrl(URL.createObjectURL(file));
             }
         } else {
             setFormData(prev => ({ ...prev, [name]: value }));
@@ -228,6 +246,14 @@ const EditAgent = () => {
             console.log('Form submitted:', formData);
             toast.success('Agent updated successfully!');
             
+            // Clean up preview URLs
+            if (previewUrl && previewUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(previewUrl);
+            }
+            if (profilePreview && profilePreview.startsWith('blob:')) {
+                URL.revokeObjectURL(profilePreview);
+            }
+            
             // Navigate back to agent details
             navigate(`/management/agent-details/${uid}`, {
                 state: { 
@@ -259,38 +285,67 @@ const EditAgent = () => {
         navigate(`/management/agent-details/${uid}`);
     };
 
-    const isPDF = (file) => {
-        if (!file) return false;
-        
-        if (typeof file === 'object' && file.fileType) {
-            return file.fileType === "pdf";
-        }
-        
-        return file.type === 'application/pdf' || file.name?.toLowerCase().endsWith('.pdf');
-    };
+const isPDF = (file) => {
+    if (!file) return false;
 
-    const isImage = (file) => {
-        if (!file) return false;
-        
-        if (typeof file === 'object' && file.fileType) {
-            return file.fileType === "image";
-        }
-        
-        return file.type?.startsWith('image/');
-    };
+    // If it has a type property (File object)
+    if (file?.type) {
+        return file.type === "application/pdf";
+    }
+
+    // If backend object
+    if (file?.fileType) {
+        return file.fileType === "pdf";
+    }
+
+    // If string URL
+    if (typeof file === "string") {
+        return file.toLowerCase().endsWith(".pdf");
+    }
+
+    return false;
+};
+
+const isImage = (file) => {
+    if (!file) return false;
+
+    if (file?.type) {
+        return file.type.startsWith("image/");
+    }
+
+    if (file?.fileType) {
+        return file.fileType === "image";
+    }
+
+    if (typeof file === "string") {
+        return /\.(jpg|jpeg|png|gif|png)$/i.test(file);
+    }
+
+    return false;
+};
+
 
     const openDocument = () => {
-        if (formData.aadharDocument) {
-            if (isPDF(formData.aadharDocument)) {
-                if (typeof formData.aadharDocument === 'object' && formData.aadharDocument.url) {
-                    window.open(formData.aadharDocument.url, '_blank');
-                } else if (formData.aadharDocument instanceof File) {
-                    const pdfUrl = URL.createObjectURL(formData.aadharDocument);
-                    window.open(pdfUrl, '_blank');
-                }
-            } else if (isImage(formData.aadharDocument) && previewUrl) {
-                window.open(previewUrl, '_blank');
-            }
+        const file = formData.aadharDocument;
+
+        if (!file) return;
+
+        // NEWLY UPLOADED FILE (File object)
+        if (file instanceof File) {
+            const blobUrl = URL.createObjectURL(file);
+            window.open(blobUrl, "_blank");
+            return;
+        }
+
+        // EXISTING BACKEND FILE OBJECT
+        if (typeof file === "object" && file.url) {
+            window.open(file.url, "_blank");
+            return;
+        }
+
+        // DIRECT STRING URL
+        if (typeof file === "string") {
+            window.open(file, "_blank");
         }
     };
 
@@ -338,6 +393,7 @@ const EditAgent = () => {
                     <button
                         onClick={handleCancel}
                         className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        disabled={isSubmitting}
                     >
                         <ArrowLeft size={20} />
                     </button>
@@ -361,67 +417,68 @@ const EditAgent = () => {
                         <h2 className="text-lg font-semibold text-gray-900">Personal Details</h2>
                     </div>
 
-                                    {/* Profile Photo Section */}
-                <div className="flex flex-col items-center justify-center mb-8">
-                    <div className="relative w-32 h-32 mb-4">
-                        <div className="w-full h-full rounded-full border-4 border-gray-200 overflow-hidden bg-gray-100 flex items-center justify-center">
-                            {profilePreview ? (
-                                <img 
-                                    src={profilePreview} 
-                                    alt="Profile" 
-                                    className="w-full h-full object-cover"
-                                    onError={(e) => {
-                                        e.target.onerror = null;
-                                        e.target.src = "https://via.placeholder.com/150?text=Agent";
-                                    }}
-                                />
-                            ) : (
-                                <div className="flex flex-col items-center justify-center p-4">
-                                    <User className="text-gray-400" size={40} />
-                                    <p className="text-xs text-gray-500 mt-2 text-center">Add Photo</p>
-                                </div>
+                    {/* Profile Photo Section */}
+                    <div className="flex flex-col items-center justify-center mb-8">
+                        <div className="relative w-32 h-32 mb-4">
+                            <div className="w-full h-full rounded-full border-4 border-gray-200 overflow-hidden bg-gray-100 flex items-center justify-center">
+                                {profilePreview ? (
+                                    <img 
+                                        src={profilePreview} 
+                                        alt="Profile" 
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = "https://via.placeholder.com/150?text=Agent";
+                                        }}
+                                    />
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center p-4">
+                                        <User className="text-gray-400" size={40} />
+                                        <p className="text-xs text-gray-500 mt-2 text-center">Add Photo</p>
+                                    </div>
+                                )}
+                            </div>
+                            <label 
+                                htmlFor="profilePhoto"
+                                className={`absolute bottom-0 right-0 bg-primary-600 text-white p-2 rounded-full cursor-pointer hover:bg-primary-700 transition-colors shadow-lg ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            >
+                                <Camera size={18} />
+                            </label>
+                            {profilePreview && (
+                                <button
+                                    type="button"
+                                    onClick={removeProfilePhoto}
+                                    className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
+                                    disabled={isSubmitting}
+                                >
+                                    <X size={14} />
+                                </button>
                             )}
                         </div>
-                        <label 
-                            htmlFor="profilePhoto"
-                            className="absolute bottom-0 right-0 bg-primary-600 text-white p-2 rounded-full cursor-pointer hover:bg-primary-700 transition-colors shadow-lg"
-                        >
-                            <Camera size={18} />
-                        </label>
-                        {profilePreview && (
-                            <button
-                                type="button"
-                                onClick={removeProfilePhoto}
-                                className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
-                            >
-                                <X size={14} />
-                            </button>
-                        )}
-                    </div>
-                    
-                    <div className="text-center">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Profile Photo
-                        </label>
-                        <input
-                            type="file"
-                            name="profilePhoto"
-                            onChange={handleChange}
-                            className="hidden"
-                            id="profilePhoto"
-                            accept=".jpg,.jpeg,.png"
-                        />
                         
-                        {formData.profilePhoto && (
-                            <p className="text-xs text-green-600 mt-2">
-                                ✓ {typeof formData.profilePhoto === 'object' && formData.profilePhoto.name 
-                                    ? formData.profilePhoto.name 
-                                    : 'Profile photo selected'}
-                            </p>
-                        )}
+                        <div className="text-center">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Profile Photo
+                            </label>
+                            <input
+                                type="file"
+                                name="profilePhoto"
+                                onChange={handleChange}
+                                className="hidden"
+                                id="profilePhoto"
+                                accept=".jpg,.jpeg,.png"
+                                disabled={isSubmitting}
+                            />
+                            
+                            {formData.profilePhoto && (
+                                <p className="text-xs text-green-600 mt-2">
+                                    ✓ {formData.profilePhoto instanceof File 
+                                        ? formData.profilePhoto.name 
+                                        : 'Profile photo selected'}
+                                </p>
+                            )}
+                        </div>
                     </div>
-                </div>
-
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
@@ -435,6 +492,7 @@ const EditAgent = () => {
                                 onChange={handleChange}
                                 className={`w-full px-4 py-2 border ${errors.fullName ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500`}
                                 placeholder="Enter full name"
+                                disabled={isSubmitting}
                             />
                             {errors.fullName && (
                                 <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>
@@ -454,6 +512,7 @@ const EditAgent = () => {
                                     onChange={handleChange}
                                     className={`w-full pl-10 px-4 py-2 border ${errors.mobile ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500`}
                                     placeholder="Enter 10-digit mobile number"
+                                    disabled={isSubmitting}
                                 />
                             </div>
                             {errors.mobile && (
@@ -472,6 +531,7 @@ const EditAgent = () => {
                                 onChange={handleChange}
                                 className={`w-full px-4 py-2 border ${errors.aadharNumber ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500`}
                                 placeholder="Enter 12-digit Aadhar number"
+                                disabled={isSubmitting}
                             />
                             {errors.aadharNumber && (
                                 <p className="text-red-500 text-xs mt-1">{errors.aadharNumber}</p>
@@ -501,7 +561,7 @@ const EditAgent = () => {
                                                     : 'bg-blue-100 text-blue-600'
                                             }`}>
                                                 {isPDF(formData.aadharDocument) ? (
-                                                    <File size={24} />
+                                                    <FileIcon size={24} />
                                                 ) : (
                                                     <Camera size={24} />
                                                 )}
@@ -513,11 +573,9 @@ const EditAgent = () => {
                                                 <p className="text-sm text-gray-500">
                                                     {isPDF(formData.aadharDocument) 
                                                         ? 'PDF Document' 
-                                                        : typeof formData.aadharDocument === 'object' && formData.aadharDocument.fileSize
-                                                        ? formData.aadharDocument.fileSize
-                                                        : formData.aadharDocument.size 
+                                                        : formData.aadharDocument?.size
                                                         ? `${Math.round(formData.aadharDocument.size / 1024)} KB`
-                                                        : ''}
+                                                        : formData.aadharDocument?.fileSize || ''}
                                                 </p>
                                             </div>
                                         </div>
@@ -531,6 +589,7 @@ const EditAgent = () => {
                                                         : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
                                                 }`}
                                                 title={isPDF(formData.aadharDocument) ? "Open PDF" : "Preview Image"}
+                                                disabled={isSubmitting}
                                             >
                                                 <Eye size={18} />
                                             </button>
@@ -539,12 +598,14 @@ const EditAgent = () => {
                                                 onClick={removeAadharDocument}
                                                 className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
                                                 title="Remove"
+                                                disabled={isSubmitting}
                                             >
                                                 <X size={18} />
                                             </button>
                                         </div>
                                     </div>
                                     
+                                    {/* Show preview for images */}
                                     {isImage(formData.aadharDocument) && previewUrl && (
                                         <div className="mt-4 border border-gray-200 rounded-lg overflow-hidden">
                                             <div className="p-2 bg-gray-50 border-b border-gray-200">
@@ -560,9 +621,10 @@ const EditAgent = () => {
                                         </div>
                                     )}
                                     
+                                    {/* Show PDF info */}
                                     {isPDF(formData.aadharDocument) && (
                                         <div className="mt-4 text-center p-6 border border-gray-200 rounded-lg bg-gray-50">
-                                            <File className="mx-auto text-red-400 mb-3" size={48} />
+                                            <FileIcon className="mx-auto text-red-400 mb-3" size={48} />
                                             <p className="text-sm text-gray-700 font-medium mb-2">
                                                 {getDisplayFileName(formData.aadharDocument)}
                                             </p>
@@ -573,6 +635,7 @@ const EditAgent = () => {
                                                 type="button"
                                                 onClick={openDocument}
                                                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+                                                disabled={isSubmitting}
                                             >
                                                 Open {getDisplayFileName(formData.aadharDocument)}
                                             </button>
@@ -592,7 +655,7 @@ const EditAgent = () => {
                                         
                                         <label 
                                             htmlFor="aadharDocument"
-                                            className="px-4 py-2 bg-primary-600 text-white rounded-lg cursor-pointer hover:bg-primary-700 transition-colors text-sm"
+                                            className={`px-4 py-2 bg-primary-600 text-white rounded-lg cursor-pointer hover:bg-primary-700 transition-colors text-sm ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         >
                                             Browse File
                                         </label>
@@ -607,6 +670,7 @@ const EditAgent = () => {
                                 className="hidden"
                                 id="aadharDocument"
                                 accept=".jpg,.jpeg,.png,.pdf"
+                                disabled={isSubmitting}
                             />
                         </div>
                     </div>
@@ -617,7 +681,8 @@ const EditAgent = () => {
                     <button
                         type="button"
                         onClick={handleCancel}
-                        className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2"
+                        className={`px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={isSubmitting}
                     >
                         <ArrowLeft size={16} />
                         Cancel
@@ -626,14 +691,15 @@ const EditAgent = () => {
                         <button
                             type="button"
                             onClick={handleCancel}
-                            className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                            className={`px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            disabled={isSubmitting}
                         >
                             Discard Changes
                         </button>
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="px-6 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 disabled:opacity-50"
+                            className="px-6 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {isSubmitting ? (
                                 <>
