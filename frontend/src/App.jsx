@@ -30,6 +30,7 @@ import api from "./services/api/api";
 import { Endpoints } from "./services/api/EndPoint";
 import SessionTimeoutModal from './components/SessionTimeoutModal';
 import HealthCheckupList from './pages/management/health/HealthCheckupList';
+import AgentDetails from './pages/management/agents/AgentDetails';
 
 // ProtectedRoute Component
 const ProtectedRoute = ({ children, allowedRoles = [1, 2, 3] }) => {
@@ -242,8 +243,16 @@ const AppContent = () => {
           <Route
             path={PATHROUTES.agentsList.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1, 2]}>
+              <ProtectedRoute allowedRoles={[1, 2, 3]}>
                 <AgentsList />
+              </ProtectedRoute>
+            }
+          />
+           <Route
+            path={PATHROUTES.agentDetails.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1, 2, 3]}>
+                <AgentDetails/>
               </ProtectedRoute>
             }
           />
