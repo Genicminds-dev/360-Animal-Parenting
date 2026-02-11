@@ -8,12 +8,12 @@ export const Endpoints = {
   FORGOT_PASSWORD: "/auth/forgot-password",
   RESET_PASSWORD: "/auth/reset-password",
 
-  // USER MANAGEMENT
-  GET_USERS: "/admin/users",
-  CREATE_USER: "/admin/users",
-  UPDATE_USER: (uid) => `/admin/user/${uid}`,
-  DELETE_USER: (uid) => `/admin/user/${uid}`,
-  GET_USER_BY_ID: (uid) => `/admin/user/${uid}`,
+  // Agent MANAGEMENT
+  GET_AGENT: "/admin/users",
+  CREATE_AGENT: "/admin/commission-agent",
+  UPDATE_AGENT: (uid) => `/admin/user/${uid}`,
+  DELETE_AGENT: (uid) => `/admin/user/${uid}`,
+  GET_AGENT_BY_ID: (uid) => `/admin/user/${uid}`,
 
   GET_ROLES: "/admin/roles",
 
@@ -22,7 +22,8 @@ export const Endpoints = {
   CREATE_VENDOR: "/admin/vendor",
   UPDATE_VENDOR: (uid) => `/admin/vendor/${uid}`,
   // DELETE_VENDOR: (uid) => `/admin/vendor/${uid}`,
-  DELETE_VENDOR: (uid, status = false) => `/admin/vendor/${uid}?status=${status}`,
+  DELETE_VENDOR: (uid, status = false) =>
+    `/admin/vendor/${uid}?status=${status}`,
   GET_VENDOR_BY_UID: (uid) => `/admin/vendor/${uid}`,
   GET_STATS: "/admin/vendor/stats",
   EXPORT_VENDORS: "/admin/vendor/export",
@@ -33,16 +34,15 @@ export const Endpoints = {
   UPDATE_ANIMAL: (uid) => `/admin/animal/${uid}`,
   DELETE_ANIMAL: (uid) => `/admin/animal/${uid}`,
   GET_ANIMAL_BY_UID: (uid) => `/admin/animal/${uid}`,
-  EXPORT_ANIMALS: '/admin/animals/export',
-  GET_ANIMAL_STATS: '/admin/animals/stats',
+  EXPORT_ANIMALS: "/admin/animals/export",
+  GET_ANIMAL_STATS: "/admin/animals/stats",
 
-  VENDOR_DROPDOWN: '/admin/vendor-dropdown',
-  HOLDING_STATION_DROPDOWN: '/admin/holding-station-dropdown',
-
+  VENDOR_DROPDOWN: "/admin/vendor-dropdown",
+  HOLDING_STATION_DROPDOWN: "/admin/holding-station-dropdown",
 
   GET_PAYMENT: "/admin/payment",
   CREATE_PAYMENT: "/admin/payment",
-  DELETE_PAYMENT : (uid) => `/admin/payment/${uid}`,
+  DELETE_PAYMENT: (uid) => `/admin/payment/${uid}`,
   GET_PAYMENT_BY_ID: (uid) => `/admin/payment/${uid}`,
-  GET_ANIMAL_LIST_BY_VENDOR_ID: (uid) => `/admin/vendor-animal/${uid}`
+  GET_ANIMAL_LIST_BY_VENDOR_ID: (uid) => `/admin/vendor-animal/${uid}`,
 };

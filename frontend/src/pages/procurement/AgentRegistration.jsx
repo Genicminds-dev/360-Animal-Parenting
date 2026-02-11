@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { User, Phone, Camera, Upload, FileText, X, Eye, File } from 'lucide-react';
+import { Toaster, toast } from 'react-hot-toast';
+import api from '../../services/api/api';
+import { Endpoints } from '../../services/api/EndPoint';
+import { PATHROUTES } from '../../routes/pathRoutes';
 
 const AgentRegistration = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         fullName: '',
         mobile: '',
@@ -12,6 +18,7 @@ const AgentRegistration = () => {
 
     const [errors, setErrors] = useState({});
     const [previewUrl, setPreviewUrl] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const getDisplayFileName = (file) => {
         if (!file) return '';
@@ -56,10 +63,13 @@ const AgentRegistration = () => {
     const validateForm = () => {
         const newErrors = {};
         
-        if (!formData.fullName.trim()) newErrors.fullName = 'Full Name is required';
-        if (!formData.mobile.trim()) newErrors.mobile = 'Mobile Number is required';
+        if (!formData.fullName.trim()) {
+            newErrors.fullName = 'Full Name is required';
+        }
         
-        if (formData.mobile && !/^[0-9]{10}$/.test(formData.mobile)) {
+        if (!formData.mobile.trim()) {
+            newErrors.mobile = 'Mobile Number is required';
+        } else if (!/^[0-9]{10}$/.test(formData.mobile)) {
             newErrors.mobile = 'Mobile number must be 10 digits';
         }
         
@@ -71,27 +81,103 @@ const AgentRegistration = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         
-        if (validateForm()) {
-            console.log('Form submitted:', formData);
-            alert('Agent registration submitted successfully!');
+        if (!validateForm()) {
+            toast.error('Please fix the form errors before submitting');
+            return;
+        }
+        
+        try {
+            setIsSubmitting(true);
             
-            // Clean up preview URLs
-            if (previewUrl) {
-                URL.revokeObjectURL(previewUrl);
+            // Create FormData for file upload
+            const formDataToSend = new FormData();
+            formDataToSend.append('name', formData.fullName.trim());
+            formDataToSend.append('phone', formData.mobile.trim());
+            
+            if (formData.aadharNumber.trim()) {
+                formDataToSend.append('aadhaarNumber', formData.aadharNumber.trim());
             }
             
-            setFormData({
-                fullName: '',
-                mobile: '',
-                aadharNumber: '',
-                profilePhoto: null,
-                aadharDocument: null
+            // Append files only if they exist
+            if (formData.profilePhoto) {
+                formDataToSend.append('profileImg', formData.profilePhoto);
+            }
+            
+            if (formData.aadharDocument) {
+                formDataToSend.append('aadhaarFile', formData.aadharDocument);
+            }
+            
+            // Make API call without showing "Registering agent..." loading toast
+            const response = await api.post(Endpoints.CREATE_AGENT, formDataToSend, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
             });
-            setErrors({});
-            setPreviewUrl(null);
+            
+            if (response.data.success) {
+                // Show success toast
+                toast.success(response.data.message || 'Agent registered successfully!');
+                
+                // Clean up preview URLs
+                if (previewUrl) {
+                    URL.revokeObjectURL(previewUrl);
+                }
+                
+                // Reset form
+                setFormData({
+                    fullName: '',
+                    mobile: '',
+                    aadharNumber: '',
+                    profilePhoto: null,
+                    aadharDocument: null
+                });
+                setErrors({});
+                setPreviewUrl(null);
+                
+                // Navigate to commission agents page after a short delay
+                setTimeout(() => {
+                    navigate(PATHROUTES.commissionAgents);
+                }, 1500);
+                
+            } else {
+                // Handle API error messages
+                const errorMessage = response.data.message || 'Failed to register agent';
+                toast.error(errorMessage);
+                
+                // Set specific field errors based on error message
+                if (errorMessage.toLowerCase().includes('phone')) {
+                    setErrors(prev => ({ ...prev, mobile: 'This phone number is already registered' }));
+                } else if (errorMessage.toLowerCase().includes('aadhaar')) {
+                    setErrors(prev => ({ ...prev, aadharNumber: 'This Aadhaar number is already registered' }));
+                }
+            }
+        } catch (error) {
+            console.error('Error registering agent:', error);
+            
+            // Handle different error types
+            let errorMessage = 'An unexpected error occurred. Please try again.';
+            
+            if (error.response) {
+                // Server responded with error status
+                errorMessage = error.response.data?.message || 'Server error occurred';
+                
+                // Set specific field errors based on error message
+                if (errorMessage.toLowerCase().includes('phone')) {
+                    setErrors(prev => ({ ...prev, mobile: 'This phone number is already registered' }));
+                } else if (errorMessage.toLowerCase().includes('aadhaar')) {
+                    setErrors(prev => ({ ...prev, aadharNumber: 'This Aadhaar number is already registered' }));
+                }
+            } else if (error.request) {
+                // Request was made but no response
+                errorMessage = 'Network error. Please check your connection.';
+            }
+            
+            toast.error(errorMessage);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -101,7 +187,7 @@ const AgentRegistration = () => {
             profilePhoto: null,
             aadharDocument: null
         }));
-        alert('Saved as draft!');
+        toast.success('Saved as draft!');
     };
 
     const isPDF = (file) => {
@@ -129,6 +215,17 @@ const AgentRegistration = () => {
 
     return (
         <div className="space-y-6">
+            {/* Toaster Component */}
+            <Toaster
+                position="top-center"
+                toastOptions={{
+                    style: { background: "#363636", color: "#fff" },
+                    success: { style: { background: "#10b981" } },
+                    error: { style: { background: "#ef4444" } },
+                    duration: 3000,
+                }}
+            />
+            
             <div>
                 <h1 className="text-2xl font-bold text-gray-900">Agent Registration</h1>
                 <p className="text-gray-600">Register new agent for animal procurement</p>
@@ -153,7 +250,7 @@ const AgentRegistration = () => {
                         </div>
                         <label 
                             htmlFor="profilePhoto"
-                            className="absolute bottom-0 right-0 bg-primary-600 text-white p-2 rounded-full cursor-pointer hover:bg-primary-700 transition-colors shadow-lg"
+                            className={`absolute bottom-0 right-0 bg-primary-600 text-white p-2 rounded-full cursor-pointer hover:bg-primary-700 transition-colors shadow-lg ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             <Camera size={18} />
                         </label>
@@ -170,10 +267,13 @@ const AgentRegistration = () => {
                             className="hidden"
                             id="profilePhoto"
                             accept=".jpg,.jpeg,.png"
+                            disabled={isSubmitting}
                         />
                         
-                        {formData.profilePhoto && (
+                        {formData.profilePhoto ? (
                             <p className="text-xs text-green-600 mt-2">✓ {formData.profilePhoto.name}</p>
+                        ) : (
+                            <p className="text-xs text-gray-500 mt-2">Upload profile photo</p>
                         )}
                     </div>
                 </div>
@@ -198,6 +298,7 @@ const AgentRegistration = () => {
                                 onChange={handleChange}
                                 className={`input-field ${errors.fullName ? 'border-red-500' : ''}`}
                                 placeholder="Enter full name"
+                                disabled={isSubmitting}
                             />
                             {errors.fullName && (
                                 <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>
@@ -217,6 +318,7 @@ const AgentRegistration = () => {
                                     onChange={handleChange}
                                     className={`input-field pl-10 ${errors.mobile ? 'border-red-500' : ''}`}
                                     placeholder="Enter 10-digit mobile number"
+                                    disabled={isSubmitting}
                                 />
                             </div>
                             {errors.mobile && (
@@ -235,6 +337,7 @@ const AgentRegistration = () => {
                                 onChange={handleChange}
                                 className={`input-field ${errors.aadharNumber ? 'border-red-500' : ''}`}
                                 placeholder="Enter 12-digit Aadhar number"
+                                disabled={isSubmitting}
                             />
                             {errors.aadharNumber && (
                                 <p className="text-red-500 text-xs mt-1">{errors.aadharNumber}</p>
@@ -289,6 +392,7 @@ const AgentRegistration = () => {
                                                         : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
                                                 }`}
                                                 title={isPDF(formData.aadharDocument) ? "Open PDF" : "Preview Image"}
+                                                disabled={isSubmitting}
                                             >
                                                 <Eye size={18} />
                                             </button>
@@ -297,6 +401,7 @@ const AgentRegistration = () => {
                                                 onClick={removeAadharDocument}
                                                 className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
                                                 title="Remove"
+                                                disabled={isSubmitting}
                                             >
                                                 <X size={18} />
                                             </button>
@@ -331,6 +436,7 @@ const AgentRegistration = () => {
                                                 type="button"
                                                 onClick={openDocument}
                                                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+                                                disabled={isSubmitting}
                                             >
                                                 Open {getDisplayFileName(formData.aadharDocument)}
                                             </button>
@@ -350,7 +456,7 @@ const AgentRegistration = () => {
                                         
                                         <label 
                                             htmlFor="aadharDocument"
-                                            className="px-4 py-2 bg-primary-600 text-white rounded-lg cursor-pointer hover:bg-primary-700 transition-colors text-sm"
+                                            className={`px-4 py-2 bg-primary-600 text-white rounded-lg cursor-pointer hover:bg-primary-700 transition-colors text-sm ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         >
                                             Browse File
                                         </label>
@@ -365,6 +471,7 @@ const AgentRegistration = () => {
                                 className="hidden"
                                 id="aadharDocument"
                                 accept=".jpg,.jpeg,.png,.pdf"
+                                disabled={isSubmitting}
                             />
                         </div>
                     </div>
@@ -374,7 +481,8 @@ const AgentRegistration = () => {
                     <button
                         type="button"
                         onClick={() => window.history.back()}
-                        className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                        className={`px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={isSubmitting}
                     >
                         Cancel
                     </button>
@@ -382,15 +490,27 @@ const AgentRegistration = () => {
                         <button
                             type="button"
                             onClick={handleSaveDraft}
-                            className="px-6 py-2 border border-primary-500 text-primary-600 rounded-lg hover:bg-primary-50 transition-colors"
+                            className={`px-6 py-2 border border-primary-500 text-primary-600 rounded-lg hover:bg-primary-50 transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            disabled={isSubmitting}
                         >
                             Save as Draft
                         </button>
                         <button
                             type="submit"
-                            className="px-6 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:opacity-90 transition-opacity"
+                            disabled={isSubmitting}
+                            className={`px-6 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center min-w-[120px] ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
-                            Register Agent
+                            {isSubmitting ? (
+                                <>
+                                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Registering...
+                                </>
+                            ) : (
+                                'Register Agent'
+                            )}
                         </button>
                     </div>
                 </div>
