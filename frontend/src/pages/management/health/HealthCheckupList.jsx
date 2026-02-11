@@ -3,8 +3,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { Plus, RefreshCw } from "lucide-react";
-import DataTable from "../../components/common/Table/DataTable";
-import FilterSection from "../../components/common/Filter/FilterSection";
+import DataTable from "../../../components/common/Table/DataTable";
+import FilterSection from "../../../components/common/Filter/FilterSection";
 
 // Mock data for health checkups
 const MOCK_HEALTH_CHECKUPS = [

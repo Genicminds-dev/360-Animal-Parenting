@@ -13,7 +13,7 @@ import Login from './pages/Auth/Login';
 import Dashboard from './pages/Dashboard/Dashboard';
 import SellerRegistration from './pages/procurement/SellerRegistration';
 import AnimalRegistration from './pages/procurement/AnimalRegistration';
-import HealthCheck from './pages/procurement/HealthCheck';
+
 import AgentRegistration from './pages/procurement/AgentRegistration';
 import ForgotPassword from './pages/Auth/ForgotPassword';
 import ResetPassword from './pages/Auth/ResetPassword';
@@ -29,6 +29,7 @@ import { PATHROUTES } from './routes/pathRoutes';
 import api from "./services/api/api";
 import { Endpoints } from "./services/api/EndPoint";
 import SessionTimeoutModal from './components/SessionTimeoutModal';
+import HealthCheckupList from './pages/management/health/HealthCheckupList';
 
 // ProtectedRoute Component
 const ProtectedRoute = ({ children, allowedRoles = [1, 2, 3] }) => {
@@ -210,14 +211,24 @@ const AppContent = () => {
               </ProtectedRoute>
             }
           />
+
           <Route
+            path={PATHROUTES.healthCheckUpList.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1,2,3]}>
+                <HealthCheckupList/>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* <Route
             path={PATHROUTES.healthCheck.replace('/', '')}
             element={
               <ProtectedRoute allowedRoles={[3]}>
                 <HealthCheck />
               </ProtectedRoute>
             }
-          />
+          /> */}
 
           {/* Management Menu Routes */}
           <Route
