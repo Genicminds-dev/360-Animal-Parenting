@@ -300,25 +300,6 @@ const AppContent = () => {
             }
           />
 
-          {/* Commission Agents */}
-          <Route
-            path={PATHROUTES.commissionAgents.replace('/', '')}
-            element={
-              <ProtectedRoute allowedRoles={[1, 2]}>
-                <Placeholder title="Commission Agents" />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Animals */}
-          <Route
-            path={PATHROUTES.animals.replace('/', '')}
-            element={
-              <ProtectedRoute allowedRoles={[1, 2, 3]}>
-                <Placeholder title="Animals" />
-              </ProtectedRoute>
-            }
-          />
 
           {/* Transporters */}
           <Route

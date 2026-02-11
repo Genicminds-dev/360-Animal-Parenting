@@ -27,8 +27,10 @@ export const PATHROUTES = {
   animalDetails: "/management/animal-details/:uid",
   
   // Placeholder Routes
+  commissionAgents: "/commission-agents",
   transporters: "/transporters",
   suppliers: "/suppliers",
+  agents: "/agents",
   beneficiaries: "/beneficiaries",
   team: "/team",
   reports: "/reports",
