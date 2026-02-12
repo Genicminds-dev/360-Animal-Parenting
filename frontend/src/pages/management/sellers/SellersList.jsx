@@ -386,22 +386,18 @@ const SellersList = () => {
     ],
     dateRange: true,
   };
-
   
 // Event handlers - FIXED for DataTable
 const handleView = (item) => {
-  // If DataTable passes just the ID
   if (typeof item === 'string' || typeof item === 'number') {
     const seller = sellers.find(s => s.uid === item || s.id === item);
     if (seller) {
-      navigate(`${PATHROUTES.sellerDetails}/${seller.uid}`, { 
+      navigate(`/management/seller-details/${seller.uid}`, { 
         state: { seller } 
       });
     }
-  } 
-  // If DataTable passes the entire item
-  else if (item?.uid) {
-    navigate(`${PATHROUTES.sellerDetails}/${item.uid}`, { 
+  } else if (item?.uid) {
+    navigate(`/management/seller-details/${item.uid}`, { 
       state: { seller: item } 
     });
   }
@@ -411,12 +407,12 @@ const handleEdit = (item) => {
   if (typeof item === 'string' || typeof item === 'number') {
     const seller = sellers.find(s => s.uid === item || s.id === item);
     if (seller) {
-      navigate(`${PATHROUTES.editSeller}/${seller.uid}`, { 
+      navigate(`/management/edit-seller/${seller.uid}`, { 
         state: { seller } 
       });
     }
   } else if (item?.uid) {
-    navigate(`${PATHROUTES.editSeller}/${item.uid}`, { 
+    navigate(`/management/edit-seller/${item.uid}`, { 
       state: { seller: item } 
     });
   }

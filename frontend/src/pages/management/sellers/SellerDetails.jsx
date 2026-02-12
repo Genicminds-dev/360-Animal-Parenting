@@ -16,6 +16,7 @@ import {
   Calendar,
   CheckCircle
 } from "lucide-react";
+import { PATHROUTES } from "../../../routes/pathRoutes";
 
 const SellerDetails = () => {
   const navigate = useNavigate();
@@ -221,7 +222,7 @@ const SellerDetails = () => {
       {/* Header Section - Only Back Button */}
       <div className="flex items-center gap-4">
         <button
-          onClick={() => navigate("/sellers")}
+          onClick={() => navigate(PATHROUTES.sellerDetails)}
           className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
         >
           <ArrowLeft size={20} />

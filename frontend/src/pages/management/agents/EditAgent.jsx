@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { toast, Toaster } from "react-hot-toast";
 import { User, Phone, Camera, Upload, FileText, X, Eye, FileIcon, ArrowLeft, Save } from 'lucide-react';
+import { PATHROUTES } from '../../../routes/pathRoutes';
 
 const EditAgent = () => {
     const navigate = useNavigate();
@@ -391,7 +392,7 @@ const isImage = (file) => {
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <button
-                        onClick={handleCancel}
+                        onClick={() => navigate(PATHROUTES.agentsList)}
                         className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                         disabled={isSubmitting}
                     >
