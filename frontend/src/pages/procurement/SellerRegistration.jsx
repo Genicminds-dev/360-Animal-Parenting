@@ -7,18 +7,18 @@ const SellerRegistration = () => {
         fullName: '',
         mobile: '',
         gender: '',
-        
+
         // Profile Picture (non-mandatory)
         profilePhoto: null,
         aadharNumber: '', // non-mandatory
-        
+
         // Address Details
         address: '',
         state: '',
         district: '',
         pincode: '',
         village: '',
-        
+
         // Bank Details (all non-mandatory)
         bankName: '',
         accountNumber: '',
@@ -35,7 +35,7 @@ const SellerRegistration = () => {
         } else {
             setFormData(prev => ({ ...prev, [name]: value }));
         }
-        
+
         // Clear error when user starts typing
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
@@ -44,40 +44,40 @@ const SellerRegistration = () => {
 
     const validateForm = () => {
         const newErrors = {};
-        
+
         // Mandatory fields validation
         if (!formData.fullName.trim()) newErrors.fullName = 'Full Name is required';
         if (!formData.mobile.trim()) newErrors.mobile = 'Mobile Number is required';
         if (!formData.gender) newErrors.gender = 'Gender is required';
         if (!formData.address.trim()) newErrors.address = 'Complete Address is required';
         if (!formData.state) newErrors.state = 'State is required';
-        
+
         // Mobile number pattern validation
         if (formData.mobile && !/^[0-9]{10}$/.test(formData.mobile)) {
             newErrors.mobile = 'Mobile number must be 10 digits';
         }
-        
+
         // Pincode pattern validation (if provided)
         if (formData.pincode && !/^[0-9]{6}$/.test(formData.pincode)) {
             newErrors.pincode = 'PIN code must be 6 digits';
         }
-        
+
         // Aadhar pattern validation (if provided)
         if (formData.aadharNumber && !/^[0-9]{12}$/.test(formData.aadharNumber)) {
             newErrors.aadharNumber = 'Aadhar number must be 12 digits';
         }
-        
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        
+
         if (validateForm()) {
             console.log('Form submitted:', formData);
             alert('Seller registration submitted successfully!');
-            
+
             // Reset form
             setFormData({
                 fullName: '',
@@ -97,11 +97,6 @@ const SellerRegistration = () => {
             });
             setErrors({});
         }
-    };
-
-    const handleSaveDraft = () => {
-        localStorage.setItem('seller_draft', JSON.stringify(formData));
-        alert('Saved as draft!');
     };
 
     return (
@@ -127,9 +122,9 @@ const SellerRegistration = () => {
                         <div className="relative w-32 h-32 mb-4">
                             <div className="w-full h-full rounded-full border-4 border-gray-200 overflow-hidden bg-gray-100 flex items-center justify-center">
                                 {formData.profilePhoto ? (
-                                    <img 
-                                        src={URL.createObjectURL(formData.profilePhoto)} 
-                                        alt="Profile" 
+                                    <img
+                                        src={URL.createObjectURL(formData.profilePhoto)}
+                                        alt="Profile"
                                         className="w-full h-full object-cover"
                                     />
                                 ) : (
@@ -139,14 +134,14 @@ const SellerRegistration = () => {
                                     </div>
                                 )}
                             </div>
-                            <label 
+                            <label
                                 htmlFor="profilePhoto"
                                 className="absolute bottom-0 right-0 bg-primary-600 text-white p-2 rounded-full cursor-pointer hover:bg-primary-700 transition-colors shadow-lg"
                             >
                                 <Camera size={18} />
                             </label>
                         </div>
-                        
+
                         <div className="text-center">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                                 Profile Photo
@@ -159,7 +154,7 @@ const SellerRegistration = () => {
                                 id="profilePhoto"
                                 accept=".jpg,.jpeg,.png"
                             />
-                            
+
                             {formData.profilePhoto && (
                                 <p className="text-xs text-green-600 mt-2">✓ {formData.profilePhoto.name}</p>
                             )}
@@ -433,21 +428,12 @@ const SellerRegistration = () => {
                     >
                         Cancel
                     </button>
-                    <div className="flex space-x-4">
-                        <button
-                            type="button"
-                            onClick={handleSaveDraft}
-                            className="px-6 py-2 border border-primary-500 text-primary-600 rounded-lg hover:bg-primary-50 transition-colors"
-                        >
-                            Save as Draft
-                        </button>
-                        <button
-                            type="submit"
-                            className="px-6 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:opacity-90 transition-opacity"
-                        >
-                            Register Seller
-                        </button>
-                    </div>
+                    <button
+                        type="submit"
+                        className="px-6 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:opacity-90 transition-opacity"
+                    >
+                        Register Seller
+                    </button>
                 </div>
             </form>
         </div>

@@ -77,7 +77,7 @@ const MOCK_HEALTH_CHECKUPS = [
 const getUniqueSellers = () => {
   const uniqueSellers = [];
   const sellerMap = new Map();
-  
+
   MOCK_HEALTH_CHECKUPS.forEach(checkup => {
     const key = `${checkup.sellerName}-${checkup.sellerMobile}`;
     if (!sellerMap.has(key)) {
@@ -93,7 +93,7 @@ const getUniqueSellers = () => {
       });
     }
   });
-  
+
   return uniqueSellers;
 };
 
@@ -103,9 +103,7 @@ const HealthCheckupList = () => {
   const [filteredCheckups, setFilteredCheckups] = useState(MOCK_HEALTH_CHECKUPS);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({});
-  
-  // Store pending filters before Apply button is clicked
-  const [pendingFilters, setPendingFilters] = useState({});
+  const [selectedCheckups, setSelectedCheckups] = useState([]);
 
   // Fetch health checkups with simulated API call
   const fetchHealthCheckups = useCallback(async () => {
@@ -130,13 +128,9 @@ const HealthCheckupList = () => {
     fetchHealthCheckups();
   }, [fetchHealthCheckups]);
 
-  // Apply filters function - only when Apply button is clicked
+  // Apply filters function
   const applyFilters = useCallback((newFilters) => {
-    // Update the actual filters state
     setFilters(newFilters);
-    
-    // Also update pending filters to match
-    setPendingFilters(newFilters);
 
     let filtered = [...MOCK_HEALTH_CHECKUPS];
 
@@ -151,11 +145,11 @@ const HealthCheckupList = () => {
       );
     }
 
-    // Apply seller filter (based on selected seller from dropdown)
+    // Apply seller filter
     if (newFilters.seller) {
       const selectedSeller = newFilters.seller;
-      filtered = filtered.filter(checkup => 
-        checkup.sellerName === selectedSeller.name && 
+      filtered = filtered.filter(checkup =>
+        checkup.sellerName === selectedSeller.name &&
         checkup.sellerMobile === selectedSeller.mobile
       );
     }
@@ -164,6 +158,7 @@ const HealthCheckupList = () => {
     if (newFilters.fromDate || newFilters.toDate) {
       filtered = filtered.filter(checkup => {
         const checkupDate = new Date(checkup.checkupDate);
+        checkupDate.setHours(0, 0, 0, 0);
 
         if (newFilters.fromDate) {
           const fromDate = new Date(newFilters.fromDate);
@@ -184,14 +179,8 @@ const HealthCheckupList = () => {
     setFilteredCheckups(filtered);
   }, []);
 
-  // Handle filter changes without applying them - just store pending filters
-  const handleFilterChange = useCallback((newPendingFilters) => {
-    setPendingFilters(newPendingFilters);
-  }, []);
-
   const clearFilters = useCallback(() => {
     setFilters({});
-    setPendingFilters({});
     setFilteredCheckups(MOCK_HEALTH_CHECKUPS);
   }, []);
 
@@ -272,6 +261,37 @@ const HealthCheckupList = () => {
         animalData: checkup
       }
     });
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Remove from local state using id for deletion
+      setHealthCheckups(prev => prev.filter(checkup => checkup.id !== id));
+      setFilteredCheckups(prev => prev.filter(checkup => checkup.id !== id));
+
+      toast.success("Health checkup record deleted successfully!");
+    } catch (error) {
+      toast.error("Failed to delete health checkup record");
+    }
+  };
+
+  const handleBulkDelete = async (ids) => {
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      // Remove from local state using id for deletion
+      setHealthCheckups(prev => prev.filter(checkup => !ids.includes(checkup.id)));
+      setFilteredCheckups(prev => prev.filter(checkup => !ids.includes(checkup.id)));
+
+      toast.success(`${ids.length} health checkup records deleted successfully!`);
+      setSelectedCheckups([]);
+    } catch (error) {
+      toast.error("Failed to delete health checkup records");
+    }
   };
 
   const handleExport = () => {
@@ -392,34 +412,30 @@ const HealthCheckupList = () => {
           <h1 className="text-2xl font-bold text-gray-900">Animal Health Checkups</h1>
           <p className="text-gray-600">View animals and perform health checkups</p>
         </div>
-        <div>
-          <button
-            onClick={handleRefresh}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center space-x-2"
-          >
-            <span>Refresh</span>
-            <RefreshCw size={16} />
-          </button>
-        </div>
+        <button
+          onClick={handleRefresh}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center space-x-2"
+        >
+          <span>Refresh</span>
+          <RefreshCw size={16} />
+        </button>
       </div>
 
       {/* Filter Section */}
       <FilterSection
         filterConfig={filterConfig}
         onApplyFilters={applyFilters}
-        onFilterChange={handleFilterChange} // Add this prop to capture filter changes without applying
         onClearFilters={clearFilters}
         onExport={handleExport}
         onPrint={handlePrint}
-        selectedCount={0}
-        initialFilters={pendingFilters} // Use pendingFilters instead of filters
+        onBulkDelete={handleBulkDelete}
+        selectedCount={selectedCheckups.length}
+        initialFilters={filters}
         searchPlaceholder="Search by Animal ID, Tag ID, Seller Name or Mobile..."
         enableSearch={true}
         enableExport={true}
         enablePrint={true}
         enableBulkDelete={true}
-        applyButtonLabel="Apply Filters" // Ensure the Apply button is clearly labeled
-        autoApply={false} // Add this prop if FilterSection supports it
       />
 
       {/* Data Table */}
@@ -427,15 +443,23 @@ const HealthCheckupList = () => {
         columns={columns}
         data={filteredCheckups}
         loading={loading}
+        getSelectedItems={() => selectedCheckups}
+        onDelete={handleDelete}
+        onBulkDelete={handleBulkDelete}
+        onExport={handleExport}
+        onPrint={handlePrint}
         onHealthCheck={handleHealthDetails}
         enableHealthCheck={true}
         healthCheckLabel=" Add Health Details"
         addButtonLabel="New Health Checkup"
         onAdd={handleAddNew}
-        emptyStateMessage="animals found for health checkup. Try adjusting your filters."
+        emptyStateMessage="No animals found for health checkup. Try adjusting your filters."
         loadingMessage="Loading animal data..."
         enableSelection={true}
+        enableExport={true}
+        enablePrint={true}
         enablePagination={true}
+        enableBulkDelete={true}
       />
     </div>
   );
