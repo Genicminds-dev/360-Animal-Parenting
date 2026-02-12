@@ -1,4 +1,4 @@
-// pages/agents/ViewAgent.jsx
+// pages/management/agents/AgentDetails.jsx
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { toast, Toaster } from "react-hot-toast";
@@ -14,6 +14,8 @@ import {
   Calendar,
   CreditCard
 } from "lucide-react";
+import api, { baseURLFile } from "../../../services/api/api";
+import { Endpoints } from "../../../services/api/EndPoint";
 import { PATHROUTES } from "../../../routes/pathRoutes";
 
 const AgentDetails = () => {
@@ -24,51 +26,39 @@ const AgentDetails = () => {
   const [agent, setAgent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("details");
+  const [imageError, setImageError] = useState({
+    profile: false,
+    document: false
+  });
+  const [documentPreview, setDocumentPreview] = useState(null);
 
-  // Mock agent data matching ONLY the registration form fields
-  const MOCK_AGENTS = [
-    {
-      uid: "CA0001",
-      fullName: "Rajesh Kumar",
-      mobile: "9876543210",
-      aadharNumber: "123456789012",
-      profilePhoto: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400",
-      aadharDocument: {
-        fileType: "pdf",
-        fileName: "Aadhaar_Rajesh_Kumar.pdf",
-        fileSize: "2.4 MB",
-        uploadDate: "2024-01-15T10:30:00Z",
-        url: "/dummy-aadhar.pdf"
-      },
-      createdAt: "2024-01-15T10:30:00Z",
-      status: "Active"
-    },
-    {
-      uid: "CA0002",
-      fullName: "Priya Sharma",
-      mobile: "8765432109",
-      aadharNumber: "",
-      profilePhoto: null,
-      aadharDocument: null,
-      createdAt: "2024-01-20T14:45:00Z",
-      status: "Active"
-    }
-  ];
+  // Helper function to get full URL for files
+  const getFullFileUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith('http')) return path;
+    return `${baseURLFile}${path}`;
+  };
 
-  // Load agent data
+  // Load agent data from API
   useEffect(() => {
     const loadAgentData = async () => {
       setLoading(true);
       
       try {
-        // Check if agent data was passed in state
+        // Check if agent data was passed in state (from list page)
         if (location.state?.agent) {
-          setAgent(location.state.agent);
+          const agentData = location.state.agent;
+          setAgent(agentData);
+          
+          // Set document preview if exists with full URL
+          if (agentData.aadhaarFile) {
+            setDocumentPreview(getFullFileUrl(agentData.aadhaarFile));
+          }
         } else if (uid) {
           await fetchAgentData(uid);
         } else {
           toast.error("No agent ID provided");
-          navigate("/agents");
+          navigate(PATHROUTES.agentsList);
         }
       } catch (error) {
         console.error("Error loading agent data:", error);
@@ -81,22 +71,43 @@ const AgentDetails = () => {
     loadAgentData();
   }, [uid, location.state, navigate]);
 
-  // Fetch agent data function
-  const fetchAgentData = async (uid) => {
+  // Fetch agent data from API using GET_AGENT_BY_ID
+  const fetchAgentData = async (agentUid) => {
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
+      const response = await api.get(Endpoints.GET_AGENT_BY_ID(agentUid));
       
-      const foundAgent = MOCK_AGENTS.find(a => a.uid === uid);
-      
-      if (foundAgent) {
-        setAgent(foundAgent);
+      if (response.data.success) {
+        const agentData = response.data.data;
+        
+        // Transform API response to match component's expected format
+        const transformedAgent = {
+          uid: agentData.uid,
+          fullName: agentData.name || '',
+          mobile: agentData.phone || '',
+          aadharNumber: agentData.aadhaarNumber || null,
+          profilePhoto: getFullFileUrl(agentData.profileImg),
+          aadharDocument: agentData.aadhaarFile ? {
+            fileName: agentData.aadhaarFile.split('/').pop() || 'Aadhar Document',
+            uploadDate: agentData.createdAt,
+            url: getFullFileUrl(agentData.aadhaarFile)
+          } : null,
+          createdAt: agentData.createdAt
+        };
+        
+        setAgent(transformedAgent);
+        
+        // Set document preview with full URL
+        if (agentData.aadhaarFile) {
+          setDocumentPreview(getFullFileUrl(agentData.aadhaarFile));
+        }
       } else {
-        toast.error("Agent not found");
-        navigate("/agents");
+        toast.error(response.data.message || "Agent not found");
+        navigate(PATHROUTES.agentsList);
       }
     } catch (error) {
       console.error("Error fetching agent data:", error);
-      toast.error("Failed to load agent details");
+      toast.error(error?.response?.data?.message || "Failed to load agent details");
+      navigate(PATHROUTES.agentsList);
     }
   };
 
@@ -115,8 +126,35 @@ const AgentDetails = () => {
     }
   };
 
-  const isPDFFile = (fileName) => {
-    return fileName?.toLowerCase().endsWith(".pdf");
+  const isPDFFile = (url) => {
+    if (!url) return false;
+    return url.toLowerCase().includes('.pdf');
+  };
+
+  const isImageFile = (url) => {
+    if (!url) return false;
+    return /\.(jpg|jpeg|png|gif)$/i.test(url);
+  };
+
+  const handleViewDocument = (url) => {
+    if (url) {
+      window.open(url, '_blank');
+    }
+  };
+
+  const handleDownloadDocument = (url, fileName) => {
+    if (url) {
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName || 'aadhar-document.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  const handleImageError = (type) => {
+    setImageError(prev => ({ ...prev, [type]: true }));
   };
 
   // Loading state
@@ -142,7 +180,7 @@ const AgentDetails = () => {
           <h3 className="text-xl font-bold text-gray-700 mb-2">Agent Not Found</h3>
           <p className="text-gray-500 mb-6">No agent data found in the system.</p>
           <button
-            onClick={() => navigate("/agents")}
+            onClick={() => navigate(PATHROUTES.agentsList)}
             className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 mx-auto"
           >
             <ArrowLeft size={16} />
@@ -157,7 +195,7 @@ const AgentDetails = () => {
     <div className="space-y-6 p-4 md:p-6 bg-gradient-to-r from-gray-50 via-white to-gray-50">
       <Toaster position="top-center" />
 
-      {/* Header Section - SIMPLIFIED */}
+      {/* Header Section */}
       <div className="flex items-center gap-4">
         <button
           onClick={() => navigate(PATHROUTES.agentsList)}
@@ -177,41 +215,33 @@ const AgentDetails = () => {
           {/* Profile Image */}
           <div className="flex-shrink-0">
             <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 border-4 border-white shadow-lg flex items-center justify-center overflow-hidden">
-              {agent.profilePhoto ? (
+              {agent.profilePhoto && !imageError.profile ? (
                 <img
                   src={agent.profilePhoto}
                   alt={agent.fullName}
                   className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "https://via.placeholder.com/150?text=Agent";
-                  }}
+                  onError={() => handleImageError('profile')}
                 />
               ) : (
-                <User className="text-gray-400" size={40} />
+                <div className="flex flex-col items-center justify-center p-4">
+                  <User className="text-gray-400" size={40} />
+                  <p className="text-xs text-gray-500 mt-1">
+                    {agent.profilePhoto ? 'Failed to load' : 'No Photo'}
+                  </p>
+                </div>
               )}
             </div>
           </div>
 
           {/* Agent Info */}
           <div className="flex-1">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-              <div>
-                <h3 className="text-2xl font-bold text-gray-900">
-                  {agent.fullName}
-                </h3>
-                <p className="text-gray-600 mt-1">
-                  Agent ID: {agent.uid} • {agent.status}
-                </p>
-              </div>
-              
-              <div className="flex flex-col items-start md:items-end gap-2 mt-4 md:mt-0">
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  agent.status === "Active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-                }`}>
-                  {agent.status || "Active"}
-                </span>
-              </div>
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900">
+                {agent.fullName}
+              </h3>
+              <p className="text-gray-600 mt-1">
+                Agent ID: {agent.uid}
+              </p>
             </div>
 
             <div className="flex flex-wrap gap-4 mt-4">
@@ -274,7 +304,7 @@ const AgentDetails = () => {
         </nav>
       </div>
 
-      {/* Details Tab Content - SIMPLIFIED without edit buttons */}
+      {/* Details Tab Content */}
       {activeTab === "details" && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Personal Information */}
@@ -291,7 +321,6 @@ const AgentDetails = () => {
             <div className="space-y-4">
               <DetailRow label="Agent ID" value={agent.uid} />
               <DetailRow label="Registration Date" value={formatDate(agent.createdAt)} />
-              <DetailRow label="Status" value={agent.status} />
             </div>
           </DetailSection>
         </div>
@@ -306,18 +335,18 @@ const AgentDetails = () => {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <div className={`p-3 rounded-lg ${
-                      agent.aadharDocument.fileType === "pdf" 
+                      isPDFFile(agent.aadharDocument.url) 
                         ? "bg-red-100 text-red-600" 
                         : "bg-blue-100 text-blue-600"
                     }`}>
-                      {agent.aadharDocument.fileType === "pdf" ? (
+                      {isPDFFile(agent.aadharDocument.url) ? (
                         <File size={20} />
                       ) : (
                         <Camera size={20} />
                       )}
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900">
+                      <p className="font-medium text-gray-900 break-all max-w-xs">
                         {agent.aadharDocument.fileName}
                       </p>
                       <p className="text-sm text-gray-500">
@@ -327,23 +356,59 @@ const AgentDetails = () => {
                   </div>
                 </div>
 
+                {/* Image Preview */}
+                {isImageFile(agent.aadharDocument.url) && documentPreview && !imageError.document && (
+                  <div className="mt-4 mb-4 border border-gray-200 rounded-lg overflow-hidden">
+                    <div className="p-2 bg-gray-50 border-b border-gray-200">
+                      <p className="text-sm font-medium text-gray-700">Document Preview</p>
+                    </div>
+                    <div className="p-4 flex items-center justify-center bg-gray-50">
+                      <img 
+                        src={documentPreview} 
+                        alt="Aadhar Preview" 
+                        className="max-w-full max-h-64 object-contain rounded"
+                        onError={() => setImageError(prev => ({ ...prev, document: true }))}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Show error message if image failed to load */}
+                {isImageFile(agent.aadharDocument.url) && imageError.document && (
+                  <div className="mt-4 text-center p-6 border border-gray-200 rounded-lg bg-gray-50">
+                    <Camera className="mx-auto text-gray-400 mb-3" size={48} />
+                    <p className="text-sm text-gray-700 font-medium mb-2">
+                      Failed to load image preview
+                    </p>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Click view button to open the document
+                    </p>
+                  </div>
+                )}
+
+                {/* PDF Preview Info */}
+                {isPDFFile(agent.aadharDocument.url) && (
+                  <div className="mt-4 text-center p-6 border border-gray-200 rounded-lg bg-gray-50">
+                    <File className="mx-auto text-red-400 mb-3" size={48} />
+                    <p className="text-sm text-gray-700 font-medium mb-2">
+                      {agent.aadharDocument.fileName}
+                    </p>
+                    <p className="text-sm text-gray-600 mb-4">
+                      This is a PDF document. Click view to open.
+                    </p>
+                  </div>
+                )}
+
                 <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
                   <button
-                    onClick={() => window.open(agent.aadharDocument.url, '_blank')}
+                    onClick={() => handleViewDocument(agent.aadharDocument.url)}
                     className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm flex items-center justify-center gap-2"
                   >
                     <Eye size={14} />
                     View Document
                   </button>
                   <button
-                    onClick={() => {
-                      const link = document.createElement('a');
-                      link.href = agent.aadharDocument.url;
-                      link.download = agent.aadharDocument.fileName;
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                    }}
+                    onClick={() => handleDownloadDocument(agent.aadharDocument.url, agent.aadharDocument.fileName)}
                     className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm flex items-center justify-center gap-2"
                   >
                     <Download size={14} />
@@ -373,7 +438,7 @@ const AgentDetails = () => {
   );
 };
 
-// Reusable Components - SIMPLIFIED
+// Reusable Components
 const DetailSection = ({ title, icon, children }) => (
   <div className="bg-white rounded-xl shadow-md overflow-hidden">
     <div className="px-5 py-4 border-b border-gray-200">

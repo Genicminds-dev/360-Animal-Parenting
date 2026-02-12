@@ -1,9 +1,11 @@
-// pages/agents/EditAgent.jsx
+// pages/management/agents/EditAgent.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { toast, Toaster } from "react-hot-toast";
 import { User, Phone, Camera, Upload, FileText, X, Eye, FileIcon, ArrowLeft, Save } from 'lucide-react';
-import { PATHROUTES } from '../../../routes/pathRoutes';
+import api, { baseURLFile } from "../../../services/api/api";
+import { Endpoints } from "../../../services/api/EndPoint";
+import { PATHROUTES } from "../../../routes/pathRoutes";
 
 const EditAgent = () => {
     const navigate = useNavigate();
@@ -12,6 +14,9 @@ const EditAgent = () => {
     
     const [agent, setAgent] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [imageError, setImageError] = useState({});
+    
     const [formData, setFormData] = useState({
         fullName: '',
         mobile: '',
@@ -21,74 +26,58 @@ const EditAgent = () => {
     });
     
     const [errors, setErrors] = useState({});
-    const [previewUrl, setPreviewUrl] = useState(null);
     const [profilePreview, setProfilePreview] = useState(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [documentPreview, setDocumentPreview] = useState(null);
+    const [existingFiles, setExistingFiles] = useState({
+        profileImg: null,
+        aadhaarFile: null
+    });
 
-    // Mock data matching the registration form
-    const MOCK_AGENTS = [
-        {
-            uid: "CA0001",
-            fullName: "Rajesh Kumar",
-            mobile: "9876543210",
-            aadharNumber: "123456789012",
-            profilePhoto: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400",
-            aadharDocument: {
-                fileType: "pdf",
-                fileName: "Aadhaar_Rajesh_Kumar.pdf",
-                fileSize: "2.4 MB",
-                uploadDate: "2024-01-15T10:30:00Z",
-                url: "/dummy-aadhar.pdf"
-            },
-            createdAt: "2024-01-15T10:30:00Z",
-            status: "Active"
-        },
-        {
-            uid: "CA0002",
-            fullName: "Priya Sharma",
-            mobile: "8765432109",
-            aadharNumber: "",
-            profilePhoto: null,
-            aadharDocument: null,
-            createdAt: "2024-01-20T14:45:00Z",
-            status: "Active"
-        }
-    ];
+    // Helper function to get full URL for files
+    const getFullFileUrl = (path) => {
+        if (!path) return null;
+        if (path.startsWith('http')) return path;
+        return `${baseURLFile}${path}`;
+    };
 
-    // Load agent data
+    // Load agent data from API
     useEffect(() => {
         const loadAgentData = async () => {
             setLoading(true);
             
             try {
-                // Check if agent data was passed in state
-                if (location.state?.agent) {
-                    const agentData = location.state.agent;
+                // Check if agent data was passed in state (from list page)
+                if (location.state) {
+                    const agentData = location.state;
                     setAgent(agentData);
                     
-                    // Set form data from agent
                     setFormData({
                         fullName: agentData.fullName || '',
                         mobile: agentData.mobile || '',
                         aadharNumber: agentData.aadharNumber || '',
-                        profilePhoto: agentData.profilePhoto || null,
-                        aadharDocument: agentData.aadharDocument || null
+                        profilePhoto: null,
+                        aadharDocument: null
                     });
                     
-                    // Set profile preview if exists
-                    if (agentData.profilePhoto) {
-                        setProfilePreview(agentData.profilePhoto);
+                    // Store existing file URLs separately
+                    setExistingFiles({
+                        profileImg: agentData.profileImg || null,
+                        aadhaarFile: agentData.aadhaarFile || null
+                    });
+                    
+                    // Set preview URLs from existing files with full URL
+                    if (agentData.profileImg) {
+                        setProfilePreview(getFullFileUrl(agentData.profileImg));
                     }
                     
-                    // Set document preview if exists
-                    if (agentData.aadharDocument) {
-                        setPreviewUrl(agentData.aadharDocument.url);
+                    if (agentData.aadhaarFile) {
+                        setDocumentPreview(getFullFileUrl(agentData.aadhaarFile));
                     }
                 } else if (uid) {
                     await fetchAgentData(uid);
                 } else {
                     toast.error("No agent ID provided");
-                    navigate("/agents");
+                    navigate(PATHROUTES.agentsList);
                 }
             } catch (error) {
                 console.error("Error loading agent data:", error);
@@ -102,121 +91,146 @@ const EditAgent = () => {
 
         // Cleanup function for preview URLs
         return () => {
-            if (previewUrl && previewUrl.startsWith('blob:')) {
-                URL.revokeObjectURL(previewUrl);
-            }
             if (profilePreview && profilePreview.startsWith('blob:')) {
                 URL.revokeObjectURL(profilePreview);
+            }
+            if (documentPreview && documentPreview.startsWith('blob:')) {
+                URL.revokeObjectURL(documentPreview);
             }
         };
     }, [uid, location.state, navigate]);
 
-    // Fetch agent data function
-    const fetchAgentData = async (uid) => {
+    // Fetch agent data from API
+    const fetchAgentData = async (agentUid) => {
         try {
-            await new Promise(resolve => setTimeout(resolve, 500));
+            const response = await api.get(Endpoints.GET_AGENT_BY_ID(agentUid));
             
-            const foundAgent = MOCK_AGENTS.find(a => a.uid === uid);
-            
-            if (foundAgent) {
-                setAgent(foundAgent);
+            if (response.data.success) {
+                const agentData = response.data.data;
+                setAgent(agentData);
                 
-                // Set form data
                 setFormData({
-                    fullName: foundAgent.fullName || '',
-                    mobile: foundAgent.mobile || '',
-                    aadharNumber: foundAgent.aadharNumber || '',
-                    profilePhoto: foundAgent.profilePhoto || null,
-                    aadharDocument: foundAgent.aadharDocument || null
+                    fullName: agentData.name || '',
+                    mobile: agentData.phone || '',
+                    aadharNumber: agentData.aadhaarNumber || '',
+                    profilePhoto: null,
+                    aadharDocument: null
                 });
                 
-                // Set previews
-                if (foundAgent.profilePhoto) {
-                    setProfilePreview(foundAgent.profilePhoto);
+                setExistingFiles({
+                    profileImg: agentData.profileImg || null,
+                    aadhaarFile: agentData.aadhaarFile || null
+                });
+                
+                // Set preview URLs from existing files with full URL
+                if (agentData.profileImg) {
+                    setProfilePreview(getFullFileUrl(agentData.profileImg));
                 }
-                if (foundAgent.aadharDocument) {
-                    setPreviewUrl(foundAgent.aadharDocument.url);
+                
+                if (agentData.aadhaarFile) {
+                    setDocumentPreview(getFullFileUrl(agentData.aadhaarFile));
                 }
             } else {
-                toast.error("Agent not found");
-                navigate("/agents");
+                toast.error(response.data.message || "Agent not found");
+                navigate(PATHROUTES.agentsList);
             }
         } catch (error) {
             console.error("Error fetching agent data:", error);
-            toast.error("Failed to load agent details");
+            toast.error(error?.response?.data?.message || "Failed to load agent details");
+            navigate(PATHROUTES.agentsList);
         }
-    };
-
-    const getDisplayFileName = (file) => {
-        if (!file) return '';
-        
-        if (typeof file === 'object' && file.fileName) {
-            return file.fileName;
-        }
-        
-        // Handle File objects
-        if (file?.name && file?.size){
-            const extension = file.name.split('.').pop().toLowerCase();
-            return `Aadhaar.${extension}`;
-        }
-        
-        return 'Aadhaar Document';
     };
 
     const handleChange = (e) => {
-        const { name, value, files } = e.target;
-        if (files && files[0]) {
-            const file = files[0];
-            setFormData(prev => ({ ...prev, [name]: file }));
-            
-            // Clean up previous preview URLs
-            if (name === 'profilePhoto') {
-                if (profilePreview && profilePreview.startsWith('blob:')) {
-                    URL.revokeObjectURL(profilePreview);
-                    setProfilePreview(null);
-                }
-                setProfilePreview(URL.createObjectURL(file));
-            } else if (name === 'aadharDocument') {
-                // Clear previous preview
-                if (previewUrl && previewUrl.startsWith('blob:')) {
-                    URL.revokeObjectURL(previewUrl);
-                    setPreviewUrl(null);
-                }
-                
-                // Create preview URL for BOTH images and PDFs
-                // This is the key fix for the blank URL issue
-                setPreviewUrl(URL.createObjectURL(file));
-            }
-        } else {
-            setFormData(prev => ({ ...prev, [name]: value }));
-        }
+        const { name, value } = e.target;
+        
+        setFormData(prev => ({ ...prev, [name]: value }));
         
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
         }
     };
 
+    const handleFileChange = (e, field) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Validate file size
+        if (field === 'profilePhoto') {
+            if (file.size > 5 * 1024 * 1024) {
+                toast.error("Profile photo size should be less than 5MB");
+                return;
+            }
+            if (!file.type.startsWith('image/')) {
+                toast.error("Please upload a valid image file");
+                return;
+            }
+        } else if (field === 'aadharDocument') {
+            if (file.size > 10 * 1024 * 1024) {
+                toast.error("Document size should be less than 10MB");
+                return;
+            }
+        }
+
+        // Update form data with actual file
+        setFormData(prev => ({ ...prev, [field]: file }));
+
+        // Create preview URL
+        const url = URL.createObjectURL(file);
+        
+        if (field === 'profilePhoto') {
+            // Clean up old preview URL
+            if (profilePreview && profilePreview.startsWith('blob:')) {
+                URL.revokeObjectURL(profilePreview);
+            }
+            setProfilePreview(url);
+            // Clear image error
+            setImageError(prev => ({ ...prev, profile: false }));
+        } else if (field === 'aadharDocument') {
+            // Clean up old preview URL
+            if (documentPreview && documentPreview.startsWith('blob:')) {
+                URL.revokeObjectURL(documentPreview);
+            }
+            setDocumentPreview(url);
+            // Clear image error
+            setImageError(prev => ({ ...prev, document: false }));
+        }
+
+        // Clear error if any
+        if (errors[field]) {
+            setErrors(prev => ({ ...prev, [field]: '' }));
+        }
+    };
+
     const removeProfilePhoto = () => {
+        // Clean up blob URL
         if (profilePreview && profilePreview.startsWith('blob:')) {
             URL.revokeObjectURL(profilePreview);
         }
+        
         setProfilePreview(null);
         setFormData(prev => ({ ...prev, profilePhoto: null }));
+        setExistingFiles(prev => ({ ...prev, profileImg: null }));
+        setImageError(prev => ({ ...prev, profile: false }));
     };
 
     const removeAadharDocument = () => {
-        if (previewUrl && previewUrl.startsWith('blob:')) {
-            URL.revokeObjectURL(previewUrl);
+        // Clean up blob URL
+        if (documentPreview && documentPreview.startsWith('blob:')) {
+            URL.revokeObjectURL(documentPreview);
         }
-        setPreviewUrl(null);
+        
+        setDocumentPreview(null);
         setFormData(prev => ({ ...prev, aadharDocument: null }));
+        setExistingFiles(prev => ({ ...prev, aadhaarFile: null }));
+        setImageError(prev => ({ ...prev, document: false }));
     };
 
     const validateForm = () => {
         const newErrors = {};
         
-        if (!formData.fullName.trim()) newErrors.fullName = 'Full Name is required';
-        if (!formData.mobile.trim()) newErrors.mobile = 'Mobile Number is required';
+        if (!formData.fullName?.trim()) newErrors.fullName = 'Full Name is required';
+        if (!formData.mobile?.trim()) newErrors.mobile = 'Mobile Number is required';
         
         if (formData.mobile && !/^[0-9]{10}$/.test(formData.mobile)) {
             newErrors.mobile = 'Mobile number must be 10 digits';
@@ -230,6 +244,64 @@ const EditAgent = () => {
         return Object.keys(newErrors).length === 0;
     };
 
+    const isPDF = (file) => {
+        if (!file) return false;
+        
+        if (file instanceof File) {
+            return file.type === "application/pdf";
+        }
+        
+        if (typeof file === "string") {
+            return file.toLowerCase().includes('.pdf');
+        }
+        
+        return false;
+    };
+
+    const isImage = (file) => {
+        if (!file) return false;
+        
+        if (file instanceof File) {
+            return file.type.startsWith("image/");
+        }
+        
+        if (typeof file === "string") {
+            return /\.(jpg|jpeg|png|gif)$/i.test(file);
+        }
+        
+        return false;
+    };
+
+    const getFileName = () => {
+        if (formData.aadharDocument instanceof File) {
+            return formData.aadharDocument.name;
+        }
+        if (existingFiles.aadhaarFile) {
+            const urlParts = existingFiles.aadhaarFile.split('/');
+            return urlParts[urlParts.length - 1] || 'Aadhar Document.pdf';
+        }
+        return 'Aadhar Document.pdf';
+    };
+
+    const openDocument = () => {
+        // If newly uploaded file
+        if (formData.aadharDocument instanceof File) {
+            const blobUrl = URL.createObjectURL(formData.aadharDocument);
+            window.open(blobUrl, "_blank");
+            return;
+        }
+        
+        // If existing file URL - add base URL
+        if (existingFiles.aadhaarFile) {
+            const fullUrl = getFullFileUrl(existingFiles.aadhaarFile);
+            window.open(fullUrl, "_blank");
+        }
+    };
+
+    const handleImageError = (type) => {
+        setImageError(prev => ({ ...prev, [type]: true }));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         
@@ -241,34 +313,64 @@ const EditAgent = () => {
         setIsSubmitting(true);
         
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            const formDataToSend = new FormData();
             
-            console.log('Form submitted:', formData);
-            toast.success('Agent updated successfully!');
+            // Append basic fields
+            formDataToSend.append('name', formData.fullName);
+            formDataToSend.append('phone', formData.mobile);
             
-            // Clean up preview URLs
-            if (previewUrl && previewUrl.startsWith('blob:')) {
-                URL.revokeObjectURL(previewUrl);
+            // Only append aadhar number if it has value, otherwise send empty string to clear it
+            formDataToSend.append('aadhaarNumber', formData.aadharNumber || '');
+            
+            // Handle profile photo
+            if (formData.profilePhoto instanceof File) {
+                // New file selected
+                formDataToSend.append('profileImg', formData.profilePhoto);
+            } else if (!existingFiles.profileImg) {
+                // File was removed - send empty string to clear
+                formDataToSend.append('profileImg', '');
             }
-            if (profilePreview && profilePreview.startsWith('blob:')) {
-                URL.revokeObjectURL(profilePreview);
+            
+            // Handle aadhar document
+            if (formData.aadharDocument instanceof File) {
+                // New file selected
+                formDataToSend.append('aadhaarFile', formData.aadharDocument);
+            } else if (!existingFiles.aadhaarFile) {
+                // File was removed - send empty string to clear
+                formDataToSend.append('aadhaarFile', '');
             }
             
-            // Navigate back to agent details
-            navigate(`/management/agent-details/${uid}`, {
-                state: { 
-                    agent: {
-                        ...agent,
-                        ...formData,
-                        updatedAt: new Date().toISOString()
+            // Send PUT request to update agent
+            const response = await api.put(
+                Endpoints.UPDATE_AGENT(uid),
+                formDataToSend,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
                     }
                 }
-            });
+            );
+            
+            if (response.data.success) {
+                toast.success(response.data.message || 'Agent updated successfully!');
+                
+                // Clean up preview URLs
+                if (profilePreview && profilePreview.startsWith('blob:')) {
+                    URL.revokeObjectURL(profilePreview);
+                }
+                if (documentPreview && documentPreview.startsWith('blob:')) {
+                    URL.revokeObjectURL(documentPreview);
+                }
+                
+                // Navigate back to agent list
+                navigate(PATHROUTES.agentsList);
+            } else {
+                toast.error(response.data.message || "Failed to update agent");
+            }
             
         } catch (error) {
             console.error("Error updating agent:", error);
-            toast.error("Failed to update agent");
+            toast.error(error?.response?.data?.message || "Failed to update agent");
         } finally {
             setIsSubmitting(false);
         }
@@ -276,78 +378,14 @@ const EditAgent = () => {
 
     const handleCancel = () => {
         // Clean up preview URLs
-        if (previewUrl && previewUrl.startsWith('blob:')) {
-            URL.revokeObjectURL(previewUrl);
-        }
         if (profilePreview && profilePreview.startsWith('blob:')) {
             URL.revokeObjectURL(profilePreview);
         }
+        if (documentPreview && documentPreview.startsWith('blob:')) {
+            URL.revokeObjectURL(documentPreview);
+        }
         
-        navigate(`/management/agent-details/${uid}`);
-    };
-
-const isPDF = (file) => {
-    if (!file) return false;
-
-    // If it has a type property (File object)
-    if (file?.type) {
-        return file.type === "application/pdf";
-    }
-
-    // If backend object
-    if (file?.fileType) {
-        return file.fileType === "pdf";
-    }
-
-    // If string URL
-    if (typeof file === "string") {
-        return file.toLowerCase().endsWith(".pdf");
-    }
-
-    return false;
-};
-
-const isImage = (file) => {
-    if (!file) return false;
-
-    if (file?.type) {
-        return file.type.startsWith("image/");
-    }
-
-    if (file?.fileType) {
-        return file.fileType === "image";
-    }
-
-    if (typeof file === "string") {
-        return /\.(jpg|jpeg|png|gif|png)$/i.test(file);
-    }
-
-    return false;
-};
-
-
-    const openDocument = () => {
-        const file = formData.aadharDocument;
-
-        if (!file) return;
-
-        // NEWLY UPLOADED FILE (File object)
-        if (file instanceof File) {
-            const blobUrl = URL.createObjectURL(file);
-            window.open(blobUrl, "_blank");
-            return;
-        }
-
-        // EXISTING BACKEND FILE OBJECT
-        if (typeof file === "object" && file.url) {
-            window.open(file.url, "_blank");
-            return;
-        }
-
-        // DIRECT STRING URL
-        if (typeof file === "string") {
-            window.open(file, "_blank");
-        }
+        navigate(PATHROUTES.agentsList);
     };
 
     // Loading state
@@ -363,27 +401,6 @@ const isImage = (file) => {
         );
     }
 
-    if (!agent) {
-        return (
-            <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-50 via-white to-gray-50">
-                <div className="text-center p-8 bg-white rounded-xl shadow-md">
-                    <div className="p-4 bg-blue-100 rounded-full mb-4 inline-block">
-                        <User className="w-12 h-12 text-blue-600" />
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-700 mb-2">Agent Not Found</h3>
-                    <p className="text-gray-500 mb-6">No agent data found in the system.</p>
-                    <button
-                        onClick={() => navigate("/agents")}
-                        className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 mx-auto"
-                    >
-                        <ArrowLeft size={16} />
-                        Back to Agents
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div className="space-y-6">
             <Toaster position="top-center" />
@@ -392,7 +409,7 @@ const isImage = (file) => {
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <button
-                        onClick={() => navigate(PATHROUTES.agentsList)}
+                        onClick={handleCancel}
                         className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                         disabled={isSubmitting}
                     >
@@ -400,11 +417,11 @@ const isImage = (file) => {
                     </button>
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900">Edit Agent</h1>
-                        <p className="text-gray-600">Update agent information for {agent.fullName}</p>
+                        <p className="text-gray-600">Update agent information for {formData.fullName}</p>
                     </div>
                 </div>
                 <div className="text-sm text-gray-500">
-                    Agent ID: <span className="font-medium">{agent.uid}</span>
+                    Agent ID: <span className="font-medium">{uid}</span>
                 </div>
             </div>
 
@@ -422,26 +439,25 @@ const isImage = (file) => {
                     <div className="flex flex-col items-center justify-center mb-8">
                         <div className="relative w-32 h-32 mb-4">
                             <div className="w-full h-full rounded-full border-4 border-gray-200 overflow-hidden bg-gray-100 flex items-center justify-center">
-                                {profilePreview ? (
+                                {profilePreview && !imageError.profile ? (
                                     <img 
                                         src={profilePreview} 
                                         alt="Profile" 
                                         className="w-full h-full object-cover"
-                                        onError={(e) => {
-                                            e.target.onerror = null;
-                                            e.target.src = "https://via.placeholder.com/150?text=Agent";
-                                        }}
+                                        onError={() => handleImageError('profile')}
                                     />
                                 ) : (
                                     <div className="flex flex-col items-center justify-center p-4">
                                         <User className="text-gray-400" size={40} />
-                                        <p className="text-xs text-gray-500 mt-2 text-center">Add Photo</p>
+                                        <p className="text-xs text-gray-500 mt-2 text-center">
+                                            {profilePreview ? 'Failed to load' : 'No Photo'}
+                                        </p>
                                     </div>
                                 )}
                             </div>
                             <label 
                                 htmlFor="profilePhoto"
-                                className={`absolute bottom-0 right-0 bg-primary-600 text-white p-2 rounded-full cursor-pointer hover:bg-primary-700 transition-colors shadow-lg ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                className={`absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full cursor-pointer hover:bg-blue-700 transition-colors shadow-lg ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
                                 <Camera size={18} />
                             </label>
@@ -464,18 +480,21 @@ const isImage = (file) => {
                             <input
                                 type="file"
                                 name="profilePhoto"
-                                onChange={handleChange}
+                                onChange={(e) => handleFileChange(e, 'profilePhoto')}
                                 className="hidden"
                                 id="profilePhoto"
-                                accept=".jpg,.jpeg,.png"
+                                accept="image/*"
                                 disabled={isSubmitting}
                             />
                             
-                            {formData.profilePhoto && (
+                            {formData.profilePhoto instanceof File && (
                                 <p className="text-xs text-green-600 mt-2">
-                                    ✓ {formData.profilePhoto instanceof File 
-                                        ? formData.profilePhoto.name 
-                                        : 'Profile photo selected'}
+                                    ✓ {formData.profilePhoto.name}
+                                </p>
+                            )}
+                            {existingFiles.profileImg && !(formData.profilePhoto instanceof File) && !imageError.profile && (
+                                <p className="text-xs text-gray-500 mt-2">
+                                    Current: {existingFiles.profileImg.split('/').pop()}
                                 </p>
                             )}
                         </div>
@@ -491,7 +510,7 @@ const isImage = (file) => {
                                 name="fullName"
                                 value={formData.fullName}
                                 onChange={handleChange}
-                                className={`w-full px-4 py-2 border ${errors.fullName ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500`}
+                                className={`w-full px-4 py-2 border ${errors.fullName ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                                 placeholder="Enter full name"
                                 disabled={isSubmitting}
                             />
@@ -511,7 +530,7 @@ const isImage = (file) => {
                                     name="mobile"
                                     value={formData.mobile}
                                     onChange={handleChange}
-                                    className={`w-full pl-10 px-4 py-2 border ${errors.mobile ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500`}
+                                    className={`w-full pl-10 px-4 py-2 border ${errors.mobile ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                                     placeholder="Enter 10-digit mobile number"
                                     disabled={isSubmitting}
                                 />
@@ -530,13 +549,16 @@ const isImage = (file) => {
                                 name="aadharNumber"
                                 value={formData.aadharNumber}
                                 onChange={handleChange}
-                                className={`w-full px-4 py-2 border ${errors.aadharNumber ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500`}
+                                className={`w-full px-4 py-2 border ${errors.aadharNumber ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                                 placeholder="Enter 12-digit Aadhar number"
                                 disabled={isSubmitting}
                             />
                             {errors.aadharNumber && (
                                 <p className="text-red-500 text-xs mt-1">{errors.aadharNumber}</p>
                             )}
+                            {/* <p className="text-xs text-gray-500 mt-1">
+                                Leave empty to remove Aadhar number
+                            </p> */}
                         </div>
                     </div>
                 </div>
@@ -552,31 +574,29 @@ const isImage = (file) => {
 
                     <div className="flex flex-col items-center justify-center">
                         <div className="w-full max-w-2xl">
-                            {formData.aadharDocument ? (
+                            {(formData.aadharDocument || existingFiles.aadhaarFile) ? (
                                 <div className="border-2 border-gray-300 rounded-lg p-6">
                                     <div className="flex items-center justify-between mb-4">
                                         <div className="flex items-center space-x-3">
                                             <div className={`p-3 rounded-lg ${
-                                                isPDF(formData.aadharDocument) 
+                                                isPDF(formData.aadharDocument || existingFiles.aadhaarFile) 
                                                     ? 'bg-red-100 text-red-600' 
                                                     : 'bg-blue-100 text-blue-600'
                                             }`}>
-                                                {isPDF(formData.aadharDocument) ? (
+                                                {isPDF(formData.aadharDocument || existingFiles.aadhaarFile) ? (
                                                     <FileIcon size={24} />
                                                 ) : (
                                                     <Camera size={24} />
                                                 )}
                                             </div>
                                             <div>
-                                                <p className="font-medium text-gray-900">
-                                                    {getDisplayFileName(formData.aadharDocument)}
+                                                <p className="font-medium text-gray-900 break-all max-w-xs">
+                                                    {getFileName()}
                                                 </p>
                                                 <p className="text-sm text-gray-500">
-                                                    {isPDF(formData.aadharDocument) 
+                                                    {isPDF(formData.aadharDocument || existingFiles.aadhaarFile) 
                                                         ? 'PDF Document' 
-                                                        : formData.aadharDocument?.size
-                                                        ? `${Math.round(formData.aadharDocument.size / 1024)} KB`
-                                                        : formData.aadharDocument?.fileSize || ''}
+                                                        : 'Image Document'}
                                                 </p>
                                             </div>
                                         </div>
@@ -585,11 +605,11 @@ const isImage = (file) => {
                                                 type="button"
                                                 onClick={openDocument}
                                                 className={`p-2 rounded-lg hover:opacity-90 transition-opacity ${
-                                                    isPDF(formData.aadharDocument)
+                                                    isPDF(formData.aadharDocument || existingFiles.aadhaarFile)
                                                         ? 'bg-red-100 text-red-600 hover:bg-red-200'
                                                         : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
                                                 }`}
-                                                title={isPDF(formData.aadharDocument) ? "Open PDF" : "Preview Image"}
+                                                title={isPDF(formData.aadharDocument || existingFiles.aadhaarFile) ? "Open PDF" : "Preview Image"}
                                                 disabled={isSubmitting}
                                             >
                                                 <Eye size={18} />
@@ -607,56 +627,69 @@ const isImage = (file) => {
                                     </div>
                                     
                                     {/* Show preview for images */}
-                                    {isImage(formData.aadharDocument) && previewUrl && (
+                                    {isImage(formData.aadharDocument || existingFiles.aadhaarFile) && 
+                                     documentPreview && 
+                                     !imageError.document && (
                                         <div className="mt-4 border border-gray-200 rounded-lg overflow-hidden">
                                             <div className="p-2 bg-gray-50 border-b border-gray-200">
                                                 <p className="text-sm font-medium text-gray-700">Document Preview</p>
                                             </div>
                                             <div className="p-4 flex items-center justify-center bg-gray-50">
                                                 <img 
-                                                    src={previewUrl} 
+                                                    src={documentPreview} 
                                                     alt="Aadhar Preview" 
                                                     className="max-w-full max-h-64 object-contain rounded"
+                                                    onError={() => setImageError(prev => ({ ...prev, document: true }))}
                                                 />
                                             </div>
                                         </div>
                                     )}
                                     
+                                    {/* Show error message if image failed to load */}
+                                    {isImage(formData.aadharDocument || existingFiles.aadhaarFile) && 
+                                     imageError.document && (
+                                        <div className="mt-4 text-center p-6 border border-gray-200 rounded-lg bg-gray-50">
+                                            <Camera className="mx-auto text-gray-400 mb-3" size={48} />
+                                            <p className="text-sm text-gray-700 font-medium mb-2">
+                                                Failed to load image preview
+                                            </p>
+                                            <p className="text-sm text-gray-600 mb-4">
+                                                Click the eye icon above to view the document
+                                            </p>
+                                        </div>
+                                    )}
+                                    
                                     {/* Show PDF info */}
-                                    {isPDF(formData.aadharDocument) && (
+                                    {isPDF(formData.aadharDocument || existingFiles.aadhaarFile) && (
                                         <div className="mt-4 text-center p-6 border border-gray-200 rounded-lg bg-gray-50">
                                             <FileIcon className="mx-auto text-red-400 mb-3" size={48} />
                                             <p className="text-sm text-gray-700 font-medium mb-2">
-                                                {getDisplayFileName(formData.aadharDocument)}
+                                                {getFileName()}
                                             </p>
                                             <p className="text-sm text-gray-600 mb-4">
                                                 Click the eye icon above to open this PDF document
                                             </p>
-                                            <button
-                                                type="button"
-                                                onClick={openDocument}
-                                                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
-                                                disabled={isSubmitting}
-                                            >
-                                                Open {getDisplayFileName(formData.aadharDocument)}
-                                            </button>
                                         </div>
                                     )}
+                                    
+                                    <p className="text-xs text-gray-500 mt-2">
+                                        Upload a new file to replace existing document. Click remove to delete.
+                                    </p>
                                 </div>
                             ) : (
-                                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary-500 transition-colors">
+                                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors">
                                     <div className="flex flex-col items-center justify-center">
                                         <Upload className="text-gray-400 mb-3" size={40} />
                                         <p className="text-sm text-gray-700 mb-2 font-medium">
                                             Upload Aadhar Document
                                         </p>
                                         <p className="text-xs text-gray-500 mb-4">
-                                            Upload photo or PDF of Aadhar card
+                                            Upload photo or PDF of Aadhar card (Max 10MB)
                                         </p>
                                         
                                         <label 
                                             htmlFor="aadharDocument"
-                                            className={`px-4 py-2 bg-primary-600 text-white rounded-lg cursor-pointer hover:bg-primary-700 transition-colors text-sm ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            className={`px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition-colors text-sm ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         >
                                             Browse File
                                         </label>
@@ -667,7 +700,7 @@ const isImage = (file) => {
                             <input
                                 type="file"
                                 name="aadharDocument"
-                                onChange={handleChange}
+                                onChange={(e) => handleFileChange(e, 'aadharDocument')}
                                 className="hidden"
                                 id="aadharDocument"
                                 accept=".jpg,.jpeg,.png,.pdf"
@@ -678,43 +711,32 @@ const isImage = (file) => {
                 </div>
 
                 {/* Form Actions */}
-                <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+                <div className="flex items-center justify-end gap-4 pt-6 border-t border-gray-200">
                     <button
                         type="button"
                         onClick={handleCancel}
-                        className={`px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        className={`px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                         disabled={isSubmitting}
                     >
-                        <ArrowLeft size={16} />
                         Cancel
                     </button>
-                    <div className="flex space-x-4">
-                        <button
-                            type="button"
-                            onClick={handleCancel}
-                            className={`px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            disabled={isSubmitting}
-                        >
-                            Discard Changes
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="px-6 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {isSubmitting ? (
-                                <>
-                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                    Updating...
-                                </>
-                            ) : (
-                                <>
-                                    <Save size={16} />
-                                    Update Agent
-                                </>
-                            )}
-                        </button>
-                    </div>
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {isSubmitting ? (
+                            <>
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                Updating...
+                            </>
+                        ) : (
+                            <>
+                                <Save size={16} />
+                                Update Agent
+                            </>
+                        )}
+                    </button>
                 </div>
             </form>
         </div>
