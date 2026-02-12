@@ -18,6 +18,7 @@ import {
     Hash,
     CircleDollarSign
 } from 'lucide-react';
+import { PATHROUTES } from '../../../routes/pathRoutes';
 
 const EditSeller = () => {
     const navigate = useNavigate();
@@ -389,7 +390,7 @@ const EditSeller = () => {
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <button
-                        onClick={handleCancel}
+                        onClick={() => navigate(PATHROUTES.sellerDetails)}
                         className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                     >
                         <ArrowLeft size={20} />
