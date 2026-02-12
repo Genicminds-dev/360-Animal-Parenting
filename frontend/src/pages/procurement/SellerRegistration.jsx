@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
-import { User, MapPin, Phone, CreditCard, Camera, Upload } from 'lucide-react';
+import { User, MapPin, Phone, CreditCard, Camera } from 'lucide-react';
+import { Toaster, toast } from 'react-hot-toast';
+import api from '../../services/api/api';
+import { Endpoints } from '../../services/api/EndPoint';
+import { PATHROUTES } from '../../routes/pathRoutes';
+import { useNavigate } from 'react-router-dom';
 
 const SellerRegistration = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         // Personal Details
         fullName: '',
@@ -27,6 +33,7 @@ const SellerRegistration = () => {
     });
 
     const [errors, setErrors] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;
@@ -71,36 +78,152 @@ const SellerRegistration = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (validateForm()) {
-            console.log('Form submitted:', formData);
-            alert('Seller registration submitted successfully!');
+        if (!validateForm()) {
+            toast.error('Please fix the form errors before submitting');
+            return;
+        }
 
-            // Reset form
-            setFormData({
-                fullName: '',
-                mobile: '',
-                gender: '',
-                profilePhoto: null,
-                aadharNumber: '',
-                address: '',
-                state: '',
-                district: '',
-                pincode: '',
-                village: '',
-                bankName: '',
-                accountNumber: '',
-                ifscCode: '',
-                upiId: ''
+        try {
+            setIsSubmitting(true);
+
+            // Create FormData for file upload
+            const formDataToSend = new FormData();
+            
+            // Append all form fields
+            formDataToSend.append('name', formData.fullName.trim());
+            formDataToSend.append('phone', formData.mobile.trim());
+            formDataToSend.append('gender', formData.gender);
+            
+            if (formData.aadharNumber.trim()) {
+                formDataToSend.append('aadhaarNumber', formData.aadharNumber.trim());
+            }
+            
+            formDataToSend.append('address', formData.address.trim());
+            formDataToSend.append('state', formData.state);
+            
+            if (formData.district.trim()) {
+                formDataToSend.append('district', formData.district.trim());
+            }
+            
+            if (formData.pincode.trim()) {
+                formDataToSend.append('pincode', formData.pincode.trim());
+            }
+            
+            if (formData.village.trim()) {
+                formDataToSend.append('town', formData.village.trim());
+            }
+            
+            if (formData.bankName.trim()) {
+                formDataToSend.append('bankName', formData.bankName.trim());
+            }
+            
+            if (formData.accountNumber.trim()) {
+                formDataToSend.append('accountNumber', formData.accountNumber.trim());
+            }
+            
+            if (formData.ifscCode.trim()) {
+                formDataToSend.append('ifscCode', formData.ifscCode.trim());
+            }
+            
+            if (formData.upiId.trim()) {
+                formDataToSend.append('upiId', formData.upiId.trim());
+            }
+            
+            // Append files only if they exist
+            if (formData.profilePhoto) {
+                formDataToSend.append('profileImg', formData.profilePhoto);
+            }
+
+            // Make API call
+            const response = await api.post(Endpoints.CREATE_SELLER, formDataToSend, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
             });
-            setErrors({});
+
+            if (response.data.success) {
+                // Show success toast
+                toast.success(response.data.message || 'Seller registered successfully!');
+                
+                // Reset form
+                setFormData({
+                    fullName: '',
+                    mobile: '',
+                    gender: '',
+                    profilePhoto: null,
+                    aadharNumber: '',
+                    address: '',
+                    state: '',
+                    district: '',
+                    pincode: '',
+                    village: '',
+                    bankName: '',
+                    accountNumber: '',
+                    ifscCode: '',
+                    upiId: ''
+                });
+                setErrors({});
+                
+                // Navigate to sellers list page after a short delay
+                setTimeout(() => {
+                    navigate(PATHROUTES.sellersList);
+                }, 1500);
+                
+            } else {
+                // Handle API error messages
+                const errorMessage = response.data.message || 'Failed to register seller';
+                toast.error(errorMessage);
+                
+                // Set specific field errors based on error message
+                if (errorMessage.toLowerCase().includes('phone') || errorMessage.toLowerCase().includes('mobile')) {
+                    setErrors(prev => ({ ...prev, mobile: 'This phone number is already registered' }));
+                } else if (errorMessage.toLowerCase().includes('aadhaar')) {
+                    setErrors(prev => ({ ...prev, aadharNumber: 'This Aadhaar number is already registered' }));
+                }
+            }
+        } catch (error) {
+            console.error('Error registering seller:', error);
+            
+            // Handle different error types
+            let errorMessage = 'An unexpected error occurred. Please try again.';
+            
+            if (error.response) {
+                // Server responded with error status
+                errorMessage = error.response.data?.message || 'Server error occurred';
+                
+                // Set specific field errors based on error message
+                if (errorMessage.toLowerCase().includes('phone') || errorMessage.toLowerCase().includes('mobile')) {
+                    setErrors(prev => ({ ...prev, mobile: 'This phone number is already registered' }));
+                } else if (errorMessage.toLowerCase().includes('aadhaar')) {
+                    setErrors(prev => ({ ...prev, aadharNumber: 'This Aadhaar number is already registered' }));
+                }
+            } else if (error.request) {
+                // Request was made but no response
+                errorMessage = 'Network error. Please check your connection.';
+            }
+            
+            toast.error(errorMessage);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
     return (
         <div className="space-y-6">
+            {/* Toaster Component */}
+            <Toaster
+                position="top-center"
+                toastOptions={{
+                    style: { background: "#363636", color: "#fff" },
+                    success: { style: { background: "#10b981" } },
+                    error: { style: { background: "#ef4444" } },
+                    duration: 3000,
+                }}
+            />
+            
             {/* Header */}
             <div>
                 <h1 className="text-2xl font-bold text-gray-900">Seller Registration</h1>
@@ -136,7 +259,7 @@ const SellerRegistration = () => {
                             </div>
                             <label
                                 htmlFor="profilePhoto"
-                                className="absolute bottom-0 right-0 bg-primary-600 text-white p-2 rounded-full cursor-pointer hover:bg-primary-700 transition-colors shadow-lg"
+                                className={`absolute bottom-0 right-0 bg-primary-600 text-white p-2 rounded-full cursor-pointer hover:bg-primary-700 transition-colors shadow-lg ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
                                 <Camera size={18} />
                             </label>
@@ -153,6 +276,7 @@ const SellerRegistration = () => {
                                 className="hidden"
                                 id="profilePhoto"
                                 accept=".jpg,.jpeg,.png"
+                                disabled={isSubmitting}
                             />
 
                             {formData.profilePhoto && (
@@ -174,6 +298,7 @@ const SellerRegistration = () => {
                                 onChange={handleChange}
                                 className={`input-field ${errors.fullName ? 'border-red-500' : ''}`}
                                 placeholder="Enter full name"
+                                disabled={isSubmitting}
                             />
                             {errors.fullName && (
                                 <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>
@@ -194,6 +319,7 @@ const SellerRegistration = () => {
                                     onChange={handleChange}
                                     className={`input-field pl-10 ${errors.mobile ? 'border-red-500' : ''}`}
                                     placeholder="Enter 10-digit mobile number"
+                                    disabled={isSubmitting}
                                 />
                             </div>
                             {errors.mobile && (
@@ -211,11 +337,12 @@ const SellerRegistration = () => {
                                 value={formData.gender}
                                 onChange={handleChange}
                                 className={`input-field ${errors.gender ? 'border-red-500' : ''}`}
+                                disabled={isSubmitting}
                             >
                                 <option value="">Select Gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
                             </select>
                             {errors.gender && (
                                 <p className="text-red-500 text-xs mt-1">{errors.gender}</p>
@@ -234,6 +361,7 @@ const SellerRegistration = () => {
                                 onChange={handleChange}
                                 className={`input-field ${errors.aadharNumber ? 'border-red-500' : ''}`}
                                 placeholder="Enter 12-digit Aadhar number"
+                                disabled={isSubmitting}
                             />
                             {errors.aadharNumber && (
                                 <p className="text-red-500 text-xs mt-1">{errors.aadharNumber}</p>
@@ -263,6 +391,7 @@ const SellerRegistration = () => {
                                 onChange={handleChange}
                                 className={`input-field min-h-[80px] ${errors.address ? 'border-red-500' : ''}`}
                                 placeholder="Enter complete address with landmarks"
+                                disabled={isSubmitting}
                             />
                             {errors.address && (
                                 <p className="text-red-500 text-xs mt-1">{errors.address}</p>
@@ -279,18 +408,19 @@ const SellerRegistration = () => {
                                 value={formData.state}
                                 onChange={handleChange}
                                 className={`input-field ${errors.state ? 'border-red-500' : ''}`}
+                                disabled={isSubmitting}
                             >
                                 <option value="">Select State</option>
-                                <option value="UP">Uttar Pradesh</option>
-                                <option value="MH">Maharashtra</option>
-                                <option value="RJ">Rajasthan</option>
-                                <option value="MP">Madhya Pradesh</option>
-                                <option value="KA">Karnataka</option>
-                                <option value="TN">Tamil Nadu</option>
-                                <option value="GJ">Gujarat</option>
-                                <option value="AP">Andhra Pradesh</option>
-                                <option value="WB">West Bengal</option>
-                                <option value="PB">Punjab</option>
+                                <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                <option value="Maharashtra">Maharashtra</option>
+                                <option value="Rajasthan">Rajasthan</option>
+                                <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                <option value="Karnataka">Karnataka</option>
+                                <option value="Tamil Nadu">Tamil Nadu</option>
+                                <option value="Gujarat">Gujarat</option>
+                                <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                <option value="West Bengal">West Bengal</option>
+                                <option value="Punjab">Punjab</option>
                             </select>
                             {errors.state && (
                                 <p className="text-red-500 text-xs mt-1">{errors.state}</p>
@@ -309,6 +439,7 @@ const SellerRegistration = () => {
                                 onChange={handleChange}
                                 className="input-field"
                                 placeholder="Enter district"
+                                disabled={isSubmitting}
                             />
                         </div>
 
@@ -324,6 +455,7 @@ const SellerRegistration = () => {
                                 onChange={handleChange}
                                 className={`input-field ${errors.pincode ? 'border-red-500' : ''}`}
                                 placeholder="Enter 6-digit PIN code"
+                                disabled={isSubmitting}
                             />
                             {errors.pincode && (
                                 <p className="text-red-500 text-xs mt-1">{errors.pincode}</p>
@@ -342,6 +474,7 @@ const SellerRegistration = () => {
                                 onChange={handleChange}
                                 className="input-field"
                                 placeholder="Enter village/town"
+                                disabled={isSubmitting}
                             />
                         </div>
                     </div>
@@ -369,6 +502,7 @@ const SellerRegistration = () => {
                                 onChange={handleChange}
                                 className="input-field"
                                 placeholder="Enter bank name"
+                                disabled={isSubmitting}
                             />
                         </div>
 
@@ -384,6 +518,7 @@ const SellerRegistration = () => {
                                 onChange={handleChange}
                                 className="input-field"
                                 placeholder="Enter account number"
+                                disabled={isSubmitting}
                             />
                         </div>
 
@@ -399,6 +534,7 @@ const SellerRegistration = () => {
                                 onChange={handleChange}
                                 className="input-field"
                                 placeholder="Enter IFSC code"
+                                disabled={isSubmitting}
                             />
                         </div>
 
@@ -414,6 +550,7 @@ const SellerRegistration = () => {
                                 onChange={handleChange}
                                 className="input-field"
                                 placeholder="Enter UPI ID"
+                                disabled={isSubmitting}
                             />
                         </div>
                     </div>
@@ -424,15 +561,27 @@ const SellerRegistration = () => {
                     <button
                         type="button"
                         onClick={() => window.history.back()}
-                        className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                        className={`px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={isSubmitting}
                     >
                         Cancel
                     </button>
                     <button
                         type="submit"
-                        className="px-6 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:opacity-90 transition-opacity"
+                        disabled={isSubmitting}
+                        className={`px-6 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center min-w-[140px] ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                        Register Seller
+                        {isSubmitting ? (
+                            <>
+                                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Registering...
+                            </>
+                        ) : (
+                            'Register Seller'
+                        )}
                     </button>
                 </div>
             </form>

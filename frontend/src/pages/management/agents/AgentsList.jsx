@@ -1,222 +1,272 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { 
-  User, 
-  Phone, 
-  CreditCard, 
-  Calendar,
   ArrowRight,
-  Building,
-  TrendingUp,
-  FileText,
-  Users
+  ChevronUp,
+  ChevronDown,
+  Minus
 } from "lucide-react";
+import { 
+  FaDownload, 
+  FaPrint, 
+  FaEye, 
+  FaEdit 
+} from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
+import { BiSearch } from "react-icons/bi";
+import { HiOutlineTrash } from "react-icons/hi";
 import FilterSection from "../../../components/common/Filter/FilterSection";
 import DataTable from "../../../components/common/Table/DataTable";
-
-// Mock data for agents - only with required fields
-const MOCK_AGENTS = [
-  {
-    id: 1,
-    uid: "CA0001",
-    fullName: "Rajesh Kumar",
-    mobile: "9876543210",
-    aadharNumber: "123456789012",
-    createdAt: "2024-01-15T10:30:00Z",
-  },
-  {
-    id: 2,
-    uid: "CA0002",
-    fullName: "Priya Sharma",
-    mobile: "8765432109",
-    aadharNumber: "", // Empty for "N/A"
-    createdAt: "2024-01-20T14:45:00Z",
-  },
-  {
-    id: 3,
-    uid: "CA0003",
-    fullName: "Mohan Singh",
-    mobile: "7654321098",
-    aadharNumber: "234567890123",
-    createdAt: "2024-01-25T09:15:00Z",
-  },
-  {
-    id: 4,
-    uid: "CA0004",
-    fullName: "Anita Reddy",
-    mobile: "6543210987",
-    aadharNumber: "345678901234",
-    createdAt: "2024-01-10T11:20:00Z",
-  },
-  {
-    id: 5,
-    uid: "CA0005",
-    fullName: "Vikram Joshi",
-    mobile: "5432109876",
-    aadharNumber: "", // Empty for "N/A"
-    createdAt: "2024-01-18T16:30:00Z",
-  },
-  {
-    id: 6,
-    uid: "CA0006",
-    fullName: "Suresh Patel",
-    mobile: "4321098765",
-    aadharNumber: "456789012345",
-    createdAt: "2024-01-22T13:10:00Z",
-  },
-  {
-    id: 7,
-    uid: "CA0007",
-    fullName: "Neha Gupta",
-    mobile: "3210987654",
-    aadharNumber: "567890123456",
-    createdAt: "2024-01-28T10:00:00Z",
-  },
-  {
-    id: 8,
-    uid: "CA0008",
-    fullName: "Ramesh Iyer",
-    mobile: "2109876543",
-    aadharNumber: "", // Empty for "N/A"
-    createdAt: "2024-01-12T15:45:00Z",
-  },
-  {
-    id: 9,
-    uid: "CA0009",
-    fullName: "Smita Malhotra",
-    mobile: "1098765432",
-    aadharNumber: "678901234567",
-    createdAt: "2024-01-30T12:30:00Z",
-  },
-  {
-    id: 10,
-    uid: "CA0010",
-    fullName: "Ajay Kapoor",
-    mobile: "0987654321",
-    aadharNumber: "789012345678",
-    createdAt: "2024-01-14T08:20:00Z",
-  },
-];
+import api from "../../../services/api/api";
+import { Endpoints } from "../../../services/api/EndPoint";
+import { PATHROUTES } from "../../../routes/pathRoutes";
 
 const AgentsList = () => {
   const navigate = useNavigate();
-  const [agents, setAgents] = useState(MOCK_AGENTS);
-  const [filteredAgents, setFilteredAgents] = useState(MOCK_AGENTS);
+  const [agents, setAgents] = useState([]);
+  const [filteredAgents, setFilteredAgents] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [filters, setFilters] = useState({});
+  
+  // Search state - separate input and debounced term
+  const [searchInput, setSearchInput] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const searchTimeoutRef = useRef(null);
+  
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalRecords: 0,
+    limit: 10
+  });
+  
   const [stats, setStats] = useState({
     totalAgents: 0,
     withAadhar: 0,
     withoutAadhar: 0,
   });
+  
+  // Selection state
+  const [selectedAgents, setSelectedAgents] = useState(new Set());
+  
+  // Delete modal state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false); // Added to prevent double submission
+  
+  // Sorting state - exactly like vendor example
+  const [sortCycle, setSortCycle] = useState({
+    key: "createdAt",
+    step: 2, // 0: normal, 1: asc, 2: desc
+  });
 
-  // Fetch agents
-  const fetchAgents = useCallback(async () => {
+  // Helper function to handle null/undefined values
+  const getValue = (value) => {
+    if (
+      value === null ||
+      value === undefined ||
+      value === "N/A" ||
+      value === "null" ||
+      value === "undefined"
+    ) {
+      return "";
+    }
+    return String(value).trim();
+  };
+
+  // Fetch agents with API - search and pagination
+  const fetchAgents = useCallback(async (page = 1, search = "") => {
     setLoading(true);
     try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 500));
+      console.log("Fetching with search:", search);
       
-      // Calculate stats
-      const withAadharCount = MOCK_AGENTS.filter(a => a.aadharNumber && a.aadharNumber !== "").length;
-      const withoutAadharCount = MOCK_AGENTS.length - withAadharCount;
+      const url = `${Endpoints.GET_AGENT}?page=${page}&limit=${pagination.limit}&search=${encodeURIComponent(search)}`;
+      console.log("API URL:", url);
       
-      setStats({
-        totalAgents: MOCK_AGENTS.length,
-        withAadhar: withAadharCount,
-        withoutAadhar: withoutAadharCount,
-      });
+      const response = await api.get(url);
       
-      setAgents(MOCK_AGENTS);
-      setFilteredAgents(MOCK_AGENTS);
-      
+      if (response.data.success) {
+        const agentsData = response.data.data.map(agent => ({
+          id: agent.uid,
+          uid: getValue(agent.uid),
+          fullName: getValue(agent.name),
+          mobile: getValue(agent.phone),
+          aadharNumber: agent.aadhaarNumber,
+          profileImg: agent.profileImg,
+          aadhaarFile: agent.aadhaarFile,
+          createdAt: agent.createdAt
+        }));
+        
+        setAgents(agentsData);
+        setFilteredAgents(agentsData);
+        
+        setPagination({
+          currentPage: response.data.pagination.currentPage,
+          totalPages: response.data.pagination.totalPages,
+          totalRecords: response.data.pagination.totalRecords,
+          limit: response.data.pagination.limit
+        });
+        
+        const withAadharCount = agentsData.filter(a => a.aadharNumber && a.aadharNumber !== "" && a.aadharNumber !== null).length;
+        const withoutAadharCount = agentsData.length - withAadharCount;
+        
+        setStats({
+          totalAgents: response.data.summary?.totalAgents || agentsData.length,
+          withAadhar: withAadharCount,
+          withoutAadhar: withoutAadharCount,
+        });
+      }
     } catch (error) {
+      console.error('Error fetching agents:', error);
       toast.error("Failed to fetch agents");
       setAgents([]);
       setFilteredAgents([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [pagination.limit]);
 
+  // Debounce search - EXACTLY like vendor example
   useEffect(() => {
-    fetchAgents();
-  }, [fetchAgents]);
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
 
-  // Apply filters function
-  const applyFilters = useCallback((newFilters) => {
-    setFilters(newFilters);
-    
-    let filtered = [...MOCK_AGENTS];
-    
-    // Apply search filter
-    if (newFilters.search) {
-      const searchTerm = newFilters.search.toLowerCase();
-      filtered = filtered.filter(agent =>
-        agent.fullName.toLowerCase().includes(searchTerm) ||
-        agent.uid.toLowerCase().includes(searchTerm) ||
-        agent.mobile.includes(searchTerm) ||
-        (agent.aadharNumber && agent.aadharNumber.includes(searchTerm))
-      );
-    }
-    
-    // Apply aadhar filter
-    if (newFilters.hasAadhar) {
-      filtered = filtered.filter(agent => 
-        newFilters.hasAadhar === 'yes' 
-          ? agent.aadharNumber && agent.aadharNumber !== ""
-          : !agent.aadharNumber || agent.aadharNumber === ""
-      );
-    }
-    
-    // Apply date range filter
-    if (newFilters.fromDate || newFilters.toDate) {
-      filtered = filtered.filter(agent => {
-        const agentDate = new Date(agent.createdAt);
-        
-        if (newFilters.fromDate) {
-          const fromDate = new Date(newFilters.fromDate);
-          if (agentDate < fromDate) return false;
-        }
-        
-        if (newFilters.toDate) {
-          const toDate = new Date(newFilters.toDate);
-          toDate.setHours(23, 59, 59, 999); // End of day
-          if (agentDate > toDate) return false;
-        }
-        
-        return true;
-      });
-    }
-    
-    setFilteredAgents(filtered);
+    searchTimeoutRef.current = setTimeout(() => {
+      console.log("Setting search term to:", searchInput);
+      setSearchTerm(searchInput);
+      setPagination(prev => ({ ...prev, currentPage: 1 }));
+    }, 500);
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [searchInput]);
+
+  // Fetch when search term or pagination changes
+  useEffect(() => {
+    fetchAgents(pagination.currentPage, searchTerm);
+  }, [searchTerm, pagination.currentPage, pagination.limit, fetchAgents]);
+
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    console.log("Search input changed:", value);
+    setSearchInput(value);
+  };
+
+  // Clear search
+  const handleClearSearch = () => {
+    setSearchInput("");
+    setSearchTerm("");
+    fetchAgents(1, "");
+  };
+
+  // Handle page change
+  const handlePageChange = (page) => {
+    setPagination(prev => ({ ...prev, currentPage: page }));
+  };
+
+  // Handle limit change
+  const handleLimitChange = (newLimit) => {
+    setPagination(prev => ({ 
+      ...prev, 
+      limit: newLimit,
+      currentPage: 1 
+    }));
+  };
+
+  // Sorting handler - EXACTLY like vendor example (3-step cycle)
+  const requestSort = useCallback((key) => {
+    setSortCycle((prev) => {
+      if (prev.key !== key) {
+        // Different column, start with ascending
+        return { key, step: 1 };
+      }
+
+      // Same column, cycle through steps: 1→2→0→1
+      const nextStep = (prev.step + 1) % 3;
+      return { key, step: nextStep };
+    });
   }, []);
 
-  const clearFilters = useCallback(() => {
-    setFilters({});
-    setFilteredAgents(MOCK_AGENTS);
-  }, []);
+  // Apply sorting to data - EXACTLY like vendor example
+  const sortedAgents = useMemo(() => {
+    if (sortCycle.step === 0) {
+      // Normal - no sorting, use original order
+      return filteredAgents;
+    }
 
-  // Table columns - ONLY THE 5 SPECIFIED FIELDS
-  const columns = [
+    return [...filteredAgents].sort((a, b) => {
+      const key = sortCycle.key;
+      let aValue = a[key] ?? "";
+      let bValue = b[key] ?? "";
+
+      // Handle null values for aadharNumber
+      if (key === 'aadharNumber') {
+        aValue = aValue || '';
+        bValue = bValue || '';
+      }
+
+      if (sortCycle.step === 1) {
+        // Ascending
+        if (key === 'createdAt') {
+          return new Date(aValue) - new Date(bValue);
+        }
+        return String(aValue).localeCompare(String(bValue));
+      } else {
+        // Descending
+        if (key === 'createdAt') {
+          return new Date(bValue) - new Date(aValue);
+        }
+        return String(bValue).localeCompare(String(aValue));
+      }
+    });
+  }, [filteredAgents, sortCycle]);
+
+  // Get sort icon - EXACTLY like vendor example
+  const getSortIcon = useCallback(
+    (key) => {
+      if (sortCycle.key !== key) {
+        return <Minus className="ml-1 text-gray-400" size={16} />;
+      }
+
+      if (sortCycle.step === 0) {
+        return <Minus className="ml-1 text-gray-400" size={16} />;
+      } else if (sortCycle.step === 1) {
+        return <ChevronUp className="ml-1 text-gray-600" size={16} />;
+      } else {
+        return <ChevronDown className="ml-1 text-gray-600" size={16} />;
+      }
+    },
+    [sortCycle]
+  );
+
+  // Table columns
+  const columns = useMemo(() => [
     { 
       key: "uid", 
       label: "Commission Agent ID",
+      sortable: true,
+      onSort: () => requestSort('uid'),
+      sortIcon: getSortIcon('uid'),
       render: (item) => (
         <div className="flex items-center gap-3">
-            <div className="font-medium items-center text-gray-900">{item.uid}</div>
+          <div className="font-medium text-gray-900">{item.uid}</div>
         </div>
       )
     },
     { 
       key: "fullName", 
       label: "Name",
+      sortable: true,
+      onSort: () => requestSort('fullName'),
+      sortIcon: getSortIcon('fullName'),
       render: (item) => (
         <div className="flex items-center gap-3">
-          {/* <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center">
-            <Users className="text-green-600" size={18} />
-          </div> */}
           <div>
             <div className="font-medium text-gray-900">{item.fullName}</div>
           </div>
@@ -226,9 +276,11 @@ const AgentsList = () => {
     { 
       key: "mobile", 
       label: "Phone",
+      sortable: true,
+      onSort: () => requestSort('mobile'),
+      sortIcon: getSortIcon('mobile'),
       render: (item) => (
         <div className="flex items-center gap-2">
-          {/* <Phone className="text-gray-400" size={16} /> */}
           <div className="font-medium text-gray-900">{item.mobile}</div>
         </div>
       )
@@ -236,25 +288,21 @@ const AgentsList = () => {
     { 
       key: "aadharNumber", 
       label: "Aadhar Number",
+      sortable: true,
+      onSort: () => requestSort('aadharNumber'),
+      sortIcon: getSortIcon('aadharNumber'),
       render: (item) => {
-        const hasAadhar = item.aadharNumber && item.aadharNumber !== "";
+        const hasAadhar = item.aadharNumber && item.aadharNumber !== "" && item.aadharNumber !== null;
         
         return (
           <div className="flex items-center gap-2">
-            <CreditCard className={hasAadhar ? "text-green-500" : "text-gray-400"} size={16} />
             <div>
               {hasAadhar ? (
-                <>
-                  <div className="font-medium text-gray-900">
-                    {item.aadharNumber.replace(/(\d{4})(?=\d)/g, "$1 ")}
-                  </div>
-                  <div className="text-xs text-green-600">Provided</div>
-                </>
+                <div className="font-medium text-gray-900">
+                  {item.aadharNumber.replace(/(\d{4})(?=\d)/g, "$1 ")}
+                </div>
               ) : (
-                <>
-                  <div className="font-medium text-gray-400 italic">N/A</div>
-                  <div className="text-xs text-yellow-600">Not provided</div>
-                </>
+                <div className="font-medium text-gray-400 italic">N/A</div>
               )}
             </div>
           </div>
@@ -264,6 +312,9 @@ const AgentsList = () => {
     { 
       key: "createdAt", 
       label: "Created At",
+      sortable: true,
+      onSort: () => requestSort('createdAt'),
+      sortIcon: getSortIcon('createdAt'),
       render: (item) => {
         const date = new Date(item.createdAt);
         const formattedDate = date.toLocaleDateString('en-US', {
@@ -276,84 +327,133 @@ const AgentsList = () => {
           <div className="flex items-center gap-2">
             <div>
               <div className="font-medium text-gray-900">{formattedDate}</div>
-              <div className="text-xs text-gray-500">
-                {date.toLocaleTimeString}
-              </div>
             </div>
           </div>
         );
       }
     },
-  ];
+  ], [getSortIcon, requestSort]);
 
-  // Filter configuration
-  const filterConfig = {
-    fields: [
-      {
-        key: "hasAadhar",
-        label: "Aadhar Status",
-        type: "select",
-        options: [
-          { value: "", label: "All" },
-          { value: "yes", label: "With Aadhar" },
-          { value: "no", label: "Without Aadhar" },
-        ],
-      },
-    ],
-    dateRange: true,
+  // Selection handlers
+  const toggleSelectAgent = (uid) => {
+    if (!uid) return;
+    setSelectedAgents((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(uid)) {
+        newSet.delete(uid);
+      } else {
+        newSet.add(uid);
+      }
+      return newSet;
+    });
   };
 
-  // Event handlers
-  const handleAddNew = () => {
-    navigate("/agents/register");
-  };
-
-  const handleEdit = (agent) => {
-    navigate(`/management/edit-agent/${agent.uid}`, { 
-    state: { agent }  });
-  };
-
-    const handleView = (agent) => {
-        navigate(`/management/agent-details/${agent.uid}`, { 
-        state: { agent } 
-        });
-    };
-
-  const handleDelete = async (id) => {
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Remove from local state
-      setAgents(prev => prev.filter(agent => agent.id !== id));
-      setFilteredAgents(prev => prev.filter(agent => agent.id !== id));
-      
-      toast.success("Agent deleted successfully!");
-    } catch (error) {
-      toast.error("Failed to delete agent");
+  const toggleSelectAll = () => {
+    if (selectedAgents.size === filteredAgents.length && filteredAgents.length > 0) {
+      setSelectedAgents(new Set());
+    } else {
+      setSelectedAgents(new Set(filteredAgents.map(agent => agent.uid).filter(Boolean)));
     }
   };
 
-  const handleBulkDelete = async (ids) => {
+  // Event handlers
+  const handleEdit = (agent) => {
+      navigate(`${PATHROUTES.editAgent.replace(':uid', agent.uid)}`, { 
+      state: { 
+        uid: agent.uid,
+        fullName: agent.fullName,
+        mobile: agent.mobile,
+        aadharNumber: agent.aadharNumber,
+        profileImg: agent.profileImg,
+        aadhaarFile: agent.aadhaarFile
+      } 
+    });
+  };
+
+  const handleView = (agent) => {
+    navigate(`${PATHROUTES.agentDetails.replace(':uid', agent.uid)}`, { 
+      state: { uid: agent.uid }
+    });
+  };
+
+  const handleDelete = (uid) => {
+    if (!uid) {
+      toast.error("Cannot delete agent: Invalid agent ID");
+      return;
+    }
+    setDeleteTarget("single");
+    setDeleteId(uid);
+    setShowDeleteModal(true);
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedAgents.size === 0) {
+      toast.error("Please select agents to delete");
+      return;
+    }
+    setDeleteTarget("selected");
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    // Prevent double submission
+    if (isDeleting) return;
+    
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 800));
+      setIsDeleting(true);
+      setLoading(true);
       
-      // Remove from local state
-      setAgents(prev => prev.filter(agent => !ids.includes(agent.id)));
-      setFilteredAgents(prev => prev.filter(agent => !ids.includes(agent.id)));
-      
-      toast.success(`${ids.length} agents deleted successfully!`);
+      if (deleteTarget === "selected") {
+        const deletePromises = Array.from(selectedAgents).map((uid) =>
+          uid ? api.delete(Endpoints.DELETE_AGENT(uid)) : Promise.reject(new Error("Invalid agent ID"))
+        );
+
+        const results = await Promise.allSettled(deletePromises);
+        
+        const successfulDeletes = results.filter(r => r.status === 'fulfilled');
+        
+        if (successfulDeletes.length > 0) {
+          await fetchAgents(pagination.currentPage, searchTerm);
+          
+          const successfulUids = successfulDeletes.map((_, index) => 
+            Array.from(selectedAgents)[index]
+          ).filter(Boolean);
+          
+          setSelectedAgents(prev => {
+            const newSet = new Set(prev);
+            successfulUids.forEach(uid => newSet.delete(uid));
+            return newSet;
+          });
+          
+          toast.success(`${successfulDeletes.length} agent(s) deleted successfully!`);
+        }
+
+      } else if (deleteTarget === "single" && deleteId) {
+        await api.delete(Endpoints.DELETE_AGENT(deleteId));
+        await fetchAgents(pagination.currentPage, searchTerm);
+        setSelectedAgents((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(deleteId);
+          return newSet;
+        });
+        toast.success("Agent deleted successfully!");
+      }
     } catch (error) {
-      toast.error("Failed to delete agents");
+      console.error("Error in delete operation:", error);
+      toast.error(error?.response?.data?.message || "Failed to delete agent");
+    } finally {
+      setShowDeleteModal(false);
+      setDeleteTarget(null);
+      setDeleteId(null);
+      setLoading(false);
+      setIsDeleting(false);
     }
   };
 
   const handleExport = () => {
-    // CSV Export with only required fields
     const csvContent = [
       ["Agent ID", "Full Name", "Mobile", "Aadhar Number", "Created At"],
-      ...filteredAgents.map(a => [
+      ...sortedAgents.map(a => [
         a.uid, 
         a.fullName, 
         a.mobile, 
@@ -368,7 +468,7 @@ const AgentsList = () => {
     a.href = url;
     a.download = `commission-agents-${new Date().toISOString().split('T')[0]}.csv`;
     a.click();
-    
+    window.URL.revokeObjectURL(url);
     toast.success("Agents data exported successfully!");
   };
 
@@ -392,6 +492,7 @@ const AgentsList = () => {
           <div class="header">
             <h1>Commission Agents Report</h1>
             <p>Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
+            ${searchTerm ? `<p style="color: #666; font-style: italic;">Search: "${searchTerm}" - ${sortedAgents.length} results found</p>` : ''}
           </div>
           
           <div class="stats">
@@ -411,7 +512,7 @@ const AgentsList = () => {
               </tr>
             </thead>
             <tbody>
-              ${filteredAgents.map(agent => `
+              ${sortedAgents.map(agent => `
                 <tr>
                   <td>${agent.uid}</td>
                   <td>${agent.fullName}</td>
@@ -431,14 +532,21 @@ const AgentsList = () => {
     `);
     printWindow.document.close();
     printWindow.print();
-    
     toast.success("Printing agents report...");
   };
 
   const handleRefresh = () => {
     toast.success("Refreshing agents data...");
-    fetchAgents();
+    fetchAgents(pagination.currentPage, searchTerm);
   };
+
+  // Filter configuration - completely disabled
+  const filterConfig = {
+    fields: [],
+    dateRange: false
+  };
+
+  const totalDisplayedRecords = pagination.totalRecords;
 
   return (
     <div className="space-y-6">
@@ -448,105 +556,157 @@ const AgentsList = () => {
           <h1 className="text-2xl font-bold text-gray-900">Commission Agents</h1>
           <p className="text-gray-600">Manage commission agents for animal procurement</p>
         </div>
-        <div className="flex items-center space-x-4">
-          <div className="text-right">
-            <p className="text-sm text-gray-500">Last sync</p>
-            <p className="font-medium">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+        <button 
+          onClick={handleRefresh}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center space-x-2"
+          disabled={loading}
+        >
+          <span>Refresh</span>
+          <ArrowRight size={16} />
+        </button>
+      </div>
+
+      {/* Search and Action Menu - Like vendor example */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+            <div className="relative w-full sm:w-64">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <BiSearch className="w-4 h-4 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search by Agent ID, Name, Mobile, Aadhar..."
+                className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent text-sm bg-gray-50/50"
+                value={searchInput}
+                onChange={handleSearchChange}
+              />
+              {searchTerm && (
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                    {sortedAgents.length} found
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
-          <button 
-            onClick={handleRefresh}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center space-x-2"
-          >
-            <span>Refresh</span>
-            <ArrowRight size={16} />
-          </button>
+
+          <div className="flex flex-wrap gap-2 w-full md:w-auto justify-center md:justify-start">
+            {selectedAgents.size > 0 && (
+              <button
+                onClick={handleBulkDelete}
+                className="px-4 py-2.5 bg-gradient-to-tr from-red-600 to-red-800 text-white rounded-lg hover:shadow-md hover:opacity-90 transition-colors flex items-center gap-2 text-sm"
+              >
+                <MdDelete className="w-4 h-4" />
+                Delete ({selectedAgents.size})
+              </button>
+            )}
+            <button
+              onClick={handleExport}
+              className="px-4 py-2.5 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm hover:shadow-sm"
+            >
+              <FaDownload className="w-4 h-4" />
+              Export
+            </button>
+            <button
+              onClick={handlePrint}
+              className="px-4 py-2.5 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm hover:shadow-sm"
+            >
+              <FaPrint className="w-4 h-4" />
+              Print
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Stats Cards */}
-      {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
-          <div className="flex items-start justify-between">
-            <div className="p-3 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100">
-              <Building className="text-blue-600" size={24} />
-            </div>
-            <div className="flex items-center text-sm text-green-600">
-              <TrendingUp size={16} />
-              <span className="ml-1">+12%</span>
-            </div>
-          </div>
-          <h3 className="text-2xl font-bold text-gray-900 mt-4">{stats.totalAgents}</h3>
-          <p className="text-gray-600">Total Agents</p>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
-          <div className="flex items-start justify-between">
-            <div className="p-3 rounded-lg bg-gradient-to-br from-green-50 to-green-100">
-              <CreditCard className="text-green-600" size={24} />
-            </div>
-            <div className="flex items-center text-sm text-green-600">
-              <TrendingUp size={16} />
-              <span className="ml-1">+8%</span>
-            </div>
-          </div>
-          <h3 className="text-2xl font-bold text-gray-900 mt-4">{stats.withAadhar}</h3>
-          <p className="text-gray-600">With Aadhar</p>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
-          <div className="flex items-start justify-between">
-            <div className="p-3 rounded-lg bg-gradient-to-br from-yellow-50 to-yellow-100">
-              <FileText className="text-yellow-600" size={24} />
-            </div>
-            <div className="flex items-center text-sm text-red-600">
-              <TrendingUp size={16} />
-              <span className="ml-1">+5%</span>
-            </div>
-          </div>
-          <h3 className="text-2xl font-bold text-gray-900 mt-4">{stats.withoutAadhar}</h3>
-          <p className="text-gray-600">Without Aadhar</p>
-        </div>
-      </div> */}
-
-      {/* Filter Section */}
-      <FilterSection
-        filterConfig={filterConfig}
-        onApplyFilters={applyFilters}
-        onClearFilters={clearFilters}
-        onExport={handleExport}
-        onPrint={handlePrint}
-        onBulkDelete={() => handleBulkDelete(Array.from(new Set()))}
-        selectedCount={0}
-        initialFilters={filters}
-        searchPlaceholder="Search by Agent ID, Name, Mobile, Aadhar..."
-        
-        // Only search enabled
-        enableSearch={true}
-        enableFilters={false}
-        enableExport={true}
-        enablePrint={true}
-        enableBulkDelete={true}
-      />
-
-      {/* Data Table - Only showing 5 required fields */}
+      {/* Data Table */}
       <DataTable
         columns={columns}
-        data={filteredAgents}
+        data={sortedAgents}
         loading={loading}
         onEdit={handleEdit}
         onView={handleView}
         onDelete={handleDelete}
         onBulkDelete={handleBulkDelete}
         addButtonLabel="Add New Agent"
-        onAdd={handleAddNew}
-        emptyStateMessage="No commission agents found. Try adjusting your filters or add new agents."
+        emptyStateMessage="No commission agents found. Try adjusting your search."
         loadingMessage="Loading agents data..."
         enableSelection={true}
         enableExport={true}
         enablePrint={true}
         enablePagination={true}
         enableBulkDelete={true}
+        selectedRows={selectedAgents}
+        onSelectRow={toggleSelectAgent}
+        onSelectAll={toggleSelectAll}
+        pagination={{
+          currentPage: pagination.currentPage,
+          totalPages: pagination.totalPages,
+          totalRecords: totalDisplayedRecords,
+          onPageChange: handlePageChange,
+          onLimitChange: handleLimitChange,
+          limit: pagination.limit,
+          limitOptions: [5, 10, 25, 50, 100]
+        }}
+        // Hide the add button in DataTable if it has one
+        hideAddButton={true}
       />
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 overflow-y-auto"
+          style={{ top: 0, left: 0, right: 0, bottom: 0 }}
+        >
+          <div className="relative w-full max-w-md bg-white rounded-md shadow-xl mx-2">
+            <div className="flex justify-center mb-4 mt-4">
+              <div className="p-3 bg-red-50 rounded-full">
+                <HiOutlineTrash className="w-10 h-10 text-red-500" />
+              </div>
+            </div>
+
+            <div className="text-center mb-6">
+              <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-2">
+                Confirm Deletion
+              </h3>
+              <p className="text-gray-500 text-sm sm:text-base leading-relaxed p-3">
+                {deleteTarget === "selected"
+                  ? `You're about to delete ${selectedAgents.size} selected agent(s). This action cannot be undone.`
+                  : "You're about to delete this agent. This action cannot be undone."}
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row justify-center gap-3 px-4 pb-4">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setDeleteTarget(null);
+                  setDeleteId(null);
+                  setIsDeleting(false);
+                }}
+                className="flex-1 px-2 sm:px-5 py-1 border sm:py-2 border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors duration-150 text-sm font-medium focus:outline-none"
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={isDeleting}
+                className="flex-1 px-2 sm:px-5 py-1 sm:py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors duration-150 text-sm font-medium focus:outline-none shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isDeleting ? (
+                  <>
+                    <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <span>Delete</span>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

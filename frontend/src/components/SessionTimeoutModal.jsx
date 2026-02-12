@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import api from "../services/api/api";
 import { PATHROUTES } from "../routes/pathRoutes";
 
-const SessionTimeoutModal = ({ isAuthenticated }) => {
+const SessionTimeoutModal = ({ isAuthenticated, onLogout }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState("Session Expired");
   const [logoutMessage, setLogoutMessage] = useState(
@@ -12,7 +12,6 @@ const SessionTimeoutModal = ({ isAuthenticated }) => {
   );
 
   const navigate = useNavigate();
-
   const forceLogoutRef = useRef(false);
 
   useEffect(() => {
@@ -90,19 +89,25 @@ const SessionTimeoutModal = ({ isAuthenticated }) => {
   }, [isAuthenticated]);
 
   const handleConfirm = () => {
+    // Call onLogout prop if provided
+    if (onLogout) {
+      onLogout();
+    }
+
+    // Clear all auth data
     localStorage.removeItem("authToken");
     sessionStorage.removeItem("authToken");
     localStorage.removeItem("userData");
     sessionStorage.removeItem("userData");
 
+    // Clear login attempts if any
+    localStorage.removeItem('loginAttempts');
+    localStorage.removeItem('lockUntil');
+
     forceLogoutRef.current = false;
     setIsOpen(false);
 
-    
-  // Clear login attempts if any
-  localStorage.removeItem('loginAttempts');
-  localStorage.removeItem('lockUntil');
-
+    // Navigate to login page
     navigate(PATHROUTES.login, { replace: true });
   };
 
@@ -110,13 +115,18 @@ const SessionTimeoutModal = ({ isAuthenticated }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-md p-6 max-w-md w-full">
+      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full mx-4">
         <div className="text-center">
-          <h2 className="text-xl font-bold mb-4">{title}</h2>
-          <p className="mb-6">{logoutMessage}</p>
+          {/* Modal Title */}
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">{title}</h2>
+            <p className="text-gray-600">{logoutMessage}</p>
+          </div>
+
+          {/* OK Button with consistent styling */}
           <button
             onClick={handleConfirm}
-            className="bg-gradient-to-tr from-[#255c94] to-[#3F8F06] hover:bg-green-700 text-white font-medium py-2 px-4 rounded"
+            className="w-full bg-gradient-to-r from-primary-600 to-secondary-600 text-white py-3 px-4 rounded-lg font-medium hover:opacity-90 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
             autoFocus
           >
             OK

@@ -22,7 +22,7 @@ export const PATHROUTES = {
   editSeller: "/management/edit-seller/:uid",
 
   agentsList: "/management/commission-agents",
-  agentDetails: "/management/agent-details/:uid",
+ agentDetails: "/management/agent-details/:uid",
   editAgent: "/management/edit-agent/:uid",
   animalsList: "/management/animals",
   animalDetails: "/management/animal-details/:uid",

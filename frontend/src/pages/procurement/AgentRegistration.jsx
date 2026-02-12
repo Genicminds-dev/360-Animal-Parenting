@@ -110,7 +110,7 @@ const AgentRegistration = () => {
                 formDataToSend.append('aadhaarFile', formData.aadharDocument);
             }
             
-            // Make API call without showing "Registering agent..." loading toast
+            // Make API call
             const response = await api.post(Endpoints.CREATE_AGENT, formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -139,7 +139,7 @@ const AgentRegistration = () => {
                 
                 // Navigate to commission agents page after a short delay
                 setTimeout(() => {
-                    navigate(PATHROUTES.commissionAgents);
+                    navigate(PATHROUTES.agentsList);
                 }, 1500);
                 
             } else {
@@ -179,15 +179,6 @@ const AgentRegistration = () => {
         } finally {
             setIsSubmitting(false);
         }
-    };
-
-    const handleSaveDraft = () => {
-        localStorage.setItem('agent_draft', JSON.stringify({
-            ...formData,
-            profilePhoto: null,
-            aadharDocument: null
-        }));
-        toast.success('Saved as draft!');
     };
 
     const isPDF = (file) => {
@@ -486,33 +477,23 @@ const AgentRegistration = () => {
                     >
                         Cancel
                     </button>
-                    <div className="flex space-x-4">
-                        <button
-                            type="button"
-                            onClick={handleSaveDraft}
-                            className={`px-6 py-2 border border-primary-500 text-primary-600 rounded-lg hover:bg-primary-50 transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            disabled={isSubmitting}
-                        >
-                            Save as Draft
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className={`px-6 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center min-w-[120px] ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        >
-                            {isSubmitting ? (
-                                <>
-                                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    Registering...
-                                </>
-                            ) : (
-                                'Register Agent'
-                            )}
-                        </button>
-                    </div>
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className={`px-6 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center min-w-[120px] ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                        {isSubmitting ? (
+                            <>
+                                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Registering...
+                            </>
+                        ) : (
+                            'Register Agent'
+                        )}
+                    </button>
                 </div>
             </form>
         </div>
