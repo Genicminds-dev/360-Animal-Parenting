@@ -12,6 +12,7 @@ const FilterSection = ({
   
   // Callbacks
   onApplyFilters,
+  onFilterChange, // Add this prop
   onClearFilters,
   onExport,
   onPrint,
@@ -28,50 +29,90 @@ const FilterSection = ({
   enableExport = true,
   enablePrint = true,
   enableBulkDelete = true,
+  autoApply = false, // Add this prop with default false
 }) => {
   const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [tempFilters, setTempFilters] = useState(initialFilters);
+  const [tempFilters, setTempFilters] = useState({});
   const [isFilterApplied, setIsFilterApplied] = useState(false);
+  const [appliedFilters, setAppliedFilters] = useState({});
   
   const searchTimeoutRef = useRef(null);
 
-  // Initialize filters
+  // Initialize filters from initialFilters
   useEffect(() => {
-    const initialFilterState = {};
+    const initialFilterState = { ...initialFilters };
+    
+    // Ensure all fields have default values
     filterConfig.fields.forEach(field => {
-      initialFilterState[field.key] = "";
-    });
-    if (filterConfig.dateRange) {
-      initialFilterState.fromDate = "";
-      initialFilterState.toDate = "";
-    }
-    setTempFilters(initialFilterState);
-  }, [filterConfig]);
-
-  // Search debounce
-  useEffect(() => {
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
-    }
-
-    searchTimeoutRef.current = setTimeout(() => {
-      if (onApplyFilters) {
-        onApplyFilters({ search: searchTerm, ...tempFilters });
+      if (!(field.key in initialFilterState)) {
+        initialFilterState[field.key] = "";
       }
-    }, 500);
+    });
+    
+    if (filterConfig.dateRange) {
+      if (!('fromDate' in initialFilterState)) initialFilterState.fromDate = "";
+      if (!('toDate' in initialFilterState)) initialFilterState.toDate = "";
+    }
+    
+    setTempFilters(initialFilterState);
+    setSearchTerm(initialFilters.search || "");
+    setAppliedFilters(initialFilters);
+    
+    // Check if any filters are applied
+    const hasAppliedFilters = Object.keys(initialFilters).length > 0 && 
+      !(Object.keys(initialFilters).length === 1 && 'search' in initialFilters && !initialFilters.search);
+    setIsFilterApplied(hasAppliedFilters);
+  }, [filterConfig, initialFilters]);
 
-    return () => {
+  // Handle search with debounce - only auto-apply if autoApply is true
+  useEffect(() => {
+    if (autoApply) {
       if (searchTimeoutRef.current) {
         clearTimeout(searchTimeoutRef.current);
       }
-    };
-  }, [searchTerm, tempFilters, onApplyFilters]);
+
+      searchTimeoutRef.current = setTimeout(() => {
+        if (onApplyFilters) {
+          const filtersToApply = { search: searchTerm, ...tempFilters };
+          onApplyFilters(filtersToApply);
+          setAppliedFilters(filtersToApply);
+        }
+      }, 500);
+
+      return () => {
+        if (searchTimeoutRef.current) {
+          clearTimeout(searchTimeoutRef.current);
+        }
+      };
+    }
+  }, [searchTerm, tempFilters, onApplyFilters, autoApply]);
+
+  // Handle filter changes - notify parent without applying
+  const handleFilterChange = (key, value) => {
+    const updatedFilters = { ...tempFilters, [key]: value };
+    setTempFilters(updatedFilters);
+    
+    // Call onFilterChange if provided (for non-auto-apply mode)
+    if (onFilterChange) {
+      onFilterChange({ search: searchTerm, ...updatedFilters });
+    }
+  };
 
   const handleApplyFilters = () => {
+    const filtersToApply = { search: searchTerm, ...tempFilters };
+    
+    // Remove empty filters
+    Object.keys(filtersToApply).forEach(key => {
+      if (filtersToApply[key] === "" || filtersToApply[key] === null || filtersToApply[key] === undefined) {
+        delete filtersToApply[key];
+      }
+    });
+    
     if (onApplyFilters) {
-      onApplyFilters({ search: searchTerm, ...tempFilters });
+      onApplyFilters(filtersToApply);
     }
+    setAppliedFilters(filtersToApply);
     setIsFilterApplied(true);
     setShowFilters(false);
   };
@@ -88,9 +129,14 @@ const FilterSection = ({
     setTempFilters(emptyFilters);
     setSearchTerm("");
     setIsFilterApplied(false);
+    setAppliedFilters({});
     
     if (onClearFilters) {
       onClearFilters();
+    }
+    
+    if (onFilterChange) {
+      onFilterChange({});
     }
   };
 
@@ -114,7 +160,21 @@ const FilterSection = ({
                 placeholder={searchPlaceholder}
                 className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-gray-50/50"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  if (onFilterChange) {
+                    onFilterChange({ search: e.target.value, ...tempFilters });
+                  }
+                  // Auto-apply search only if autoApply is true
+                  if (autoApply && onApplyFilters) {
+                    if (searchTimeoutRef.current) {
+                      clearTimeout(searchTimeoutRef.current);
+                    }
+                    searchTimeoutRef.current = setTimeout(() => {
+                      onApplyFilters({ search: e.target.value, ...tempFilters });
+                    }, 500);
+                  }
+                }}
               />
             </div>
           )}
@@ -131,6 +191,11 @@ const FilterSection = ({
             >
               <Filter className="w-4 h-4" />
               Filters
+              {isFilterApplied && (
+                <span className="ml-1 px-1.5 py-0.5 bg-blue-200 text-blue-800 rounded-full text-xs">
+                  •
+                </span>
+              )}
             </button>
           )}
         </div>
@@ -186,10 +251,7 @@ const FilterSection = ({
                     className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm"
                     value={tempFilters[field.key] || ""}
                     onChange={(e) =>
-                      setTempFilters(prev => ({
-                        ...prev,
-                        [field.key]: e.target.value,
-                      }))
+                      handleFilterChange(field.key, e.target.value)
                     }
                   >
                     <option value="">All {field.label}</option>
@@ -205,10 +267,7 @@ const FilterSection = ({
                     className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm"
                     value={tempFilters[field.key] || ""}
                     onChange={(e) =>
-                      setTempFilters(prev => ({
-                        ...prev,
-                        [field.key]: e.target.value,
-                      }))
+                      handleFilterChange(field.key, e.target.value)
                     }
                     placeholder={`Enter ${field.label.toLowerCase()}`}
                   />
@@ -230,10 +289,7 @@ const FilterSection = ({
                       value={tempFilters.fromDate || ""}
                       max={getCurrentDate()}
                       onChange={(e) =>
-                        setTempFilters(prev => ({
-                          ...prev,
-                          fromDate: e.target.value,
-                        }))
+                        handleFilterChange("fromDate", e.target.value)
                       }
                     />
                   </div>
@@ -251,10 +307,7 @@ const FilterSection = ({
                       max={getCurrentDate()}
                       min={tempFilters.fromDate || undefined}
                       onChange={(e) =>
-                        setTempFilters(prev => ({
-                          ...prev,
-                          toDate: e.target.value,
-                        }))
+                        handleFilterChange("toDate", e.target.value)
                       }
                     />
                   </div>
@@ -271,21 +324,15 @@ const FilterSection = ({
                     <Filter className="w-3 h-3 mr-1" />
                     Filters Applied
                   </span>
-                  {(tempFilters.status ||
-                    tempFilters.state ||
-                    tempFilters.fromDate ||
-                    tempFilters.toDate) && (
-                    <span className="text-blue-700 text-xs">
-                      {tempFilters.status && `Status: ${tempFilters.status}`}
-                      {tempFilters.state &&
-                        `${tempFilters.status ? ", " : ""}State: ${tempFilters.state
-                        }`}
-                      {(tempFilters.fromDate || tempFilters.toDate) &&
-                        `${tempFilters.status || tempFilters.state ? ", " : ""
-                        }Date: ${tempFilters.fromDate || "Beginning"} to ${tempFilters.toDate || "Current"
-                        }`}
-                    </span>
-                  )}
+                  <span className="text-blue-700 text-xs">
+                    {Object.keys(appliedFilters).length > 0 && 
+                      Object.keys(appliedFilters).filter(k => k !== 'search' && appliedFilters[k]).map(key => {
+                        if (key === 'fromDate' || key === 'toDate') {
+                          return key === 'fromDate' ? `From: ${appliedFilters[key]}` : `To: ${appliedFilters[key]}`;
+                        }
+                        return `${key}: ${appliedFilters[key]}`;
+                      }).join(', ')}
+                  </span>
                 </div>
               )}
             </div>
