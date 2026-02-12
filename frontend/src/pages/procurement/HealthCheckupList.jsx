@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { Plus, RefreshCw, Stethoscope } from "lucide-react";
+import { RefreshCw, Plus } from "lucide-react";
 import DataTable from "../../components/common/Table/DataTable";
 import FilterSection from "../../components/common/Filter/FilterSection";
 
@@ -103,7 +103,6 @@ const HealthCheckupList = () => {
   const [filteredCheckups, setFilteredCheckups] = useState(MOCK_HEALTH_CHECKUPS);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({});
-  const [selectedCheckups, setSelectedCheckups] = useState([]);
 
   // Fetch health checkups with simulated API call
   const fetchHealthCheckups = useCallback(async () => {
@@ -249,11 +248,6 @@ const HealthCheckupList = () => {
     }
   };
 
-  // Event handlers
-  const handleAddNew = () => {
-    navigate("/health-checkup/register");
-  };
-
   // Handle Health Details button click - Navigate to new page
   const handleHealthDetails = (checkup) => {
     navigate(`/health-checkup/form/${checkup.id}`, {
@@ -261,37 +255,6 @@ const HealthCheckupList = () => {
         animalData: checkup
       }
     });
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // Remove from local state using id for deletion
-      setHealthCheckups(prev => prev.filter(checkup => checkup.id !== id));
-      setFilteredCheckups(prev => prev.filter(checkup => checkup.id !== id));
-
-      toast.success("Health checkup record deleted successfully!");
-    } catch (error) {
-      toast.error("Failed to delete health checkup record");
-    }
-  };
-
-  const handleBulkDelete = async (ids) => {
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 800));
-
-      // Remove from local state using id for deletion
-      setHealthCheckups(prev => prev.filter(checkup => !ids.includes(checkup.id)));
-      setFilteredCheckups(prev => prev.filter(checkup => !ids.includes(checkup.id)));
-
-      toast.success(`${ids.length} health checkup records deleted successfully!`);
-      setSelectedCheckups([]);
-    } catch (error) {
-      toast.error("Failed to delete health checkup records");
-    }
   };
 
   const handleExport = () => {
@@ -412,13 +375,13 @@ const HealthCheckupList = () => {
           <h1 className="text-2xl font-bold text-gray-900">Animal Health Checkups</h1>
           <p className="text-gray-600">View animals and perform health checkups</p>
         </div>
-        <button
-          onClick={handleRefresh}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center space-x-2"
-        >
-          <span>Refresh</span>
-          <RefreshCw size={16} />
-        </button>
+          <button
+            onClick={handleRefresh}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center space-x-2"
+          >
+            <RefreshCw size={16} />
+            <span>Refresh</span>
+          </button>
       </div>
 
       {/* Filter Section */}
@@ -428,14 +391,12 @@ const HealthCheckupList = () => {
         onClearFilters={clearFilters}
         onExport={handleExport}
         onPrint={handlePrint}
-        onBulkDelete={handleBulkDelete}
-        selectedCount={selectedCheckups.length}
         initialFilters={filters}
         searchPlaceholder="Search by Animal ID, Tag ID, Seller Name or Mobile..."
         enableSearch={true}
         enableExport={true}
         enablePrint={true}
-        enableBulkDelete={true}
+        enableBulkDelete={false}
       />
 
       {/* Data Table */}
@@ -443,23 +404,20 @@ const HealthCheckupList = () => {
         columns={columns}
         data={filteredCheckups}
         loading={loading}
-        getSelectedItems={() => selectedCheckups}
-        onDelete={handleDelete}
-        onBulkDelete={handleBulkDelete}
         onExport={handleExport}
         onPrint={handlePrint}
         onHealthCheck={handleHealthDetails}
         enableHealthCheck={true}
-        healthCheckLabel=" Add Health Details"
+        healthCheckLabel="Add Health Details"
         addButtonLabel="New Health Checkup"
-        onAdd={handleAddNew}
         emptyStateMessage="No animals found for health checkup. Try adjusting your filters."
         loadingMessage="Loading animal data..."
-        enableSelection={true}
+        enableSelection={false}
         enableExport={true}
         enablePrint={true}
         enablePagination={true}
-        enableBulkDelete={true}
+        enableBulkDelete={false}
+        enableDelete={false}
       />
     </div>
   );
