@@ -29,11 +29,12 @@ import { PATHROUTES } from './routes/pathRoutes';
 import api from "./services/api/api";
 import { Endpoints } from "./services/api/EndPoint";
 import SessionTimeoutModal from './components/SessionTimeoutModal';
-import HealthCheckupList from './pages/management/health/HealthCheckupList';
+import HealthCheckupList from './pages/procurement/HealthCheckupList';
 import AgentDetails from './pages/management/agents/AgentDetails';
 import EditAgent from './pages/management/agents/EditAgent';
 import SellerDetails from './pages/management/sellers/SellerDetails';
 import EditSeller from './pages/management/sellers/EditSeller';
+import HealthCheckupForm from './pages/procurement/HealthCheckupForm';
 
 // ProtectedRoute Component
 const ProtectedRoute = ({ children, allowedRoles = [1, 2, 3] }) => {
@@ -217,10 +218,18 @@ const AppContent = () => {
           />
 
           <Route
-            path={PATHROUTES.healthCheckUpList.replace('/', '')}
+            path={PATHROUTES.healthCheckupList.replace('/', '')}
             element={
               <ProtectedRoute allowedRoles={[1,2,3]}>
                 <HealthCheckupList/>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={PATHROUTES.healthCheckupForm.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1,2,3]}>
+                <HealthCheckupForm/>
               </ProtectedRoute>
             }
           />
@@ -366,7 +375,8 @@ const AppContent = () => {
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
 
-      <SessionTimeoutModal isAuthenticated={isAuthenticated} />
+      <SessionTimeoutModal isAuthenticated={isAuthenticated} onLogout={handleLogout}
+  />
     </>
   );
 };

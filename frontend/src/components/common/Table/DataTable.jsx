@@ -16,6 +16,7 @@ import {
   Edit,
   Trash2,
   Search,
+  Stethoscope,
 } from "lucide-react";
 
 const DataTable = ({
@@ -27,28 +28,33 @@ const DataTable = ({
   // Pagination
   itemsPerPageOptions = [5, 10, 20, 30],
   enablePagination = true,
-  
+
   // Features
   getSelectedItems,
   enableSelection = true,
-  
+
   // Callbacks
   onAdd,
   onEdit,
   onView,
   onDelete,
   onBulkDelete,
-  
+  onHealthCheck, // New callback for health check button
+
   // Customization
   addButtonLabel = "Add New",
   emptyStateMessage = "No data found",
   loadingMessage = "Loading...",
-  
+
   // Custom renderers
   renderCell,
   renderActions,
   renderEmptyState,
-  
+
+  // Health Check specific props
+  enableHealthCheck = false,
+  healthCheckLabel
+
 }) => {
   // State management
   const [selectedItems, setSelectedItems] = useState(new Set());
@@ -112,7 +118,7 @@ const DataTable = ({
 
   const getSortIcon = (key) => {
     if (sortConfig.key !== key) return <FaSort className="ml-1 text-gray-400" size={14} />;
-    return sortConfig.direction === "asc" 
+    return sortConfig.direction === "asc"
       ? <ChevronUp className="ml-1 text-blue-600" size={16} />
       : <ChevronDown className="ml-1 text-blue-600" size={16} />;
   };
@@ -176,16 +182,27 @@ const DataTable = ({
   // Default renderers
   const defaultRenderCell = (item, column) => {
     const value = item[column.key];
-    
+
     if (column.render) {
       return column.render(item);
     }
-    
+
     return value || "N/A";
   };
 
+  // Default actions renderer - includes Health Check button if enabled
   const defaultRenderActions = (item) => (
     <div className="flex items-center space-x-2">
+      {enableHealthCheck && onHealthCheck && (
+        <button
+          onClick={() => onHealthCheck(item)}
+          className="p-2 rounded-md text-xs font-medium bg-indigo-100 text-indigo-800 hover:bg-indigo-200 hover:text-indigo-900 flex items-center space-x-2 transition-colors duration-200"
+          title={healthCheckLabel}
+        >
+          <Stethoscope size={14} />
+          <span>{healthCheckLabel}</span>
+        </button>
+      )}
       {onView && (
         <button
           onClick={() => onView(item)}
@@ -220,10 +237,13 @@ const DataTable = ({
     <div className="flex flex-col items-center justify-center py-12">
       <Search className="w-12 h-12 text-gray-300 mb-4" />
       <div className="text-lg font-medium text-gray-500 mb-2">
-        {emptyStateMessage}  {/* Fixed: removed searchTerm reference */}
+        {emptyStateMessage}
       </div>
     </div>
   );
+
+  // Determine if we should show actions column
+  const showActionsColumn = onView || onEdit || onDelete || enableHealthCheck;
 
   return (
     <>
@@ -257,7 +277,7 @@ const DataTable = ({
                     </div>
                   </th>
                 ))}
-                {(onView || onEdit || onDelete) && (
+                {showActionsColumn && (
                   <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
@@ -268,7 +288,7 @@ const DataTable = ({
             <tbody className="bg-white divide-y divide-gray-100">
               {loading ? (
                 <tr>
-                  <td colSpan={columns.length + (enableSelection ? 1 : 0) + ((onView || onEdit || onDelete) ? 1 : 0)} className="px-4 py-12 text-center">
+                  <td colSpan={columns.length + (enableSelection ? 1 : 0) + (showActionsColumn ? 1 : 0)} className="px-4 py-12 text-center">
                     <div className="flex flex-col items-center justify-center">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
                       <div className="text-lg font-medium text-gray-500 mb-2">
@@ -281,9 +301,8 @@ const DataTable = ({
                 paginatedData.map((item, idx) => (
                   <tr
                     key={item.id || idx}
-                    className={`hover:bg-gray-50/50 transition-colors ${
-                      selectedItems.has(item.id) ? "bg-blue-50" : idx % 2 === 0 ? "bg-white" : "bg-gray-50/30"
-                    }`}
+                    className={`hover:bg-gray-50/50 transition-colors ${selectedItems.has(item.id) ? "bg-blue-50" : idx % 2 === 0 ? "bg-white" : "bg-gray-50/30"
+                      }`}
                   >
                     {enableSelection && (
                       <td className="px-4 py-3 whitespace-nowrap border-r border-gray-100 text-center">
@@ -303,7 +322,7 @@ const DataTable = ({
                         {(renderCell || defaultRenderCell)(item, col)}
                       </td>
                     ))}
-                    {(onView || onEdit || onDelete) && (
+                    {showActionsColumn && (
                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
                         <div className="flex items-center justify-center">
                           {(renderActions || defaultRenderActions)(item)}
@@ -314,7 +333,7 @@ const DataTable = ({
                 ))
               ) : (
                 <tr>
-                  <td colSpan={columns.length + (enableSelection ? 1 : 0) + ((onView || onEdit || onDelete) ? 1 : 0)} className="px-4 py-12 text-center">
+                  <td colSpan={columns.length + (enableSelection ? 1 : 0) + (showActionsColumn ? 1 : 0)} className="px-4 py-12 text-center">
                     {(renderEmptyState || defaultRenderEmptyState)()}
                   </td>
                 </tr>
@@ -340,7 +359,7 @@ const DataTable = ({
                 <span className="font-medium text-blue-700">
                   {sortedData.length}
                 </span>{" "}
-                items  {/* Fixed: removed searchTerm reference */}
+                items
               </div>
 
               <div className="flex flex-wrap items-center justify-center gap-2">
@@ -363,11 +382,10 @@ const DataTable = ({
                             setShowItemsPerPageDropdown(false);
                             setCurrentPage(1);
                           }}
-                          className={`block w-full text-left px-3 py-2 text-sm hover:bg-blue-50 transition-colors border-b border-gray-200 last:border-b-0 ${
-                            itemsPerPage === option
-                              ? "bg-blue-50 text-blue-600 font-medium"
-                              : "text-gray-700"
-                          }`}
+                          className={`block w-full text-left px-3 py-2 text-sm hover:bg-blue-50 transition-colors border-b border-gray-200 last:border-b-0 ${itemsPerPage === option
+                            ? "bg-blue-50 text-blue-600 font-medium"
+                            : "text-gray-700"
+                            }`}
                         >
                           {option}
                         </button>
@@ -390,20 +408,19 @@ const DataTable = ({
                       totalPages <= 5
                         ? i + 1
                         : currentPage <= 3
-                        ? i + 1
-                        : currentPage >= totalPages - 2
-                        ? totalPages - 4 + i
-                        : currentPage - 2 + i;
+                          ? i + 1
+                          : currentPage >= totalPages - 2
+                            ? totalPages - 4 + i
+                            : currentPage - 2 + i;
 
                     return (
                       <button
                         key={pageNumber}
                         onClick={() => setCurrentPage(pageNumber)}
-                        className={`px-3 py-2 border rounded-lg min-w-[2.5rem] transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                          currentPage === pageNumber
-                            ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white border-transparent"
-                            : "border-gray-300 hover:bg-gray-50 bg-white"
-                        }`}
+                        className={`px-3 py-2 border rounded-lg min-w-[2.5rem] transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${currentPage === pageNumber
+                          ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white border-transparent"
+                          : "border-gray-300 hover:bg-gray-50 bg-white"
+                          }`}
                       >
                         {pageNumber}
                       </button>
@@ -417,11 +434,10 @@ const DataTable = ({
                   {totalPages > 5 && currentPage < totalPages - 2 && (
                     <button
                       onClick={() => setCurrentPage(totalPages)}
-                      className={`px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
-                        currentPage === totalPages
-                          ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white border-transparent"
-                          : ""
-                      }`}
+                      className={`px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${currentPage === totalPages
+                        ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white border-transparent"
+                        : ""
+                        }`}
                     >
                       {totalPages}
                     </button>

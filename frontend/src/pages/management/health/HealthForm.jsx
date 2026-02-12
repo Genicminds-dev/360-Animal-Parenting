@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Heart, FileText, CheckCircle, XCircle, Thermometer, Calendar, Stethoscope } from 'lucide-react';
 
-const HealthCheck = () => {
+const HealthForm = () => {
   const [formData, setFormData] = useState({
     animalId: '',
     vetName: '',
@@ -496,4 +496,4 @@ const HealthCheck = () => {
   );
 };
 
-export default HealthCheck;
+export default HealthForm;
