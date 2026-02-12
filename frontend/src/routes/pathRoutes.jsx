@@ -12,7 +12,8 @@ export const PATHROUTES = {
   agentRegistration: "/procurement/agent-registration",
   sellerRegistration: "/procurement/seller-registration", 
   animalRegistration: "/procurement/animal-registration",
-  healthCheckUpList: "/procurement/health-checkUp-List",
+  healthCheckupList: "/procurement/health-checkup-List",
+  healthCheckupForm: "/health-checkup/form/:id",
   // healthCheckUpList: "/procurement/health-check",
   
   // Management Routes
