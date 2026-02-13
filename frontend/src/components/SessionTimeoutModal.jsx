@@ -124,13 +124,16 @@ const SessionTimeoutModal = ({ isAuthenticated, onLogout }) => {
           </div>
 
           {/* OK Button with consistent styling */}
-          <button
-            onClick={handleConfirm}
-            className="w-full bg-gradient-to-r from-primary-600 to-secondary-600 text-white py-3 px-4 rounded-lg font-medium hover:opacity-90 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-            autoFocus
-          >
-            OK
-          </button>
+          <div className="flex justify-center">
+            <button
+              onClick={handleConfirm}
+              className="bg-gradient-to-r from-primary-600 to-secondary-600 text-white py-2 px-6 rounded-md text-sm font-medium hover:opacity-90 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              autoFocus
+            >
+              OK
+            </button>
+          </div>
+
         </div>
       </div>
     </div>
