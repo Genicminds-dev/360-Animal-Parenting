@@ -38,6 +38,8 @@ import HealthCheckupForm from './pages/procurement/HealthCheckupForm';
 import ManageUsersForm from './pages/manageUsers/ManageUsersForm';
 import ManageUsersTable from './pages/manageUsers/ManageUsersTable';
 import ViewUserDetails from './pages/manageUsers/ViewUserDetails';
+import { Edit3Icon } from 'lucide-react';
+import EditAnimal from './pages/management/animals/EditAnimal';
 
 // ProtectedRoute Component
 const ProtectedRoute = ({ children, allowedRoles = [1, 2, 3] }) => {
@@ -311,7 +313,14 @@ const AppContent = () => {
               </ProtectedRoute>
             }
           />
-
+           <Route
+            path={PATHROUTES.editAnimal.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1, 2, 3]}>
+                <EditAnimal/>
+              </ProtectedRoute>
+            }
+          />
 
           {/* Transporters */}
           <Route

@@ -484,8 +484,7 @@ const AnimalsList = () => {
   };
 
   const handleEdit = (animal) => {
-    toast.success(`Editing animal: ${animal.uid}`);
-    navigate(`/animals/edit/${animal.uid}`, { state: { animal } });
+    navigate(`/management/edit-animal/${animal.uid}`, { state: { animal } });
   };
   
   const handleView = (animal) => {
