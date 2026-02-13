@@ -41,7 +41,7 @@ const MOCK_ANIMALS = [
   {
     id: 1,
     uid: "ANM001",
-    earTagId: "ET001",
+    earTagId: "TAG-001",
     vendorName: "Rajesh Kumar",
     vendorId: "V001",
     vendorMobile: "9876543210",
@@ -68,7 +68,7 @@ const MOCK_ANIMALS = [
   {
     id: 2,
     uid: "ANM002",
-    earTagId: "ET002",
+    earTagId: "TAG-002",
     vendorName: "Suresh Patel",
     vendorId: "V002",
     vendorMobile: "9876543211",
@@ -95,7 +95,7 @@ const MOCK_ANIMALS = [
   {
     id: 3,
     uid: "ANM003",
-    earTagId: "ET003",
+    earTagId: "TAG-003",
     vendorName: "Mohan Singh",
     vendorId: "V003",
     vendorMobile: "9876543212",
@@ -122,7 +122,7 @@ const MOCK_ANIMALS = [
   {
     id: 4,
     uid: "ANM004",
-    earTagId: "ET004",
+    earTagId: "TAG-004",
     vendorName: "Anil Sharma",
     vendorId: "V004",
     vendorMobile: "9876543213",
@@ -149,7 +149,7 @@ const MOCK_ANIMALS = [
   {
     id: 5,
     uid: "ANM005",
-    earTagId: "ET005",
+    earTagId: "TAG-005",
     vendorName: "Vikram Verma",
     vendorId: "V005",
     vendorMobile: "9876543214",
@@ -176,7 +176,7 @@ const MOCK_ANIMALS = [
   {
     id: 6,
     uid: "ANM006",
-    earTagId: "ET006",
+    earTagId: "TAG-006",
     vendorName: "Ramesh Gupta",
     vendorId: "V006",
     vendorMobile: "9876543215",
@@ -203,7 +203,7 @@ const MOCK_ANIMALS = [
   {
     id: 7,
     uid: "ANM007",
-    earTagId: "ET007",
+    earTagId: "TAG-007",
     vendorName: "Harish Joshi",
     vendorId: "V007",
     vendorMobile: "9876543216",

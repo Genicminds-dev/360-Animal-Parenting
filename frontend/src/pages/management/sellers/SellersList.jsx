@@ -373,16 +373,6 @@ const SellersList = () => {
           { value: "Uttar Pradesh", label: "Uttar Pradesh" },
         ],
       },
-      {
-        key: "hasTransaction",
-        label: "Has Transaction ID",
-        type: "select",
-        options: [
-          { value: "", label: "All" },
-          { value: "yes", label: "Yes" },
-          { value: "no", label: "No" },
-        ],
-      },
     ],
     dateRange: true,
   };
