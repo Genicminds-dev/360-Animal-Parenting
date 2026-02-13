@@ -355,7 +355,6 @@ const SellersList = () => {
         label: "Gender",
         type: "select",
         options: [
-          { value: "", label: "All Genders" },
           { value: "Male", label: "Male" },
           { value: "Female", label: "Female" },
         ],

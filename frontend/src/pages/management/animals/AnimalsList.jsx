@@ -484,8 +484,7 @@ const AnimalsList = () => {
   };
 
   const handleEdit = (animal) => {
-    toast.success(`Editing animal: ${animal.uid}`);
-    navigate(`/animals/edit/${animal.uid}`, { state: { animal } });
+    navigate(`/management/edit-animal/${animal.uid}`, { state: { animal } });
   };
   
   const handleView = (animal) => {
@@ -643,7 +642,7 @@ const AnimalsList = () => {
       {/* Header Section */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Animal Registration</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Animal Details</h1>
           <p className="text-gray-600">View and manage all registered animals</p>
         </div>
         <div className="flex items-center space-x-4">
