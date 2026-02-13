@@ -8,6 +8,14 @@ export const Endpoints = {
   FORGOT_PASSWORD: "/auth/forgot-password",
   RESET_PASSWORD: "/auth/reset-password",
 
+  // USER MANAGEMENT
+  GET_USERS: "/admin/users",
+  CREATE_USER: "/admin/users",
+  UPDATE_USER: (userId) => `/admin/user/${userId}`,
+  DELETE_USER: (userId) => `/admin/user/${userId}`,
+  GET_USER_BY_ID: (userId) => `/admin/user/${userId}`,
+  GET_ROLES: "/admin/roles",
+
   // Agent MANAGEMENT
   GET_AGENT: "/admin/users",
   CREATE_AGENT: "/admin/commission-agent",

@@ -45,15 +45,17 @@ const Sidebar = ({ toggleSidebar, onLogout, isMobile }) => {
         { path: '/procurement/animal-transfer', label: 'Animal Transfer', roles: [1, 2] },
       ]
     },
-    { path: '/management/sellers', label: 'Sellers', icon: <Users size={20} />, roles: [1, 2] },
-    { path: '/management/commission-agents', label: 'Commission Agents', icon: <Users size={20} />, roles: [1, 2] },
+    { path: '/management/sellers', label: 'Sellers', icon: <Users size={20} />, roles: [1, 2, 3] },
+    { path: '/management/commission-agents', label: 'Commission Agents', icon: <Users size={20} />, roles: [1, 2, 3] },
     { path: '/management/animals', label: 'Animals', icon: <GiCow size={20} />, roles: [1, 2, 3] },
-    { path: '/transporters', label: 'Transporters', icon: <Truck size={20} />, roles: [1, 2] },
-    { path: '/suppliers', label: 'Suppliers', icon: <UserCircle size={20} />, roles: [1, 2] },
-    { path: '/beneficiaries', label: 'Beneficiaries', icon: <Users size={20} />, roles: [1] },
-    { path: '/team', label: 'Team Members', icon: <Users size={20} />, roles: [1] },
-    { path: '/reports', label: 'Reports', icon: <FileText size={20} />, roles: [1, 2] },
-    { path: '/settings', label: 'Settings', icon: <Settings size={20} />, roles: [1] },
+    { path: '/transporters', label: 'Transporters', icon: <Truck size={20} />, roles: [1, 2, 3] },
+    { path: '/suppliers', label: 'Suppliers', icon: <UserCircle size={20} />, roles: [1, 2, 3] },
+    { path: '/beneficiaries', label: 'Beneficiaries', icon: <Users size={20} />, roles: [1, 2, 3] },
+    // { path: '/team', label: 'Team Members', icon: <Users size={20} />, roles: [1, 2, 3] },
+    // { path: '/reports', label: 'Reports', icon: <FileText size={20} />, roles: [1, 2, 3] },
+    { path: '/manage-users', label: 'Manage Users', icon: <Settings size={20} />, roles: [1, 2, 3] },
+    { path: '/settings', label: 'Settings', icon: <Settings size={20} />, roles: [1, 2, 3] },
+
   ];
 
   const userRoleId = user?.role || 2;

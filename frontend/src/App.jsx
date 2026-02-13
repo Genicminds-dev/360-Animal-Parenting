@@ -35,6 +35,9 @@ import EditAgent from './pages/management/agents/EditAgent';
 import SellerDetails from './pages/management/sellers/SellerDetails';
 import EditSeller from './pages/management/sellers/EditSeller';
 import HealthCheckupForm from './pages/procurement/HealthCheckupForm';
+import ManageUsersForm from './pages/manageUsers/ManageUsersForm';
+import ManageUsersTable from './pages/manageUsers/ManageUsersTable';
+import ViewUserDetails from './pages/manageUsers/ViewUserDetails';
 
 // ProtectedRoute Component
 const ProtectedRoute = ({ children, allowedRoles = [1, 2, 3] }) => {
@@ -220,16 +223,16 @@ const AppContent = () => {
           <Route
             path={PATHROUTES.healthCheckupList.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1,2,3]}>
-                <HealthCheckupList/>
+              <ProtectedRoute allowedRoles={[1, 2, 3]}>
+                <HealthCheckupList />
               </ProtectedRoute>
             }
           />
           <Route
             path={PATHROUTES.healthCheckupForm.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1,2,3]}>
-                <HealthCheckupForm/>
+              <ProtectedRoute allowedRoles={[1, 2, 3]}>
+                <HealthCheckupForm />
               </ProtectedRoute>
             }
           />
@@ -256,7 +259,7 @@ const AppContent = () => {
             path={PATHROUTES.editSeller.replace('/', '')}
             element={
               <ProtectedRoute allowedRoles={[1, 2]}>
-                <EditSeller/>
+                <EditSeller />
               </ProtectedRoute>
             }
           />
@@ -264,7 +267,7 @@ const AppContent = () => {
             path={PATHROUTES.sellerDetails.replace('/', '')}
             element={
               <ProtectedRoute allowedRoles={[1, 2]}>
-                <SellerDetails/>
+                <SellerDetails />
               </ProtectedRoute>
             }
           />
@@ -276,19 +279,19 @@ const AppContent = () => {
               </ProtectedRoute>
             }
           />
-           <Route
+          <Route
             path={PATHROUTES.agentDetails.replace('/', '')}
             element={
               <ProtectedRoute allowedRoles={[1, 2]}>
-                <AgentDetails/>
+                <AgentDetails />
               </ProtectedRoute>
             }
           />
-            <Route
+          <Route
             path={PATHROUTES.editAgent.replace('/', '')}
             element={
               <ProtectedRoute allowedRoles={[1, 2]}>
-                <EditAgent/>
+                <EditAgent />
               </ProtectedRoute>
             }
           />
@@ -360,6 +363,43 @@ const AppContent = () => {
             }
           />
 
+          <Route
+            path={PATHROUTES.manageUsers.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1, 2]}>
+                <ManageUsersTable />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path={PATHROUTES.addUsers.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1, 2]}>
+                <ManageUsersForm />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path={`${PATHROUTES.editUsers.replace('/', '')}/:id`}
+            element={
+              <ProtectedRoute allowedRoles={[1, 2]}>
+                <ManageUsersForm />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path={`${PATHROUTES.viewUsers}/:id`}
+            element={
+              <ProtectedRoute allowedRoles={[1, 2]}>
+                <ViewUserDetails />
+              </ProtectedRoute>
+            }
+          />
+
+
           {/* Settings */}
           <Route
             path={PATHROUTES.settings.replace('/', '')}
@@ -376,7 +416,7 @@ const AppContent = () => {
       </Routes>
 
       <SessionTimeoutModal isAuthenticated={isAuthenticated} onLogout={handleLogout}
-  />
+      />
     </>
   );
 };
