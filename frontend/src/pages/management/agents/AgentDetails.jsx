@@ -14,9 +14,9 @@ import {
   Calendar,
   CreditCard
 } from "lucide-react";
-import api, { baseURLFile } from "../../../services/api/api";
 import { Endpoints } from "../../../services/api/EndPoint";
 import { PATHROUTES } from "../../../routes/pathRoutes";
+import api, { baseURLFile } from "../../../services/api/api";
 
 const AgentDetails = () => {
   const navigate = useNavigate();
