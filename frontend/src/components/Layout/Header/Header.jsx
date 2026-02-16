@@ -26,9 +26,9 @@ const Header = ({ toggleSidebar, sidebarOpen }) => {
   // Convert numeric role ID to display name
   const getRoleDisplayName = (roleId) => {
     switch (roleId) {
-      case 1: return 'Administrator';
-      case 2: return 'Procurement Officer';
-      case 3: return 'Veterinary Officer';
+      case 1: return 'MasterAdmin';
+      case 2: return 'SuperAdmin';
+      case 3: return 'Admin';
       default: return 'User';
     }
   };
@@ -51,14 +51,6 @@ const Header = ({ toggleSidebar, sidebarOpen }) => {
             >
               {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
-            
-            {/* Logo for mobile */}
-            <div className="lg:hidden flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">360</span>
-              </div>
-              <span className="font-bold text-gray-900 text-sm hidden xs:inline">Animal Parenting</span>
-            </div>
 
             {/* Search Bar - Desktop */}
             <div className={`hidden md:block relative flex-1 max-w-md`}>
@@ -95,8 +87,7 @@ const Header = ({ toggleSidebar, sidebarOpen }) => {
             {/* User Menu */}
             <div className="relative">
               <button
-                onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center space-x-2 sm:space-x-3 p-1 rounded-lg hover:bg-gray-100"
+                className="flex items-center space-x-2 sm:space-x-3 p-1 rounded-lg"
               >
                 <div className="text-right hidden sm:block">
                   <p className="text-sm font-medium text-gray-900 truncate max-w-[120px] md:max-w-[150px]">
@@ -110,63 +101,6 @@ const Header = ({ toggleSidebar, sidebarOpen }) => {
                   {user?.avatar || 'U'}
                 </div>
               </button>
-
-              {/* User Dropdown Menu */}
-              {showUserMenu && (
-                <div className="absolute right-0 mt-2 w-56 sm:w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                  <div className="px-4 py-3 border-b border-gray-100">
-                    <p className="font-medium text-gray-900 truncate text-sm sm:text-base">
-                      {user?.email || 'user@example.com'}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {getRoleDisplayName(userRoleId)}
-                    </p>
-                    <p className="text-xs text-gray-400 mt-1">
-                      User ID: {user?.id || 'N/A'}
-                    </p>
-                  </div>
-                  
-                  <div className="py-2">
-                    <Link
-                      to="/profile"
-                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={() => setShowUserMenu(false)}
-                    >
-                      <User className="mr-3 flex-shrink-0" size={16} />
-                      <span className="truncate">My Profile</span>
-                    </Link>
-                    <Link
-                      to="/settings"
-                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={() => setShowUserMenu(false)}
-                    >
-                      <Settings className="mr-3 flex-shrink-0" size={16} />
-                      <span className="truncate">Settings</span>
-                    </Link>
-                    <Link
-                      to="/help"
-                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={() => setShowUserMenu(false)}
-                    >
-                      <HelpCircle className="mr-3 flex-shrink-0" size={16} />
-                      <span className="truncate">Help & Support</span>
-                    </Link>
-                  </div>
-                  
-                  <div className="border-t border-gray-100 pt-2">
-                    <button
-                      onClick={() => {
-                        logout();
-                        setShowUserMenu(false);
-                      }}
-                      className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                    >
-                      <LogOut className="mr-3 flex-shrink-0" size={16} />
-                      <span className="truncate">Logout</span>
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>

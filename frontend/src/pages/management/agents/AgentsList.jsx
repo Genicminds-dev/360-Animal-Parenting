@@ -1,3 +1,4 @@
+// pages/Agents/AgentsList.jsx
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
@@ -53,9 +54,9 @@ const AgentsList = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
-  const [isDeleting, setIsDeleting] = useState(false); // Added to prevent double submission
+  const [isDeleting, setIsDeleting] = useState(false);
   
-  // Sorting state - exactly like vendor example
+  // Sorting state
   const [sortCycle, setSortCycle] = useState({
     key: "createdAt",
     step: 2, // 0: normal, 1: asc, 2: desc
@@ -75,7 +76,7 @@ const AgentsList = () => {
     return String(value).trim();
   };
 
-  // Fetch agents with API - search and pagination
+  // Fetch agents with API
   const fetchAgents = useCallback(async (page = 1, search = "") => {
     setLoading(true);
     try {
@@ -127,7 +128,7 @@ const AgentsList = () => {
     }
   }, [pagination.limit]);
 
-  // Debounce search - EXACTLY like vendor example
+  // Debounce search
   useEffect(() => {
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
@@ -179,24 +180,20 @@ const AgentsList = () => {
     }));
   };
 
-  // Sorting handler - EXACTLY like vendor example (3-step cycle)
+  // Sorting handler
   const requestSort = useCallback((key) => {
     setSortCycle((prev) => {
       if (prev.key !== key) {
-        // Different column, start with ascending
         return { key, step: 1 };
       }
-
-      // Same column, cycle through steps: 1→2→0→1
       const nextStep = (prev.step + 1) % 3;
       return { key, step: nextStep };
     });
   }, []);
 
-  // Apply sorting to data - EXACTLY like vendor example
+  // Apply sorting to data
   const sortedAgents = useMemo(() => {
     if (sortCycle.step === 0) {
-      // Normal - no sorting, use original order
       return filteredAgents;
     }
 
@@ -205,20 +202,17 @@ const AgentsList = () => {
       let aValue = a[key] ?? "";
       let bValue = b[key] ?? "";
 
-      // Handle null values for aadharNumber
       if (key === 'aadharNumber') {
         aValue = aValue || '';
         bValue = bValue || '';
       }
 
       if (sortCycle.step === 1) {
-        // Ascending
         if (key === 'createdAt') {
           return new Date(aValue) - new Date(bValue);
         }
         return String(aValue).localeCompare(String(bValue));
       } else {
-        // Descending
         if (key === 'createdAt') {
           return new Date(bValue) - new Date(aValue);
         }
@@ -227,7 +221,7 @@ const AgentsList = () => {
     });
   }, [filteredAgents, sortCycle]);
 
-  // Get sort icon - EXACTLY like vendor example
+  // Get sort icon
   const getSortIcon = useCallback(
     (key) => {
       if (sortCycle.key !== key) {
@@ -358,7 +352,7 @@ const AgentsList = () => {
 
   // Event handlers
   const handleEdit = (agent) => {
-      navigate(`${PATHROUTES.editAgent.replace(':uid', agent.uid)}`, { 
+    navigate(`${PATHROUTES.editAgent.replace(':uid', agent.uid)}`, { 
       state: { 
         uid: agent.uid,
         fullName: agent.fullName,
@@ -445,8 +439,8 @@ const AgentsList = () => {
       setShowDeleteModal(false);
       setDeleteTarget(null);
       setDeleteId(null);
-      setLoading(false);
       setIsDeleting(false);
+      setLoading(false);
     }
   };
 
@@ -540,7 +534,7 @@ const AgentsList = () => {
     fetchAgents(pagination.currentPage, searchTerm);
   };
 
-  // Filter configuration - completely disabled
+  // Filter configuration
   const filterConfig = {
     fields: [],
     dateRange: false
@@ -566,7 +560,7 @@ const AgentsList = () => {
         </button>
       </div>
 
-      {/* Search and Action Menu - Like vendor example */}
+      {/* Search and Action Menu */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
@@ -627,7 +621,6 @@ const AgentsList = () => {
         onEdit={handleEdit}
         onView={handleView}
         onDelete={handleDelete}
-        onBulkDelete={handleBulkDelete}
         addButtonLabel="Add New Agent"
         emptyStateMessage="No commission agents found. Try adjusting your search."
         loadingMessage="Loading agents data..."
@@ -648,8 +641,9 @@ const AgentsList = () => {
           limit: pagination.limit,
           limitOptions: [5, 10, 25, 50, 100]
         }}
-        // Hide the add button in DataTable if it has one
         hideAddButton={true}
+        // Disable DataTable's internal delete modal
+        disableInternalDeleteModal={true}
       />
 
       {/* Delete Confirmation Modal */}
