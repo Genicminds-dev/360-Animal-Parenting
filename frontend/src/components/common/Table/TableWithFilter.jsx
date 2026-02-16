@@ -42,7 +42,7 @@ const TableWithFilter = ({
   
   // Stats configuration
   stats = [],
-  statsCards = null, // Custom stats cards component
+  statsCards = null,
   
   // Callbacks
   onAdd,
