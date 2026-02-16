@@ -772,8 +772,28 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from "react"
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import {
+  Weight,
+  Calendar,
+  User,
+  Phone,
+  TrendingUp,
+  ArrowRight,
+  Camera,
+  Video,
+  CheckCircle,
+  XCircle,
+  IndianRupee,
+  HeartPulse,
+  Eye,
+  Pencil,
+  Trash2,
+  Beef,
+  Rabbit,
+  Bird,
+  Baby,
   Milk,
   Scale,
+  CircleDot,
   Circle,
   GitCompare,
   Package,
@@ -983,136 +1003,6 @@ const MOCK_ANIMALS = [
     hasSidePhoto: true,
     hasBackPhoto: true,
     hasAnimalVideo: true,
-    hasCalfPhoto: false,
-    hasCalfVideo: false
-  },
-  {
-    id: 8,
-    uid: "ANM008",
-    earTagId: "TAG-008",
-    vendorName: "Priya Sharma",
-    vendorMobile: "9876543217",
-    animalType: "Cow",
-    breed: "Gir",
-    pricing: "₹75,000",
-    pregnancyStatus: "Milking",
-    calfTagId: "",
-    numberOfPregnancies: 2,
-    ageYears: 4,
-    ageMonths: 6,
-    weight: "420 kg",
-    milkPerDay: "14 liters",
-    calfAgeYears: "",
-    calfAgeMonths: "",
-    createdAt: "2024-02-01T09:30:00Z",
-    hasFrontPhoto: true,
-    hasSidePhoto: true,
-    hasBackPhoto: true,
-    hasAnimalVideo: false,
-    hasCalfPhoto: false,
-    hasCalfVideo: false
-  },
-  {
-    id: 9,
-    uid: "ANM009",
-    earTagId: "TAG-009",
-    vendorName: "Amit Patel",
-    vendorMobile: "9876543218",
-    animalType: "Buffalo",
-    breed: "Jaffarabadi",
-    pricing: "₹1,10,000",
-    pregnancyStatus: "Milking",
-    calfTagId: "",
-    numberOfPregnancies: 3,
-    ageYears: 5,
-    ageMonths: 0,
-    weight: "600 kg",
-    milkPerDay: "8 liters",
-    calfAgeYears: "",
-    calfAgeMonths: "",
-    createdAt: "2024-02-05T11:45:00Z",
-    hasFrontPhoto: true,
-    hasSidePhoto: true,
-    hasBackPhoto: true,
-    hasAnimalVideo: false,
-    hasCalfPhoto: false,
-    hasCalfVideo: false
-  },
-  {
-    id: 10,
-    uid: "ANM010",
-    earTagId: "TAG-010",
-    vendorName: "Sunita Devi",
-    vendorMobile: "9876543219",
-    animalType: "Goat",
-    breed: "Jamunapari",
-    pricing: "₹15,000",
-    pregnancyStatus: "Pregnant",
-    calfTagId: "",
-    numberOfPregnancies: 1,
-    ageYears: 2,
-    ageMonths: 0,
-    weight: "40 kg",
-    milkPerDay: "3 liters",
-    calfAgeYears: "",
-    calfAgeMonths: "",
-    createdAt: "2024-02-08T14:20:00Z",
-    hasFrontPhoto: true,
-    hasSidePhoto: true,
-    hasBackPhoto: true,
-    hasAnimalVideo: false,
-    hasCalfPhoto: false,
-    hasCalfVideo: false
-  },
-  {
-    id: 11,
-    uid: "ANM011",
-    earTagId: "TAG-011",
-    vendorName: "Karan Singh",
-    vendorMobile: "9876543220",
-    animalType: "Cow",
-    breed: "Sahiwal",
-    pricing: "₹80,000",
-    pregnancyStatus: "Non-Pregnant",
-    calfTagId: "",
-    numberOfPregnancies: 0,
-    ageYears: 3,
-    ageMonths: 6,
-    weight: "380 kg",
-    milkPerDay: "10 liters",
-    calfAgeYears: "",
-    calfAgeMonths: "",
-    createdAt: "2024-02-10T10:15:00Z",
-    hasFrontPhoto: true,
-    hasSidePhoto: true,
-    hasBackPhoto: true,
-    hasAnimalVideo: false,
-    hasCalfPhoto: false,
-    hasCalfVideo: false
-  },
-  {
-    id: 12,
-    uid: "ANM012",
-    earTagId: "TAG-012",
-    vendorName: "Meera Reddy",
-    vendorMobile: "9876543221",
-    animalType: "Buffalo",
-    breed: "Nagpuri",
-    pricing: "₹88,000",
-    pregnancyStatus: "Milking",
-    calfTagId: "",
-    numberOfPregnancies: 2,
-    ageYears: 4,
-    ageMonths: 2,
-    weight: "520 kg",
-    milkPerDay: "9 liters",
-    calfAgeYears: "",
-    calfAgeMonths: "",
-    createdAt: "2024-02-12T16:00:00Z",
-    hasFrontPhoto: true,
-    hasSidePhoto: true,
-    hasBackPhoto: true,
-    hasAnimalVideo: false,
     hasCalfPhoto: false,
     hasCalfVideo: false
   },
@@ -1438,10 +1328,12 @@ const AnimalsList = () => {
         );
       default:
         return (
-          <span className="px-2 py-1 rounded-full text-xs bg-gray-100">Unknown</span>
+          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+            Unknown
+          </span>
         );
     }
-  }, []);
+  };
 
   // Table columns for animals
   // Table columns for animals - Simplified version
@@ -1483,18 +1375,9 @@ const AnimalsList = () => {
       onSort: () => requestSort('breed'),
       sortIcon: getSortIcon('breed'),
       render: (item) => (
-        <div>
-          {getPregnancyBadge(item.pregnancyStatus)}
-          {item.calfTagId && (
-            <div className="text-xs text-gray-500 mt-1">Calf: {item.calfTagId}</div>
-          )}
-        </div>
         <div className="text-gray-900">{item.breed}</div>
       )
     },
-    { 
-      key: "physicalAttributes", 
-      label: "Physical",
     {
       key: "pregnancyStatus",
       label: "Pregnancy",
@@ -1503,17 +1386,10 @@ const AnimalsList = () => {
       sortIcon: getSortIcon('pregnancyStatus'),
       render: (item) => (
         <div>
-          <div className="text-sm">{item.weight}</div>
-          {item.milkPerDay && item.milkPerDay !== "N/A" && (
-            <div className="text-xs text-gray-500">{item.milkPerDay} milk/day</div>
-          )}
           {getPregnancyBadge(item.pregnancyStatus)}
         </div>
       )
     },
-    { 
-      key: "createdAt", 
-      label: "Registered",
     {
       key: "createdAt",
       label: "Created Date",
@@ -1522,11 +1398,6 @@ const AnimalsList = () => {
       sortIcon: getSortIcon('createdAt'),
       render: (item) => {
         const date = new Date(item.createdAt);
-        return date.toLocaleDateString('en-US', { 
-          day: '2-digit', 
-          month: '2-digit', 
-          year: 'numeric' 
-        });
         return (
           <div className="text-gray-900">
             {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
@@ -1534,7 +1405,6 @@ const AnimalsList = () => {
         );
       }
     },
-  ], [getPregnancyBadge]);
   ], [getSortIcon, requestSort]);
 
   // Selection handlers
@@ -1560,9 +1430,9 @@ const AnimalsList = () => {
     }
   };
 
-    // Event handlers
+  // Event handlers
   const handleAddNew = () => {
-    navigate("/procurement/animal-registration");
+    navigate("/animals/register");
   };
 
   const handleEdit = (animal) => {

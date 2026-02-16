@@ -148,43 +148,6 @@ const DataTable = ({
     return item.id || item.uid;
   };
 
-  // CRITICAL: Toggle single item selection
-  const toggleSelectItem = (item) => {
-    const id = getItemId(item);
-    setSelectedItems(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
-      }
-      return newSet;
-    });
-  };
-
-  // CRITICAL: Toggle select all - FIXED to work with current page data
-  const toggleSelectAll = () => {
-    // Get all IDs from CURRENT PAGE data (not all data)
-    const currentPageIds = paginatedData.map(item => getItemId(item)).filter(Boolean);
-    
-    setSelectedItems(prev => {
-      const newSet = new Set(prev);
-      
-      // Check if all items on current page are selected
-      const allSelected = currentPageIds.every(id => prev.has(id));
-      
-      if (allSelected) {
-        // Deselect all items on current page
-        currentPageIds.forEach(id => newSet.delete(id));
-      } else {
-        // Select all items on current page
-        currentPageIds.forEach(id => newSet.add(id));
-      }
-      
-      return newSet;
-    });
-  };
-
   // Check if all items on current page are selected
   const isAllSelected = useMemo(() => {
     if (paginatedData.length === 0) return false;
