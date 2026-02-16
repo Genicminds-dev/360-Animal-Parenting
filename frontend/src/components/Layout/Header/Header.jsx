@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Bell, Search, Menu, User, LogOut, Settings, HelpCircle, X } from 'lucide-react';
+import { FiMoon, FiSun} from 'react-icons/fi';
 import { useAuth } from '../../../contexts/AuthContext';
 import { Link } from 'react-router-dom';
+import { useTheme } from '../../../contexts/ThemeContext'; // Optional: if you want to add theme toggle in header
 import api, { baseURLFile } from '../../../services/api/api';
 import { Endpoints } from '../../../services/api/EndPoint';
 import { PATHROUTES } from '../../../routes/pathRoutes';
@@ -20,6 +22,7 @@ const Header = ({ toggleSidebar, sidebarOpen }) => {
   });
   const [loading, setLoading] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const { darkMode, updateTheme } = useTheme(); // Optional: for theme toggle
 
   // Detect screen size
   useEffect(() => {
@@ -125,8 +128,13 @@ const Header = ({ toggleSidebar, sidebarOpen }) => {
     }
   };
 
+  // Optional: Theme toggle function
+  const toggleTheme = () => {
+    updateTheme(darkMode ? 'light' : 'dark');
+  };
+
   return (
-    <header className="bg-white border-b border-gray-200">
+    <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
       <div className="px-3 sm:px-4 md:px-6 py-3 sm:py-4">
         <div className="flex items-center justify-between">
           {/* Left Section: Menu Toggle & Search */}
@@ -134,61 +142,74 @@ const Header = ({ toggleSidebar, sidebarOpen }) => {
             {/* Menu Toggle */}
             <button
               onClick={toggleSidebar}
-              className={`p-2 rounded-lg hover:bg-gray-100 ${
+              className={`p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
                 sidebarOpen ? 'lg:hidden' : 'lg:hidden'
               }`}
             >
-              {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+              {sidebarOpen ? <X size={20} className="text-gray-700 dark:text-gray-300" /> : <Menu size={20} className="text-gray-700 dark:text-gray-300" />}
             </button>
 
             {/* Search Bar - Desktop */}
             <div className={`hidden md:block relative flex-1 max-w-md`}>
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
               <input
                 type="search"
                 placeholder="Search animals, farmers, reports..."
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent w-full text-sm"
+                className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent w-full text-sm transition-colors"
               />
             </div>
           </div>
 
           {/* Right Section: Notifications & User Menu */}
           <div className="flex items-center space-x-2 sm:space-x-4">
+            {/* Optional: Theme Toggle Button */}
+            <button 
+              onClick={toggleTheme}
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors hidden md:block"
+              aria-label="Toggle theme"
+            >
+              {darkMode ? (
+                <FiSun size={20} className="text-yellow-500" />
+              ) : (
+                <FiMoon size={20} className="text-gray-700 dark:text-gray-300" />
+              )}
+            </button>
+
             {/* Mobile Search Toggle */}
             <button 
               onClick={() => setShowMobileSearch(!showMobileSearch)}
-              className="md:hidden p-2 rounded-lg hover:bg-gray-100"
+              className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
-              <Search size={20} />
+              <Search size={20} className="text-gray-700 dark:text-gray-300" />
             </button>
 
             {/* Notifications */}
             <div className="relative">
-              <button className="relative p-2 rounded-lg hover:bg-gray-100">
-                <Bell size={20} />
+              <button className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                <Bell size={20} className="text-gray-700 dark:text-gray-300" />
                 <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
               </button>
             </div>
             
             {/* Divider - Hide on very small screens */}
-            <div className="h-6 sm:h-8 w-px bg-gray-300 hidden sm:block"></div>
+            <div className="h-6 sm:h-8 w-px bg-gray-300 dark:bg-gray-600 hidden sm:block"></div>
             
             {/* User Menu */}
             <div className="relative">
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center space-x-2 sm:space-x-3 p-1 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+                className="flex items-center space-x-2 sm:space-x-3 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 disabled={loggingOut}
               >
                 <div className="text-right hidden sm:block">
-                  <p className="text-sm font-medium text-gray-900 truncate max-w-[120px] md:max-w-[150px]">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[120px] md:max-w-[150px]">
                     {loading ? 'Loading...' : getDisplayName()}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
                     {loading ? '' : getRoleDisplay()}
                   </p>
                 </div>
-                <div className="w-8 h-8 sm:w-9 sm:h-9 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center font-semibold flex-shrink-0 text-sm sm:text-base overflow-hidden">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300 rounded-full flex items-center justify-center font-semibold flex-shrink-0 text-sm sm:text-base">
                   {getProfileImage() ? (
                     <img 
                       src={getProfileImage()} 
@@ -249,16 +270,16 @@ const Header = ({ toggleSidebar, sidebarOpen }) => {
         {showMobileSearch && (
           <div className="mt-3 md:hidden">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
               <input
                 type="search"
                 placeholder="Search animals, farmers, reports..."
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent w-full text-sm"
+                className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent w-full text-sm transition-colors"
                 autoFocus
               />
               <button 
                 onClick={() => setShowMobileSearch(false)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
               >
                 <X size={18} />
               </button>

@@ -10,7 +10,7 @@ import { PATHROUTES } from '../../routes/pathRoutes';
 import api from '../../services/api/api';
 import { Endpoints } from '../../services/api/EndPoint';
 
-const PasswordSettings = ({ onLogout }) => {
+const PasswordSettings = ({ onLogout, darkMode }) => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
@@ -134,7 +134,7 @@ const PasswordSettings = ({ onLogout }) => {
     const securityColor = () => {
         if (securityLevel < 30) return 'bg-red-400';
         if (securityLevel < 70) return 'bg-yellow-400';
-        return 'bg-green-400';
+        return 'bg-primary-400';
     };
 
     return (
@@ -143,17 +143,17 @@ const PasswordSettings = ({ onLogout }) => {
                 position="top-center"
                 toastOptions={{
                     style: {
-                        background: '#363636',
+                        background: darkMode ? '#374151' : '#363636',
                         color: '#fff',
                     },
                     success: {
                         style: {
-                            background: 'green',
+                            background: '#0284c7', // primary-600
                         },
                     },
                     error: {
                         style: {
-                            background: 'red',
+                            background: '#dc2626',
                         },
                     },
                 }}
@@ -167,19 +167,19 @@ const PasswordSettings = ({ onLogout }) => {
                 <div className="text-center mb-8">
                     <motion.div
                         whileHover={{ scale: 1.05 }}
-                        className="w-20 h-20 bg-gradient-to-r from-green-100 to-pink-100 rounded-full p-5 mx-auto mb-4 flex items-center justify-center"
+                        className="w-20 h-20 bg-gradient-to-r from-primary-100 to-primary-200 dark:from-primary-900/30 dark:to-primary-800/30 rounded-full p-5 mx-auto mb-4 flex items-center justify-center"
                     >
-                        <FaShieldAlt className="h-12 w-12 text-green-500" />
+                        <FaShieldAlt className="h-12 w-12 text-primary-600 dark:text-primary-400" />
                     </motion.div>
-                    <h3 className="text-xl font-bold text-gray-800">Change Password</h3>
-                    <p className="text-gray-500 mt-2">Secure your account with a strong, unique password</p>
+                    <h3 className="text-xl font-bold text-gray-800 dark:text-white">Change Password</h3>
+                    <p className="text-gray-500 dark:text-gray-400 mt-2">Secure your account with a strong, unique password</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-5">
                         {/* Current Password */}
                         <div>
-                            <label htmlFor="oldPassword" className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                            <label htmlFor="oldPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
                                 <FiLock /> Current Password <span className="text-red-500">*</span>
                             </label>
                             <div className="mt-1 relative">
@@ -191,15 +191,17 @@ const PasswordSettings = ({ onLogout }) => {
                                     onChange={handleInputChange}
                                     maxLength={70}
                                     className={`block w-full rounded-md border ${
-                                        errors.oldPassword ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                                        errors.oldPassword 
+                                            ? 'border-red-500 bg-red-50 dark:bg-red-900/20' 
+                                            : 'border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
                                     } shadow-sm px-4 py-2 pr-10 sm:text-sm
-                                    focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500`}
+                                    focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500`}
                                     placeholder="Enter current password"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => togglePasswordVisibility('old')}
-                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-green-500"
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-primary-600 dark:hover:text-primary-400"
                                 >
                                     {passwordVisible.old ? <FiEyeOff /> : <FiEye />}
                                 </button>
@@ -208,7 +210,7 @@ const PasswordSettings = ({ onLogout }) => {
                                 <motion.p
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="mt-1 text-sm text-red-600 flex items-center gap-1"
+                                    className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1"
                                 >
                                     <FiXCircle /> {errors.oldPassword}
                                 </motion.p>
@@ -217,7 +219,7 @@ const PasswordSettings = ({ onLogout }) => {
 
                         {/* New Password */}
                         <div>
-                            <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                            <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
                                 <FiLock /> New Password <span className="text-red-500">*</span>
                             </label>
                             <div className="mt-1 relative">
@@ -229,15 +231,17 @@ const PasswordSettings = ({ onLogout }) => {
                                     onChange={handleInputChange}
                                     maxLength={70}
                                     className={`block w-full rounded-md border ${
-                                        errors.newPassword ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                                        errors.newPassword 
+                                            ? 'border-red-500 bg-red-50 dark:bg-red-900/20' 
+                                            : 'border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
                                     } shadow-sm px-4 py-2 pr-10 sm:text-sm
-                                    focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500`}
+                                    focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500`}
                                     placeholder="Enter new password"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => togglePasswordVisibility('new')}
-                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-green-500"
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-primary-600 dark:hover:text-primary-400"
                                 >
                                     {passwordVisible.new ? <FiEyeOff /> : <FiEye />}
                                 </button>
@@ -246,7 +250,7 @@ const PasswordSettings = ({ onLogout }) => {
                                 <motion.p
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="mt-1 text-sm text-red-600 flex items-center gap-1"
+                                    className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1"
                                 >
                                     <FiXCircle /> {errors.newPassword}
                                 </motion.p>
@@ -257,23 +261,23 @@ const PasswordSettings = ({ onLogout }) => {
                         {formData.newPassword && (
                             <div className="pt-2">
                                 <div className="flex justify-between mb-1">
-                                    <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
                                         <FaShieldAlt className={`${
                                             securityLevel < 30 ? 'text-red-500' :
-                                            securityLevel < 70 ? 'text-yellow-500' : 'text-green-500'
+                                            securityLevel < 70 ? 'text-yellow-500' : 'text-primary-500'
                                         }`} />
                                         Password Strength
                                     </span>
                                     <span className={`text-xs font-medium ${
                                         securityLevel < 30 ? 'text-red-500' :
-                                        securityLevel < 70 ? 'text-yellow-500' : 'text-green-500'
+                                        securityLevel < 70 ? 'text-yellow-500' : 'text-primary-500'
                                     }`}>
                                         {formData.newPassword.length > 70 ? 'Too long' :
                                          securityLevel < 30 ? 'Weak' :
                                          securityLevel < 70 ? 'Medium' : 'Strong'}
                                     </span>
                                 </div>
-                                <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
                                     <motion.div
                                         className={`h-2 rounded-full ${
                                             formData.newPassword.length > 70 ? 'bg-red-500' : securityColor()
@@ -288,7 +292,7 @@ const PasswordSettings = ({ onLogout }) => {
 
                         {/* Confirm Password */}
                         <div>
-                            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 flex items-center gap-2">
+                            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
                                 <FiLock /> Confirm New Password <span className="text-red-500">*</span>
                             </label>
                             <div className="mt-1 relative">
@@ -300,15 +304,17 @@ const PasswordSettings = ({ onLogout }) => {
                                     onChange={handleInputChange}
                                     maxLength={70}
                                     className={`block w-full rounded-md border ${
-                                        errors.confirmPassword ? 'border-red-500 bg-red-50' : 'border-gray-300'
+                                        errors.confirmPassword 
+                                            ? 'border-red-500 bg-red-50 dark:bg-red-900/20' 
+                                            : 'border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
                                     } shadow-sm px-4 py-2 pr-10 sm:text-sm
-                                    focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500`}
+                                    focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500`}
                                     placeholder="Confirm new password"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => togglePasswordVisibility('confirm')}
-                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-green-500"
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-primary-600 dark:hover:text-primary-400"
                                 >
                                     {passwordVisible.confirm ? <FiEyeOff /> : <FiEye />}
                                 </button>
@@ -317,7 +323,7 @@ const PasswordSettings = ({ onLogout }) => {
                                 <motion.p
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="mt-1 text-sm text-red-600 flex items-center gap-1"
+                                    className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1"
                                 >
                                     <FiXCircle /> {errors.confirmPassword}
                                 </motion.p>
@@ -331,7 +337,7 @@ const PasswordSettings = ({ onLogout }) => {
                                 disabled={loading}
                                 whileHover={{ scale: 1.03 }}
                                 whileTap={{ scale: 0.97 }}
-                                className="w-full px-6 py-3 border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-tr from-[#02382b] to-[#16a34a] flex items-center justify-center gap-2 disabled:opacity-50"
+                                className="w-full px-6 py-3 border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-tr from-primary-700 to-primary-500 flex items-center justify-center gap-2 disabled:opacity-50"
                             >
                                 {loading ? (
                                     <FiLoader className="animate-spin" />

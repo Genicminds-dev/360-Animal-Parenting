@@ -9,7 +9,7 @@ import { PATHROUTES } from '../../routes/pathRoutes';
 import api, { baseURLFile } from '../../services/api/api';
 import { Endpoints } from '../../services/api/EndPoint';
 
-const MyProfile = ({ onLogout }) => {
+const MyProfile = ({ onLogout, darkMode }) => {
     const navigate = useNavigate();
     const [editMode, setEditMode] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -240,17 +240,17 @@ const MyProfile = ({ onLogout }) => {
                 position="top-center"
                 toastOptions={{
                     style: {
-                        background: '#363636',
+                        background: darkMode ? '#374151' : '#363636',
                         color: '#fff',
                     },
                     success: {
                         style: {
-                            background: 'green',
+                            background: '#0284c7', // primary-600
                         },
                     },
                     error: {
                         style: {
-                            background: 'red',
+                            background: '#dc2626',
                         },
                     },
                 }}
@@ -270,7 +270,7 @@ const MyProfile = ({ onLogout }) => {
                             onHoverStart={() => setIsHovering(true)}
                             onHoverEnd={() => setIsHovering(false)}
                         >
-                            <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-white shadow-xl relative bg-gray-100 flex items-center justify-center">
+                            <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-xl relative bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
                                 {formData.previewImage || userData.profileImg ? (
                                     <img
                                         src={formData.previewImage || getImageUrl(userData.profileImg)}
@@ -278,7 +278,7 @@ const MyProfile = ({ onLogout }) => {
                                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                                     />
                                 ) : (
-                                    <FiUser className="w-20 h-20 text-gray-400" />
+                                    <FiUser className="w-20 h-20 text-gray-400 dark:text-gray-500" />
                                 )}
                                 {editMode && (
                                     <motion.label
@@ -292,7 +292,7 @@ const MyProfile = ({ onLogout }) => {
                                             className="hidden"
                                             onChange={handleImageUpload}
                                         />
-                                        <div className="bg-white/80 p-3 rounded-full text-green-600">
+                                        <div className="bg-white/80 p-3 rounded-full text-primary-600">
                                             <FiCamera className="text-2xl" />
                                         </div>
                                     </motion.label>
@@ -302,7 +302,7 @@ const MyProfile = ({ onLogout }) => {
                                 <motion.p
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
-                                    className="mt-2 text-center text-sm text-red-600"
+                                    className="mt-2 text-center text-sm text-red-600 dark:text-red-400"
                                 >
                                     {errors.profileImg}
                                 </motion.p>
@@ -310,17 +310,17 @@ const MyProfile = ({ onLogout }) => {
                         </motion.div>
 
                         <motion.h2
-                            className="text-2xl font-bold text-gray-800 text-center max-w-full truncate"
+                            className="text-2xl font-bold text-gray-800 dark:text-white text-center max-w-full truncate"
                             whileHover={{ scale: 1.02 }}
                         >
                             {userData.username}
                         </motion.h2>
 
                         <motion.p
-                            className="text-sm text-gray-500 mt-1 flex items-center gap-1"
+                            className="text-sm text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1"
                             whileHover={{ scale: 1.01 }}
                         >
-                            <FiAward className="text-green-500" /> {roleMap[userData.roleId] || userData.Role?.name || "N/A"}
+                            <FiAward className="text-primary-500" /> {roleMap[userData.roleId] || userData.Role?.name || "N/A"}
                         </motion.p>
 
                         {!editMode && (
@@ -328,7 +328,7 @@ const MyProfile = ({ onLogout }) => {
                                 onClick={() => setEditMode(true)}
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
-                                className="mt-6 px-6 py-2 border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-tr from-[#02382b] to-[#16a34a] flex items-center gap-2"
+                                className="mt-6 px-6 py-2 border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-tr from-primary-700 to-primary-500 flex items-center gap-2"
                             >
                                 <FiEdit2 /> Edit Profile
                             </motion.button>
@@ -349,7 +349,7 @@ const MyProfile = ({ onLogout }) => {
                                             transition={{ duration: 0.3 }}
                                             className="space-y-1"
                                         >
-                                            <label htmlFor={field} className="block text-sm font-medium text-gray-700 capitalize flex items-center gap-2">
+                                            <label htmlFor={field} className="block text-sm font-medium text-gray-700 dark:text-gray-300 capitalize flex items-center gap-2">
                                                 {field === 'mobile' ? <FiPhone size={14} /> : <FiUser size={14} />}
                                                 {field.replace(/([A-Z])/g, ' $1').trim()}
                                             </label>
@@ -360,16 +360,19 @@ const MyProfile = ({ onLogout }) => {
                                                 value={formData[field]}
                                                 onChange={handleInputChange}
                                                 maxLength={field === 'mobile' ? 10 : 20}
-                                                className={`mt-1 block w-full rounded-md border ${errors[field] ? 'border-red-500 bg-red-50' : 'border-gray-300'
-                                                    } shadow-sm px-4 py-2 sm:text-sm
-                                                focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500`}
+                                                className={`mt-1 block w-full rounded-md border ${
+                                                    errors[field] 
+                                                        ? 'border-red-500 bg-red-50 dark:bg-red-900/20' 
+                                                        : 'border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
+                                                } shadow-sm px-4 py-2 sm:text-sm
+                                                focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500`}
                                                 placeholder={`Enter your ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`}
                                             />
                                             {errors[field] && (
                                                 <motion.p
                                                     initial={{ opacity: 0, y: -10 }}
                                                     animate={{ opacity: 1, y: 0 }}
-                                                    className="mt-1 text-sm text-red-600 flex items-center gap-1"
+                                                    className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center gap-1"
                                                 >
                                                     <FiXCircle /> {errors[field]}
                                                 </motion.p>
@@ -391,7 +394,7 @@ const MyProfile = ({ onLogout }) => {
                                         }}
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
-                                        className="px-6 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 flex items-center gap-2"
+                                        className="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 flex items-center gap-2"
                                     >
                                         <FiArrowLeft /> Cancel
                                     </motion.button>
@@ -400,7 +403,7 @@ const MyProfile = ({ onLogout }) => {
                                         disabled={loading}
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.95 }}
-                                        className="px-6 py-2 border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-tr from-[#02382b] to-[#16a34a] flex items-center gap-2 disabled:opacity-50"
+                                        className="px-6 py-2 border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-tr from-primary-700 to-primary-500 flex items-center gap-2 disabled:opacity-50"
                                     >
                                         {loading ? (
                                             <FiLoader className="animate-spin" />
@@ -424,13 +427,13 @@ const MyProfile = ({ onLogout }) => {
                                         <motion.div
                                             key={field.key}
                                             whileHover={{ scale: 1.01 }}
-                                            className="bg-gray-50 p-5 rounded-md border border-gray-100 hover:border-green-100 transition-all duration-200"
+                                            className="bg-gray-50 dark:bg-gray-700/50 p-5 rounded-md border border-gray-100 dark:border-gray-700 hover:border-primary-200 dark:hover:border-primary-800 transition-all duration-200"
                                         >
-                                            <h3 className="text-sm font-medium text-gray-500 capitalize flex items-center gap-2">
+                                            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 capitalize flex items-center gap-2">
                                                 {field.icon}
                                                 {field.label}
                                             </h3>
-                                            <p className="mt-2 text-lg font-medium text-gray-900 max-w-[250px] break-words">
+                                            <p className="mt-2 text-lg font-medium text-gray-900 dark:text-white max-w-[250px] break-words">
                                                 {field.value || 'Not provided'}
                                             </p>
                                         </motion.div>
