@@ -302,7 +302,7 @@ const ManageUsersForm = () => {
 
         // Navigate to manage users page after a short delay
         setTimeout(() => {
-          navigate(PATHROUTES.manageUsers);
+          navigate(PATHROUTES.userList);
         }, 1500);
       } else {
         const errorMessage = response.data.message || "Failed to process request";

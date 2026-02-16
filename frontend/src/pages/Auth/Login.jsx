@@ -5,6 +5,7 @@ import { GiCow } from 'react-icons/gi';
 import { useAuth } from '../../contexts/AuthContext';
 import api from "../../services/api/api";
 import { Endpoints } from "../../services/api/EndPoint";
+import logo from "../../../public/images/logo.png"
 
 const Login = () => {
   const { loginSuccess } = useAuth();
@@ -20,33 +21,33 @@ const Login = () => {
     apiError: '',
     lockoutError: '',
   });
- 
+
   // Lockout functionality
   const [loginAttempts, setLoginAttempts] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
   const [lockTimeLeft, setLockTimeLeft] = useState(0);
   const lockTimerRef = useRef(null);
- 
+
   const navigate = useNavigate();
 
   // Load login attempts from localStorage on component mount
   useEffect(() => {
     const storedAttempts = localStorage.getItem('loginAttempts');
     const storedLockTime = localStorage.getItem('lockUntil');
-   
+
     if (storedAttempts) {
       setLoginAttempts(parseInt(storedAttempts));
     }
-   
+
     if (storedLockTime) {
       const lockUntil = parseInt(storedLockTime);
       const now = Date.now();
-     
+
       if (lockUntil > now) {
         const timeLeft = Math.ceil((lockUntil - now) / 1000);
         setIsLocked(true);
         setLockTimeLeft(timeLeft);
-       
+
         // Start countdown timer
         lockTimerRef.current = setInterval(() => {
           setLockTimeLeft(prev => {
@@ -67,7 +68,7 @@ const Login = () => {
         localStorage.removeItem('loginAttempts');
       }
     }
-   
+
     // Cleanup on unmount
     return () => {
       if (lockTimerRef.current) {
@@ -95,7 +96,7 @@ const Login = () => {
   const startLockout = () => {
     const lockDuration = 30; // 30 seconds
     const lockUntil = Date.now() + (lockDuration * 1000);
-   
+
     setIsLocked(true);
     setLockTimeLeft(lockDuration);
     setErrors(prev => ({
@@ -104,12 +105,12 @@ const Login = () => {
       apiError: ''
     }));
     localStorage.setItem('lockUntil', lockUntil.toString());
-   
+
     // Start countdown timer
     if (lockTimerRef.current) {
       clearInterval(lockTimerRef.current);
     }
-   
+
     lockTimerRef.current = setInterval(() => {
       setLockTimeLeft(prev => {
         if (prev <= 1) {
@@ -141,7 +142,7 @@ const Login = () => {
       if (email.includes('@')) {
         // Count how many @ symbols are present
         const atSymbolCount = (email.match(/@/g) || []).length;
-        
+
         if (atSymbolCount > 1) {
           newErrors.email = "Email can contain only one @ symbol";
           valid = false;
@@ -201,7 +202,7 @@ const Login = () => {
 
       // Reset login attempts on successful login
       resetLoginAttempts();
-     
+
       // Show success message
       setSuccessMessage('Login successful! Redirecting to dashboard...');
 
@@ -223,11 +224,11 @@ const Login = () => {
 
       let errorMessage = 'Sign In failed. Please try again.';
       let lockoutTriggered = false;
-     
+
       if (error.response) {
         if (error.response.status === 401) {
           errorMessage = 'The password you entered is incorrect. Please try again.';
-         
+
           // Check if this was the 4th failed attempt
           if (newAttempts >= 4) {
             startLockout();
@@ -240,7 +241,7 @@ const Login = () => {
           }
         } else if (error.response.status === 404) {
           errorMessage = 'No account found with this email. Please check it.';
-         
+
           // Also count invalid email attempts
           if (newAttempts >= 4) {
             startLockout();
@@ -254,7 +255,7 @@ const Login = () => {
           errorMessage = error.response.data.message;
         }
       }
-     
+
       if (!lockoutTriggered) {
         setErrors(prev => ({
           ...prev,
@@ -285,19 +286,16 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl mb-4">
-            <GiCow className="text-white" size={32} />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">360 Animal Parenting</h1>
-          <p className="text-gray-600">Animal Procurement Management System</p>
-        </div>
 
         {/* Login Card */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back</h2>
+            <img
+              src={logo}
+              alt="Logo"
+              className="mx-auto mb-4 h-12 sm:h-12 md:h-14 lg:h-14 object-contain"
+            />
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Login</h2>
             <p className="text-gray-600">Sign in to your account</p>
           </div>
 
@@ -348,11 +346,9 @@ const Login = () => {
                   value={email}
                   onChange={handleEmailChange}
                   disabled={isLocked || loading || successMessage}
-                  className={`w-full pl-10 p-3 border ${
-                    errors.email ? 'border-red-500' : 'border-gray-300'
-                  } rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
-                    isLocked || loading || successMessage ? 'bg-gray-100 cursor-not-allowed' : ''
-                  }`}
+                  className={`w-full pl-10 p-3 border ${errors.email ? 'border-red-500' : 'border-gray-300'
+                    } rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${isLocked || loading || successMessage ? 'bg-gray-100 cursor-not-allowed' : ''
+                    }`}
                   placeholder="Enter your email or username"
                   required
                 />
@@ -382,11 +378,9 @@ const Login = () => {
                   value={password}
                   onChange={handlePasswordChange}
                   disabled={isLocked || loading || successMessage}
-                  className={`w-full pl-10 pr-10 p-3 border ${
-                    errors.password ? 'border-red-500' : 'border-gray-300'
-                  } rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
-                    isLocked || loading || successMessage ? 'bg-gray-100 cursor-not-allowed' : ''
-                  }`}
+                  className={`w-full pl-10 pr-10 p-3 border ${errors.password ? 'border-red-500' : 'border-gray-300'
+                    } rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent ${isLocked || loading || successMessage ? 'bg-gray-100 cursor-not-allowed' : ''
+                    }`}
                   placeholder="Enter your password"
                   required
                 />
@@ -426,11 +420,10 @@ const Login = () => {
               </label>
               <Link
                 to="/forgot-password"
-                className={`text-sm font-medium ${
-                  isLocked || loading || successMessage
-                    ? 'text-gray-400 pointer-events-none'
-                    : 'text-primary-600 hover:text-primary-700'
-                }`}
+                className={`text-sm font-medium ${isLocked || loading || successMessage
+                  ? 'text-gray-400 pointer-events-none'
+                  : 'text-primary-600 hover:text-primary-700'
+                  }`}
               >
                 Forgot password?
               </Link>
@@ -440,11 +433,10 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading || isLocked || successMessage}
-              className={`w-full bg-gradient-to-r from-primary-600 to-secondary-600 text-white py-3 px-4 rounded-lg font-medium transition-all ${
-                loading || isLocked || successMessage
-                  ? 'opacity-50 cursor-not-allowed'
-                  : 'hover:opacity-90'
-              }`}
+              className={`w-full bg-gradient-to-r from-primary-600 to-secondary-600 text-white py-3 px-4 rounded-lg font-medium transition-all ${loading || isLocked || successMessage
+                ? 'opacity-50 cursor-not-allowed'
+                : 'hover:opacity-90'
+                }`}
             >
               {isLocked ? (
                 <span className="flex items-center justify-center">

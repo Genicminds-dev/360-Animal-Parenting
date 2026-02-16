@@ -8,6 +8,11 @@ export const Endpoints = {
   FORGOT_PASSWORD: "/auth/forgot-password",
   RESET_PASSWORD: "/auth/reset-password",
 
+  // Profile management
+  GET_PROFILE: (userId) => `/admin/user/${userId}`,
+  UPDATE_USER_PROFILE: "/admin/update-user",
+  CHANGE_PASSWORD: "/admin/change-password",
+
   // USER MANAGEMENT
   GET_USERS: "/admin/users",
   CREATE_USER: "/admin/users",
@@ -37,20 +42,20 @@ export const Endpoints = {
   EXPORT_VENDORS: "/admin/vendor/export",
 
   // Animal Management
-//   GET_ANIMALS: "/admin/animal",
-//   CREATE_ANIMAL: "/admin/animal",
-//   UPDATE_ANIMAL: (uid) => `/admin/animal/${uid}`,
-//   DELETE_ANIMAL: (uid) => `/admin/animal/${uid}`,
-//   GET_ANIMAL_BY_UID: (uid) => `/admin/animal/${uid}`,
-//   EXPORT_ANIMALS: "/admin/animals/export",
-//   GET_ANIMAL_STATS: "/admin/animals/stats",
+  //   GET_ANIMALS: "/admin/animal",
+  //   CREATE_ANIMAL: "/admin/animal",
+  //   UPDATE_ANIMAL: (uid) => `/admin/animal/${uid}`,
+  //   DELETE_ANIMAL: (uid) => `/admin/animal/${uid}`,
+  //   GET_ANIMAL_BY_UID: (uid) => `/admin/animal/${uid}`,
+  //   EXPORT_ANIMALS: "/admin/animals/export",
+  //   GET_ANIMAL_STATS: "/admin/animals/stats",
 
-//   VENDOR_DROPDOWN: "/admin/vendor-dropdown",
-//   HOLDING_STATION_DROPDOWN: "/admin/holding-station-dropdown",
+  //   VENDOR_DROPDOWN: "/admin/vendor-dropdown",
+  //   HOLDING_STATION_DROPDOWN: "/admin/holding-station-dropdown",
 
-//   GET_PAYMENT: "/admin/payment",
-//   CREATE_PAYMENT: "/admin/payment",
-//   DELETE_PAYMENT: (uid) => `/admin/payment/${uid}`,
-//   GET_PAYMENT_BY_ID: (uid) => `/admin/payment/${uid}`,
-//   GET_ANIMAL_LIST_BY_VENDOR_ID: (uid) => `/admin/vendor-animal/${uid}`,
+  //   GET_PAYMENT: "/admin/payment",
+  //   CREATE_PAYMENT: "/admin/payment",
+  //   DELETE_PAYMENT: (uid) => `/admin/payment/${uid}`,
+  //   GET_PAYMENT_BY_ID: (uid) => `/admin/payment/${uid}`,
+  //   GET_ANIMAL_LIST_BY_VENDOR_ID: (uid) => `/admin/vendor-animal/${uid}`,
 };

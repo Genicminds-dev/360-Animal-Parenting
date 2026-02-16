@@ -41,7 +41,7 @@ export default function ViewUserDetails() {
                     setUser(userData);
                 } else {
                     toast.error(response.data?.message || "User not found!");
-                    navigate(PATHROUTES.manageUsers);
+                    navigate(PATHROUTES.userList);
                 }
             } catch (error) {
                 console.error("Error loading user:", error);
@@ -66,7 +66,7 @@ export default function ViewUserDetails() {
 
                 // Navigate back after a short delay to show the error message
                 setTimeout(() => {
-                    navigate(PATHROUTES.manageUsers);
+                    navigate(PATHROUTES.userList);
                 }, 2000);
             } finally {
                 setLoading(false);
@@ -77,7 +77,7 @@ export default function ViewUserDetails() {
             loadUser();
         } else {
             toast.error("Invalid user ID");
-            navigate(PATHROUTES.manageUsers);
+            navigate(PATHROUTES.userList);
         }
     }, [id, navigate]);
 
@@ -202,7 +202,7 @@ export default function ViewUserDetails() {
                     <h3 className="text-xl font-bold text-gray-700 mb-2">User Not Found</h3>
                     <p className="text-gray-500 mb-6">The requested user could not be found.</p>
                     <button
-                        onClick={() => navigate(PATHROUTES.manageUsers)}
+                        onClick={() => navigate(PATHROUTES.userList)}
                         className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 mx-auto"
                     >
                         <FaArrowLeft size={16} />
@@ -223,7 +223,7 @@ export default function ViewUserDetails() {
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <button
-                        onClick={() => navigate(PATHROUTES.manageUsers)}
+                        onClick={() => navigate(PATHROUTES.userList)}
                         className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                     >
                         <ArrowLeft size={20} />

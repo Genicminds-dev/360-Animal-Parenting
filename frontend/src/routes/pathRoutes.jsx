@@ -9,7 +9,7 @@ export const PATHROUTES = {
   dashboard: "/dashboard",
 
   // User Management
-  manageUsers: "/manage-users",
+  userList: "/manage-users",
   addUsers: "/add-user",
   editUsers: "/edit-user",
   viewUsers: "/view-user",
@@ -42,6 +42,8 @@ export const PATHROUTES = {
   beneficiaries: "/beneficiaries",
   team: "/team",
   reports: "/reports",
+
+  
   settings: "/settings",
 
 };

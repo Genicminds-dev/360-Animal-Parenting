@@ -22,79 +22,52 @@ const Dashboard = () => {
         {
             title: 'Sourcing Locations',
             value: '24',
-            title: 'Sourcing Locations',
-            value: '24',
-            icon: <MapPin className="text-blue-500" size={24} />,
-            change: '+12%',
-            trend: 'up',
-            color: 'bg-blue-50',
+            icon: <MapPin className="text-blue-500 opacity-60" size={40} />,
             link: '/locations'
         },
         {
             title: 'Animals Procured',
             value: '1,842',
-            icon: <GiCow className="text-green-500" size={24} />,
-            change: '+18%',
-            trend: 'up',
-            color: 'bg-green-50',
+            icon: <GiCow className="text-green-500 opacity-60" size={40} />,
             link: '/animals'
         },
         {
             title: 'Transporters',
             value: '45',
-            icon: <Truck className="text-purple-500" size={24} />,
-            change: '+8%',
-            trend: 'up',
-            color: 'bg-purple-50',
+            icon: <Truck className="text-purple-500 opacity-60" size={40} />,
             link: '/transporters'
         },
         {
             title: 'Animal Suppliers',
             value: '156',
-            icon: <Users className="text-orange-500" size={24} />,
-            change: '+15%',
-            trend: 'up',
-            color: 'bg-orange-50',
+            icon: <Users className="text-orange-500 opacity-60" size={40} />,
             link: '/suppliers'
         },
         {
             title: 'Commission Agents',
             value: '32',
-            icon: <Shield className="text-indigo-500" size={24} />,
-            change: '+5%',
-            trend: 'up',
-            color: 'bg-indigo-50',
+            icon: <Shield className="text-indigo-500 opacity-60" size={40} />,
             link: '/agents'
         },
         {
             title: 'Beneficiaries',
             value: '892',
-            icon: <Heart className="text-pink-500" size={24} />,
-            change: '+22%',
-            trend: 'up',
-            color: 'bg-pink-50',
+            icon: <Heart className="text-pink-500 opacity-60" size={40} />,
             link: '/beneficiaries'
         },
         {
             title: 'Team Members',
             value: '48',
-            icon: <User className="text-cyan-500" size={24} />,
-            change: '+3%',
-            trend: 'up',
-            color: 'bg-cyan-50',
+            icon: <User className="text-cyan-500 opacity-60" size={40} />,
             link: '/team'
         },
         {
             title: 'This Month\'s Procurement',
             value: '189',
-            icon: <Calendar className="text-red-500" size={24} />,
-            change: '-5%',
-            trend: 'down',
-            color: 'bg-red-50',
+            icon: <Calendar className="text-red-500 opacity-60" size={40} />,
             link: '/reports/monthly'
         }
     ];
-
 
     const quickActions = [
         {
@@ -108,7 +81,7 @@ const Dashboard = () => {
             title: 'Register Sellers',
             description: 'Add new sellers details',
             icon: <Users size={20} />,
-            link: '/procurement/farmer-registration',
+            link: '/procurement/seller-registration',
             color: 'from-blue-500 to-blue-600'
         },
         {
@@ -122,7 +95,7 @@ const Dashboard = () => {
             title: 'Health Check',
             description: 'Record health details',
             icon: <FileText size={20} />,
-            link: '/procurement/health-check',
+            link: '/procurement/health-checkup-List',
             color: 'from-purple-500 to-purple-600'
         },
         {
@@ -143,11 +116,7 @@ const Dashboard = () => {
                     <p className="text-gray-600">Welcome to 360 Animal Parenting System</p>
                 </div>
                 <div className="flex items-center space-x-4">
-                    <div className="text-right">
-                        <p className="text-sm text-gray-500">Last sync</p>
-                        <p className="font-medium">Today, 09:45 AM</p>
-                    </div>
-                    <button className="btn-primary">
+                    <button className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors duration-300">
                         <span className="flex items-center space-x-2">
                             <span>Refresh</span>
                             <ArrowRight size={16} />
@@ -156,25 +125,21 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* Stats Grid */}
+            {/* Stats Grid - Clean design with only icon, value and title */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {stats.map((stat, index) => (
                     <Link
                         key={index}
                         to={stat.link}
-                        className="card hover:shadow-lg transition-shadow duration-300"
+                        className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300"
                     >
                         <div className="flex items-start justify-between">
-                            <div className={`p-3 rounded-lg ${stat.color}`}>
-                                {stat.icon}
-                            </div>
-                            <div className={`flex items-center text-sm ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-                                {stat.trend === 'up' ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
-                                <span className="ml-1">{stat.change}</span>
+                            {stat.icon}
+                            <div className="text-right">
+                                <h3 className="text-2xl font-bold text-gray-900">{stat.value}</h3>
+                                <p className="text-gray-600">{stat.title}</p>
                             </div>
                         </div>
-                        <h3 className="text-2xl font-bold text-gray-900 mt-4">{stat.value}</h3>
-                        <p className="text-gray-600">{stat.title}</p>
                     </Link>
                 ))}
             </div>
@@ -183,21 +148,21 @@ const Dashboard = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Quick Actions */}
                 <div className="lg:col-span-3">
-                    <div className="card">
+                    <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-lg font-semibold text-gray-900">Quick Actions</h2>
                             <Link to="/procurement" className="text-primary-600 text-sm font-medium hover:text-primary-700">
                                 View All
                             </Link>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
                             {quickActions.map((action, index) => (
                                 <Link
                                     key={index}
                                     to={action.link}
                                     className="group p-4 border border-gray-200 rounded-xl hover:border-primary-300 hover:shadow-md transition-all duration-300"
                                 >
-                                    <div className="flex items-center space-x-4">
+                                    <div className="flex flex-col items-center text-center space-y-3">
                                         <div className={`p-3 rounded-lg bg-gradient-to-br ${action.color} text-white`}>
                                             {action.icon}
                                         </div>
@@ -214,7 +179,7 @@ const Dashboard = () => {
             </div>
 
             {/* Procurement Progress */}
-            <div className="card">
+            <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
                 <h2 className="text-lg font-semibold text-gray-900 mb-6">Procurement Progress</h2>
                 <div className="space-y-6">
                     {[
@@ -226,7 +191,7 @@ const Dashboard = () => {
                         { step: 6, title: 'Animal Transfer', progress: 45, count: 75 }
                     ].map((step) => (
                         <div key={step.step} className="flex items-center justify-between">
-                            <div className="flex items-center space-x-4">
+                            <div className="flex items-center space-x-4 flex-1">
                                 <div className="w-8 h-8 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-medium">
                                     {step.step}
                                 </div>

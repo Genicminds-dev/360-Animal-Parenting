@@ -6,6 +6,7 @@ import { GiCow } from 'react-icons/gi';
 import api from "../../services/api/api";
 import { Endpoints } from "../../services/api/EndPoint";
 import { PATHROUTES } from "../../routes/pathRoutes";
+import logo from "../../../public/images/logo.png"
 
 const ForgetPassword = () => {
     const [email, setEmail] = useState('');
@@ -47,14 +48,14 @@ const ForgetPassword = () => {
         <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 flex items-center justify-center p-4">
             <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
                 {/* Logo inside card */}
-                <div className="text-center">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl mb-4">
-                        <GiCow className="text-white" size={32} />
-                    </div>
-            
-                </div>
-
                 <div className="text-center mb-8">
+                    <img
+                        src={logo}
+                        alt="Logo"
+                        className="mx-auto mb-4 h-12 sm:h-12 md:h-14 lg:h-14 object-contain"
+                    />
+
+
                     <h2 className="text-2xl font-bold text-gray-900 mb-2">Forgot Password</h2>
                     <p className="text-gray-600">Enter your email and we'll send you a link to reset your password.</p>
                 </div>
@@ -96,9 +97,8 @@ const ForgetPassword = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className={`w-full bg-gradient-to-r from-primary-600 to-secondary-600 text-white py-3 px-4 rounded-lg font-medium transition-all ${
-                            loading ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
-                        }`}
+                        className={`w-full bg-gradient-to-r from-primary-600 to-secondary-600 text-white py-3 px-4 rounded-lg font-medium transition-all ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
+                            }`}
                     >
                         {loading ? (
                             <span className="flex items-center justify-center">

@@ -14,6 +14,8 @@ import {
 } from 'lucide-react';
 import { GiCow } from 'react-icons/gi';
 import { useAuth } from '../../../contexts/AuthContext';
+import logo from "../../../../public/images/logo.png"
+import { PATHROUTES } from '../../../routes/pathRoutes';
 
 const Sidebar = ({ toggleSidebar, onLogout, isMobile }) => {
   const { user } = useAuth();
@@ -28,32 +30,48 @@ const Sidebar = ({ toggleSidebar, onLogout, isMobile }) => {
 
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} />, roles: [1, 2, 3] },
+    // {
+    //   path: '/procurement',
+    //   label: 'Animal Procurement',
+    //   icon: <GiCow size={20} />,
+    //   roles: [1, 2, 3],
+    //   hasSubmenu: true,
+    //   subItems: [
+    //     { path: PATHROUTES.agentRegistration, label: 'Agent Registration', roles: [1, 2] },
+    //     { path: PATHROUTES.sellerRegistration, label: 'Seller Registration', roles: [1, 2] },
+    //     { path: PATHROUTES.animalRegistration, label: 'Animal Registration', roles: [1, 2, 3] },
+    //     { path: PATHROUTES.healthCheckupList, label: 'Health Check', roles: [1, 2, 3] },
+    //     // { path: '/procurement/health-check', label: 'Health Check', roles: [3]},
+    //     { path: '/procurement/price-approval', label: 'Price & Approval', roles: [1, 2] },
+    //     { path: '/procurement/payment', label: 'Payment', roles: [1] },
+    //     { path: '/procurement/animal-transfer', label: 'Animal Transfer', roles: [1, 2] },
+    //   ]
+    // },
+    // { path: PATHROUTES.sellersList, label: 'Sellers', icon: <Users size={20} />, roles: [1, 2, 3] },
+    // { path: PATHROUTES.agentsList, label: 'Commission Agents', icon: <Users size={20} />, roles: [1, 2, 3] },
+    // { path: PATHROUTES.animalsList, label: 'Animals', icon: <GiCow size={20} />, roles: [1, 2, 3] },
+    // { path: '/transporters', label: 'Transporters', icon: <Truck size={20} />, roles: [1, 2, 3] },
+    // { path: '/suppliers', label: 'Suppliers', icon: <UserCircle size={20} />, roles: [1, 2, 3] },
+    // { path: '/beneficiaries', label: 'Beneficiaries', icon: <Users size={20} />, roles: [1, 2, 3] },
+    // { path: '/team', label: 'Team Members', icon: <Users size={20} />, roles: [1, 2, 3] },
+    // { path: '/reports', label: 'Reports', icon: <FileText size={20} />, roles: [1, 2, 3] },
+
+
     {
       path: '/procurement',
-      label: 'Animal Procurement',
+      label: 'Procurement',
       icon: <GiCow size={20} />,
       roles: [1, 2, 3],
       hasSubmenu: true,
       subItems: [
-        { path: '/procurement/agent-registration', label: 'Agent Registration', roles: [1, 2] },
-        { path: '/procurement/seller-registration', label: 'Seller Registration', roles: [1, 2] },
-        { path: '/procurement/animal-registration', label: 'Animal Registration', roles: [1, 2, 3] },
-        { path: '/procurement/health-checkup-List',  label: 'Health Check', roles: [1,2,3]},
-        // { path: '/procurement/health-check', label: 'Health Check', roles: [3]},
-        { path: '/procurement/price-approval', label: 'Price & Approval', roles: [1, 2] },
-        { path: '/procurement/payment', label: 'Payment', roles: [1] },
-        { path: '/procurement/animal-transfer', label: 'Animal Transfer', roles: [1, 2] },
+        { path: '/procurement/source-visit', label: 'Source Visit', roles: [1, 2, 3] },
+        { path: '/procurement/animal-registration', label: 'Register Animal', roles: [1, 2, 3] },
       ]
     },
-    { path: '/management/sellers', label: 'Sellers', icon: <Users size={20} />, roles: [1, 2, 3] },
-    { path: '/management/commission-agents', label: 'Commission Agents', icon: <Users size={20} />, roles: [1, 2, 3] },
-    { path: '/management/animals', label: 'Animals', icon: <GiCow size={20} />, roles: [1, 2, 3] },
-    { path: '/transporters', label: 'Transporters', icon: <Truck size={20} />, roles: [1, 2, 3] },
-    { path: '/suppliers', label: 'Suppliers', icon: <UserCircle size={20} />, roles: [1, 2, 3] },
-    { path: '/beneficiaries', label: 'Beneficiaries', icon: <Users size={20} />, roles: [1, 2, 3] },
-    // { path: '/team', label: 'Team Members', icon: <Users size={20} />, roles: [1, 2, 3] },
-    // { path: '/reports', label: 'Reports', icon: <FileText size={20} />, roles: [1, 2, 3] },
-    { path: '/manage-users', label: 'Manage Users', icon: <Settings size={20} />, roles: [1, 2, 3] },
+    
+
+
+    { path: PATHROUTES.userList, label: 'Manage Users', icon: <Settings size={20} />, roles: [1, 2, 3] },
     { path: '/settings', label: 'Settings', icon: <Settings size={20} />, roles: [1, 2, 3] },
 
   ];
@@ -78,27 +96,28 @@ const Sidebar = ({ toggleSidebar, onLogout, isMobile }) => {
   return (
     <div className="w-full sm:w-64 bg-white border-r border-gray-200 flex flex-col h-screen">
       {/* Logo Section - Fixed at top */}
-      <div className="p-4 sm:p-6 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
-        <div className="flex items-center space-x-2 sm:space-x-3">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center flex-shrink-0">
-            <GiCow className="text-white text-lg sm:text-xl" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-lg sm:text-xl font-bold text-gray-900 truncate">360 Animal</h1>
-            <p className="text-xs sm:text-sm text-gray-500 truncate">Parenting System</p>
-          </div>
+      {/* ---------- Logo Section ---------- */}
+      <div className="p-3 sm:p-2 mt-1 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
+
+        {/* Logo Only */}
+        <div className="flex items-center w-full sm:justify-start lg:justify-start px-4">
+          <img
+            src={logo}
+            alt="Logo"
+            className="w-auto h-12 sm:h-12 md:h-14 lg:h-14 object-contain transition-all duration-300"/>
         </div>
 
-        <button 
-          onClick={toggleSidebar} 
-          className="lg:hidden text-gray-500 hover:text-gray-700 p-1 rounded-lg hover:bg-gray-100"
+        {/* Mobile Close Button */}
+        <button
+          onClick={toggleSidebar}
+          className="lg:hidden absolute right-4 text-gray-500 hover:text-gray-700 p-1 rounded-lg hover:bg-gray-100"
         >
           <X size={20} />
         </button>
       </div>
 
       {/* Navigation Section - Scrollable if too many items */}
-      <nav className="flex-1 overflow-y-auto py-2 px-2 sm:px-4">
+      <nav className="flex-1 overflow-y-auto py-2 px-2 sm:px-4 scrollbar-hide">
         <div className="space-y-1">
           {navItems
             .filter(item => item.roles.includes(userRoleId))
@@ -108,18 +127,17 @@ const Sidebar = ({ toggleSidebar, onLogout, isMobile }) => {
                   <>
                     <button
                       onClick={() => toggleSubmenu(item.path)}
-                      className={`flex items-center justify-between w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg text-sm font-medium ${
-                        expandedMenus[item.path]
-                          ? 'bg-primary-50 text-primary-600'
-                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                      }`}
+                      className={`flex items-center justify-between w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg text-sm font-medium ${expandedMenus[item.path]
+                        ? 'bg-primary-50 text-primary-600'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        }`}
                     >
                       <div className="flex items-center space-x-2 sm:space-x-3">
                         <span className="flex-shrink-0">{item.icon}</span>
                         <span className="truncate">{item.label}</span>
                       </div>
-                      {expandedMenus[item.path] ? 
-                        <ChevronDown size={16} className="flex-shrink-0" /> : 
+                      {expandedMenus[item.path] ?
+                        <ChevronDown size={16} className="flex-shrink-0" /> :
                         <ChevronRight size={16} className="flex-shrink-0" />
                       }
                     </button>
@@ -133,10 +151,9 @@ const Sidebar = ({ toggleSidebar, onLogout, isMobile }) => {
                             to={sub.path}
                             onClick={handleNavClick}
                             className={({ isActive }) =>
-                              `block mt-1 ml-6 sm:ml-10 pl-3 sm:pl-4 py-2 text-sm rounded-lg truncate ${
-                                isActive
-                                  ? 'bg-primary-50 text-primary-600 border-l-4 border-primary-500'
-                                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                              `block mt-1 ml-6 sm:ml-10 pl-3 sm:pl-4 py-2 text-sm rounded-lg truncate ${isActive
+                                ? 'bg-primary-50 text-primary-600 border-l-4 border-primary-500'
+                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                               }`
                             }
                           >
@@ -149,10 +166,9 @@ const Sidebar = ({ toggleSidebar, onLogout, isMobile }) => {
                     to={item.path}
                     onClick={handleNavClick}
                     className={({ isActive }) =>
-                      `flex items-center space-x-2 sm:space-x-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg text-sm font-medium truncate ${
-                        isActive
-                          ? 'bg-primary-50 text-primary-600 border-l-4 border-primary-500'
-                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      `flex items-center space-x-2 sm:space-x-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg text-sm font-medium truncate ${isActive
+                        ? 'bg-primary-50 text-primary-600 border-l-4 border-primary-500'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                       }`
                     }
                   >

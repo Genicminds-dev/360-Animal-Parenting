@@ -1,13 +1,11 @@
-// components/DataTable.jsx
+// components/common/Table/DataTable.jsx
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import {
   FaSort,
   FaEye,
   FaEdit,
   FaTrash,
-  FaPlus,
 } from "react-icons/fa";
-import { HiOutlineTrash } from "react-icons/hi";
 import { toast, Toaster } from "react-hot-toast";
 import {
   ChevronDown,
@@ -30,7 +28,6 @@ const DataTable = ({
   enablePagination = true,
 
   // Features
-  getSelectedItems,
   enableSelection = true,
 
   // Callbacks
@@ -39,7 +36,7 @@ const DataTable = ({
   onView,
   onDelete,
   onBulkDelete,
-  onHealthCheck, // New callback for health check button
+  onHealthCheck,
 
   // Customization
   addButtonLabel = "Add New",
@@ -53,7 +50,15 @@ const DataTable = ({
 
   // Health Check specific props
   enableHealthCheck = false,
-  healthCheckLabel
+  healthCheckLabel,
+  
+  // Props for external selection management
+  selectedRows,
+  onSelectRow,
+  onSelectAll,
+
+  // Hide add button
+  hideAddButton = false,
 
 }) => {
   // State management
@@ -64,10 +69,34 @@ const DataTable = ({
     key: columns[0]?.key || "id",
     direction: "desc",
   });
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState(null);
-  const [deleteId, setDeleteId] = useState(null);
   const [showItemsPerPageDropdown, setShowItemsPerPageDropdown] = useState(false);
+
+  // Define toggle functions before they are used
+  const toggleSelectItem = (id) => {
+    setSelectedItems(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    const allIds = filteredData.map(item => item.id);
+    if (selectedItems.size === allIds.length && allIds.length > 0) {
+      setSelectedItems(new Set());
+    } else {
+      setSelectedItems(new Set(allIds));
+    }
+  };
+
+  // Use external selection state if provided, otherwise use internal
+  const effectiveSelectedItems = selectedRows || selectedItems;
+  const effectiveOnSelectRow = onSelectRow || toggleSelectItem;
+  const effectiveOnSelectAll = onSelectAll || toggleSelectAll;
 
   // Filter data - just pass through since filtering is done externally
   const filteredData = useMemo(() => {
@@ -123,62 +152,6 @@ const DataTable = ({
       : <ChevronDown className="ml-1 text-blue-600" size={16} />;
   };
 
-  const toggleSelectItem = (id) => {
-    setSelectedItems(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
-      }
-      return newSet;
-    });
-  };
-
-  const toggleSelectAll = () => {
-    const allIds = filteredData.map(item => item.id);
-    if (selectedItems.size === allIds.length && allIds.length > 0) {
-      setSelectedItems(new Set());
-    } else {
-      setSelectedItems(new Set(allIds));
-    }
-  };
-
-  const handleDelete = (id) => {
-    setDeleteTarget("single");
-    setDeleteId(id);
-    setShowDeleteModal(true);
-  };
-
-  const handleBulkDelete = () => {
-    if (selectedItems.size === 0) {
-      toast.error("Please select items to delete");
-      return;
-    }
-    setDeleteTarget("selected");
-    setShowDeleteModal(true);
-  };
-
-  const confirmDelete = async () => {
-    try {
-      if (deleteTarget === "selected") {
-        if (onBulkDelete) {
-          await onBulkDelete(Array.from(selectedItems));
-        }
-      } else if (deleteId && onDelete) {
-        await onDelete(deleteId);
-      }
-      setSelectedItems(new Set());
-      toast.success("Operation completed successfully!");
-    } catch (error) {
-      toast.error("Operation failed: " + error.message);
-    } finally {
-      setShowDeleteModal(false);
-      setDeleteTarget(null);
-      setDeleteId(null);
-    }
-  };
-
   // Default renderers
   const defaultRenderCell = (item, column) => {
     const value = item[column.key];
@@ -190,7 +163,7 @@ const DataTable = ({
     return value || "N/A";
   };
 
-  // Default actions renderer - includes Health Check button if enabled
+  // Default actions renderer
   const defaultRenderActions = (item) => (
     <div className="flex items-center space-x-2">
       {enableHealthCheck && onHealthCheck && (
@@ -223,7 +196,7 @@ const DataTable = ({
       )}
       {onDelete && (
         <button
-          onClick={() => handleDelete(item.id)}
+          onClick={() => onDelete(item.id)}
           className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
           title="Delete"
         >
@@ -249,6 +222,18 @@ const DataTable = ({
     <>
       <Toaster position="top-center" />
 
+      {/* Add Button - Only if not hidden */}
+      {!hideAddButton && onAdd && (
+        <div className="mb-4 flex justify-end">
+          <button
+            onClick={onAdd}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center space-x-2"
+          >
+            <span>{addButtonLabel}</span>
+          </button>
+        </div>
+      )}
+
       {/* Table */}
       <div className="bg-white rounded-xl shadow-md overflow-hidden">
         <div className="overflow-x-auto">
@@ -259,8 +244,8 @@ const DataTable = ({
                   <th className="w-12 px-4 py-3 border-r border-gray-100 text-center">
                     <input
                       type="checkbox"
-                      checked={selectedItems.size === filteredData.length && filteredData.length > 0}
-                      onChange={toggleSelectAll}
+                      checked={effectiveSelectedItems.size === filteredData.length && filteredData.length > 0}
+                      onChange={effectiveOnSelectAll}
                       className="rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
                     />
                   </th>
@@ -301,15 +286,15 @@ const DataTable = ({
                 paginatedData.map((item, idx) => (
                   <tr
                     key={item.id || idx}
-                    className={`hover:bg-gray-50/50 transition-colors ${selectedItems.has(item.id) ? "bg-blue-50" : idx % 2 === 0 ? "bg-white" : "bg-gray-50/30"
+                    className={`hover:bg-gray-50/50 transition-colors ${effectiveSelectedItems.has(item.id) ? "bg-blue-50" : idx % 2 === 0 ? "bg-white" : "bg-gray-50/30"
                       }`}
                   >
                     {enableSelection && (
                       <td className="px-4 py-3 whitespace-nowrap border-r border-gray-100 text-center">
                         <input
                           type="checkbox"
-                          checked={selectedItems.has(item.id)}
-                          onChange={() => toggleSelectItem(item.id)}
+                          checked={effectiveSelectedItems.has(item.id)}
+                          onChange={() => effectiveOnSelectRow(item.id)}
                           className="rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
                         />
                       </td>
@@ -456,52 +441,6 @@ const DataTable = ({
           </div>
         )}
       </div>
-
-      {/* Delete Modal */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 overflow-y-auto">
-          <div className="relative w-full max-w-md bg-white rounded-xl shadow-xl mx-2">
-            <div className="p-6">
-              <div className="flex justify-center mb-6">
-                <div className="p-4 bg-red-100 rounded-full">
-                  <Trash2 className="w-12 h-12 text-red-600" />
-                </div>
-              </div>
-
-              <div className="text-center mb-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                  Confirm Deletion
-                </h3>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  {deleteTarget === "selected"
-                    ? `You're about to delete ${selectedItems.size} selected item(s). This action cannot be undone.`
-                    : "You're about to delete this item. This action cannot be undone."}
-                </p>
-              </div>
-
-              <div className="flex flex-col sm:flex-row justify-center gap-3">
-                <button
-                  onClick={() => {
-                    setShowDeleteModal(false);
-                    setDeleteTarget(null);
-                    setDeleteId(null);
-                  }}
-                  className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm font-medium"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={confirmDelete}
-                  className="flex-1 px-4 py-2.5 bg-gradient-to-br from-red-500 to-red-600 text-white rounded-lg hover:shadow-md transition-colors text-sm font-medium flex items-center justify-center gap-2"
-                >
-                  <Trash2 size={16} />
-                  <span>Delete</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 };

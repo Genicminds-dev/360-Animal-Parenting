@@ -40,6 +40,7 @@ import ManageUsersTable from './pages/manageUsers/ManageUsersTable';
 import ViewUserDetails from './pages/manageUsers/ViewUserDetails';
 import { Edit3Icon } from 'lucide-react';
 import EditAnimal from './pages/management/animals/EditAnimal';
+import SettingsPage from './pages/settings/SettingPage';
 
 // ProtectedRoute Component
 const ProtectedRoute = ({ children, allowedRoles = [1, 2, 3] }) => {
@@ -373,7 +374,7 @@ const AppContent = () => {
           />
 
           <Route
-            path={PATHROUTES.manageUsers.replace('/', '')}
+            path={PATHROUTES.userList.replace('/', '')}
             element={
               <ProtectedRoute allowedRoles={[1, 2]}>
                 <ManageUsersTable />
@@ -413,8 +414,8 @@ const AppContent = () => {
           <Route
             path={PATHROUTES.settings.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1]}>
-                <Placeholder title="Settings" />
+              <ProtectedRoute allowedRoles={[1,2,3]}>
+                <SettingsPage/>
               </ProtectedRoute>
             }
           />
