@@ -109,26 +109,8 @@ const AppContent = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [sessionExpired, setSessionExpired] = useState(false);
 
-  const checkAuthStatus = useCallback(() => {
-    const authToken = localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
-    if (authToken) {
-      try {
-        const decoded = jwtDecode(authToken);
-        // AuthContext already handles user state
-        setSessionExpired(false);
-      } catch (error) {
-        console.error("Invalid Token", error);
-        handleLogout();
-      }
-    }
-    setIsLoading(false);
-  }, []);
-
-  useEffect(() => {
-    checkAuthStatus();
-  }, [location.pathname, checkAuthStatus]);
-
-  const handleLogout = async (isSessionExpired = false) => {
+  // Define handleLogout first before it's used
+  const handleLogout = useCallback(async (isSessionExpired = false) => {
     try {
       const authToken = localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
       if (authToken) {
@@ -152,7 +134,35 @@ const AppContent = () => {
       }
       navigate(PATHROUTES.login, { replace: true });
     }
-  };
+  }, [logout, navigate]);
+
+  // Then define checkAuthStatus that uses handleLogout
+  const checkAuthStatus = useCallback(() => {
+    const authToken = localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
+    if (authToken) {
+      try {
+        const decoded = jwtDecode(authToken);
+        const currentTime = Date.now() / 1000;
+        
+        // If token is expired, trigger logout
+        if (decoded.exp < currentTime) {
+          handleLogout(true); // true for session expired
+          return;
+        }
+        
+        // AuthContext already handles user state
+        setSessionExpired(false);
+      } catch (error) {
+        console.error("Invalid Token", error);
+        handleLogout(true);
+      }
+    }
+    setIsLoading(false);
+  }, [handleLogout]);
+
+  useEffect(() => {
+    checkAuthStatus();
+  }, [location.pathname, checkAuthStatus]);
 
   return (
     <>
@@ -239,15 +249,6 @@ const AppContent = () => {
               </ProtectedRoute>
             }
           />
-
-          {/* <Route
-            path={PATHROUTES.healthCheck.replace('/', '')}
-            element={
-              <ProtectedRoute allowedRoles={[3]}>
-                <HealthCheck />
-              </ProtectedRoute>
-            }
-          /> */}
 
           {/* Management Menu Routes */}
           <Route
@@ -409,7 +410,6 @@ const AppContent = () => {
             }
           />
 
-
           {/* Settings */}
           <Route
             path={PATHROUTES.settings.replace('/', '')}
@@ -425,8 +425,7 @@ const AppContent = () => {
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
 
-      <SessionTimeoutModal isAuthenticated={isAuthenticated} onLogout={handleLogout}
-      />
+      <SessionTimeoutModal isAuthenticated={isAuthenticated} onLogout={handleLogout} />
     </>
   );
 };
