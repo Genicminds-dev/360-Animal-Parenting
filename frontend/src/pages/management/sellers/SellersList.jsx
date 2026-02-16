@@ -25,7 +25,7 @@ import { HiOutlineTrash } from "react-icons/hi";
 import DataTable from "../../../components/common/Table/DataTable";
 import { PATHROUTES } from "../../../routes/pathRoutes";
 
-// Mock data - FRONTEND ONLY with uid as primary identifier
+// ============ MOCK DATA - YOU CAN SEE THIS DATA IN THE TABLE ============
 const MOCK_SELLERS = [
   {
     id: 1,
@@ -421,8 +421,9 @@ const SellersList = () => {
       onSort: () => requestSort('uid'),
       sortIcon: getSortIcon('uid'),
       render: (item) => (
-        <div className="flex items-center gap-2">
-          <span className="font-medium text-gray-900">{item.uid}</span>
+        <div>
+          <div className="font-medium text-gray-900">{item.uid}</div>
+          <div className="text-xs text-gray-500">ID: {item.id}</div>
         </div>
       )
     },
@@ -482,8 +483,12 @@ const SellersList = () => {
       onSort: () => requestSort('state'),
       sortIcon: getSortIcon('state'),
       render: (item) => (
-        <div className="flex items-center gap-2">
-          <span className="font-medium">{item.state}</span>
+        <div className="flex items-start gap-1">
+          <MapPin size={14} className="text-gray-400 mt-0.5" />
+          <div>
+            <div className="text-sm font-medium">{item.state}</div>
+            <div className="text-xs text-gray-500">{item.city}</div>
+          </div>
         </div>
       )
     },

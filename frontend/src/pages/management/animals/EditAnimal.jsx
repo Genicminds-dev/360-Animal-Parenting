@@ -552,12 +552,19 @@ const EditAnimal = () => {
       )}
 
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Edit Animal</h1>
-        <p className="text-gray-600">
-          Update animal information for {formData.animals[0]?.earTagId || uid}
-        </p>
-      </div>
+       <div className="flex items-center gap-4">
+            <button
+                onClick={handleCancel}
+                className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                disabled={isSubmitting}
+            >
+                <ArrowLeft size={20} />
+            </button>
+            <div>
+                <h1 className="text-2xl font-bold text-gray-900">Edit Agent</h1>
+                <p className="text-gray-600">Update agent information for {formData.fullName}</p>
+            </div>
+        </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Seller Selection Card */}

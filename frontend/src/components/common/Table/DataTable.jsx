@@ -29,6 +29,7 @@ const DataTable = ({
 
   // Features
   enableSelection = true,
+  onSelectionChange, // CRITICAL: This prop is required for parent to get selected items
 
   // Callbacks
   onAdd,
@@ -36,6 +37,7 @@ const DataTable = ({
   onView,
   onDelete,
   onBulkDelete,
+  onHealthCheck,
   onHealthCheck,
 
   // Customization
@@ -67,7 +69,7 @@ const DataTable = ({
   const [itemsPerPage, setItemsPerPage] = useState(itemsPerPageOptions[1] || 10);
   const [sortConfig, setSortConfig] = useState({
     key: columns[0]?.key || "id",
-    direction: "desc",
+    direction: "asc",
   });
   const [showItemsPerPageDropdown, setShowItemsPerPageDropdown] = useState(false);
 
@@ -103,9 +105,17 @@ const DataTable = ({
     return data;
   }, [data]);
 
+  // CRITICAL: Sync selected items with parent component whenever they change
+  useEffect(() => {
+    if (onSelectionChange) {
+      const selectedArray = Array.from(selectedItems);
+      onSelectionChange(selectedArray);
+    }
+  }, [selectedItems, onSelectionChange]);
+
   // Sort data
   const sortedData = useMemo(() => {
-    return [...filteredData].sort((a, b) => {
+    return [...data].sort((a, b) => {
       const key = sortConfig.key;
       const direction = sortConfig.direction === "asc" ? 1 : -1;
       const aValue = a[key];
@@ -119,13 +129,9 @@ const DataTable = ({
         return (aValue - bValue) * direction;
       }
 
-      if (aValue instanceof Date && bValue instanceof Date) {
-        return (aValue - bValue) * direction;
-      }
-
       return String(aValue).localeCompare(String(bValue)) * direction;
     });
-  }, [filteredData, sortConfig]);
+  }, [data, sortConfig]);
 
   // Pagination
   const paginatedData = useMemo(() => {
@@ -136,6 +142,63 @@ const DataTable = ({
   }, [sortedData, currentPage, itemsPerPage, enablePagination]);
 
   const totalPages = Math.ceil(sortedData.length / itemsPerPage);
+
+  // CRITICAL: Get item ID - handles both id and uid
+  const getItemId = (item) => {
+    return item.id || item.uid;
+  };
+
+  // CRITICAL: Toggle single item selection
+  const toggleSelectItem = (item) => {
+    const id = getItemId(item);
+    setSelectedItems(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
+  // CRITICAL: Toggle select all - FIXED to work with current page data
+  const toggleSelectAll = () => {
+    // Get all IDs from CURRENT PAGE data (not all data)
+    const currentPageIds = paginatedData.map(item => getItemId(item)).filter(Boolean);
+    
+    setSelectedItems(prev => {
+      const newSet = new Set(prev);
+      
+      // Check if all items on current page are selected
+      const allSelected = currentPageIds.every(id => prev.has(id));
+      
+      if (allSelected) {
+        // Deselect all items on current page
+        currentPageIds.forEach(id => newSet.delete(id));
+      } else {
+        // Select all items on current page
+        currentPageIds.forEach(id => newSet.add(id));
+      }
+      
+      return newSet;
+    });
+  };
+
+  // Check if all items on current page are selected
+  const isAllSelected = useMemo(() => {
+    if (paginatedData.length === 0) return false;
+    const currentPageIds = paginatedData.map(item => getItemId(item));
+    return currentPageIds.every(id => selectedItems.has(id));
+  }, [paginatedData, selectedItems]);
+
+  // Check if some items are selected (for indeterminate state)
+  const isIndeterminate = useMemo(() => {
+    if (paginatedData.length === 0) return false;
+    const currentPageIds = paginatedData.map(item => getItemId(item));
+    const selectedCount = currentPageIds.filter(id => selectedItems.has(id)).length;
+    return selectedCount > 0 && selectedCount < currentPageIds.length;
+  }, [paginatedData, selectedItems]);
 
   // Handlers
   const handleSort = (key) => {
@@ -154,13 +217,10 @@ const DataTable = ({
 
   // Default renderers
   const defaultRenderCell = (item, column) => {
-    const value = item[column.key];
-
     if (column.render) {
       return column.render(item);
     }
-
-    return value || "N/A";
+    return item[column.key] || "N/A";
   };
 
   // Default actions renderer
@@ -212,6 +272,15 @@ const DataTable = ({
       <div className="text-lg font-medium text-gray-500 mb-2">
         {emptyStateMessage}
       </div>
+      {onAdd && (
+        <button
+          onClick={onAdd}
+          className="mt-4 px-6 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:shadow-md transition-all flex items-center gap-2"
+        >
+          <FaPlus size={14} />
+          {addButtonLabel}
+        </button>
+      )}
     </div>
   );
 
@@ -328,7 +397,7 @@ const DataTable = ({
         </div>
 
         {/* Pagination */}
-        {enablePagination && (
+        {enablePagination && sortedData.length > 0 && (
           <div className="px-5 py-4 border-t border-gray-200 bg-gray-50/50">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-600">
               <div className="text-center sm:text-left">
@@ -367,10 +436,11 @@ const DataTable = ({
                             setShowItemsPerPageDropdown(false);
                             setCurrentPage(1);
                           }}
-                          className={`block w-full text-left px-3 py-2 text-sm hover:bg-blue-50 transition-colors border-b border-gray-200 last:border-b-0 ${itemsPerPage === option
-                            ? "bg-blue-50 text-blue-600 font-medium"
-                            : "text-gray-700"
-                            }`}
+                          className={`block w-full text-left px-3 py-2 text-sm hover:bg-blue-50 transition-colors border-b border-gray-200 last:border-b-0 ${
+                            itemsPerPage === option
+                              ? "bg-blue-50 text-blue-600 font-medium"
+                              : "text-gray-700"
+                          }`}
                         >
                           {option}
                         </button>
@@ -389,23 +459,26 @@ const DataTable = ({
                   </button>
 
                   {Array.from({ length: Math.min(5, totalPages) }).map((_, i) => {
-                    const pageNumber =
-                      totalPages <= 5
-                        ? i + 1
-                        : currentPage <= 3
-                          ? i + 1
-                          : currentPage >= totalPages - 2
-                            ? totalPages - 4 + i
-                            : currentPage - 2 + i;
+                    let pageNumber;
+                    if (totalPages <= 5) {
+                      pageNumber = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNumber = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNumber = totalPages - 4 + i;
+                    } else {
+                      pageNumber = currentPage - 2 + i;
+                    }
 
                     return (
                       <button
                         key={pageNumber}
                         onClick={() => setCurrentPage(pageNumber)}
-                        className={`px-3 py-2 border rounded-lg min-w-[2.5rem] transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${currentPage === pageNumber
-                          ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white border-transparent"
-                          : "border-gray-300 hover:bg-gray-50 bg-white"
-                          }`}
+                        className={`px-3 py-2 border rounded-lg min-w-[2.5rem] transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                          currentPage === pageNumber
+                            ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white border-transparent"
+                            : "border-gray-300 hover:bg-gray-50 bg-white"
+                        }`}
                       >
                         {pageNumber}
                       </button>
@@ -413,19 +486,15 @@ const DataTable = ({
                   })}
 
                   {totalPages > 5 && currentPage < totalPages - 2 && (
-                    <span className="px-2 flex items-center text-gray-400">...</span>
-                  )}
-
-                  {totalPages > 5 && currentPage < totalPages - 2 && (
-                    <button
-                      onClick={() => setCurrentPage(totalPages)}
-                      className={`px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${currentPage === totalPages
-                        ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white border-transparent"
-                        : ""
-                        }`}
-                    >
-                      {totalPages}
-                    </button>
+                    <>
+                      <span className="px-2 flex items-center text-gray-400">...</span>
+                      <button
+                        onClick={() => setCurrentPage(totalPages)}
+                        className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                      >
+                        {totalPages}
+                      </button>
+                    </>
                   )}
 
                   <button
