@@ -14,6 +14,7 @@ import {
   Filter,
   X,
   Calendar,
+  MapPin,
 } from "lucide-react";
 import {
   FaDownload,

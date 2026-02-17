@@ -43,7 +43,15 @@ export const PATHROUTES = {
   team: "/team",
   reports: "/reports",
 
-  
+
   settings: "/settings",
+
+
+
+
+
+  animalProcurement: "/animal-registration",
+  animalProcuredList: "/animal-list",
+  animalProcurementView: "/view-animal-details"
 
 };

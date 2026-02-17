@@ -41,6 +41,9 @@ import ViewUserDetails from './pages/manageUsers/ViewUserDetails';
 import { Edit3Icon } from 'lucide-react';
 import EditAnimal from './pages/management/animals/EditAnimal';
 import SettingsPage from './pages/settings/SettingPage';
+import AnimalProcurement from './pages/AnimalProcurement/AnimalProcurement';
+import ProcurementList from './pages/AnimalProcuredList/ProcurementList';
+import ViewProcurement from './pages/AnimalProcuredList/ViewProcurement';
 
 // ProtectedRoute Component
 const ProtectedRoute = ({ children, allowedRoles = [1, 2, 3] }) => {
@@ -143,13 +146,13 @@ const AppContent = () => {
       try {
         const decoded = jwtDecode(authToken);
         const currentTime = Date.now() / 1000;
-        
+
         // If token is expired, trigger logout
         if (decoded.exp < currentTime) {
           handleLogout(true); // true for session expired
           return;
         }
-        
+
         // AuthContext already handles user state
         setSessionExpired(false);
       } catch (error) {
@@ -315,11 +318,11 @@ const AppContent = () => {
               </ProtectedRoute>
             }
           />
-           <Route
+          <Route
             path={PATHROUTES.editAnimal.replace('/', '')}
             element={
               <ProtectedRoute allowedRoles={[1, 2, 3]}>
-                <EditAnimal/>
+                <EditAnimal />
               </ProtectedRoute>
             }
           />
@@ -374,6 +377,37 @@ const AppContent = () => {
             }
           />
 
+
+          <Route
+            path={PATHROUTES.animalsList.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1, 2, 3]}>
+                <AnimalsList />
+              </ProtectedRoute>
+            }
+          />
+
+
+
+          <Route
+            path={PATHROUTES.animalProcurement.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1, 2]}>
+                <AnimalProcurement />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path={PATHROUTES.animalProcuredList.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1, 2]}>
+                <ProcurementList />
+              </ProtectedRoute>
+            }
+          />
+
+
           <Route
             path={PATHROUTES.userList.replace('/', '')}
             element={
@@ -388,6 +422,15 @@ const AppContent = () => {
             element={
               <ProtectedRoute allowedRoles={[1, 2]}>
                 <ManageUsersForm />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path={PATHROUTES.animalProcurementView.replace('/', '')}
+            element={
+              <ProtectedRoute allowedRoles={[1, 2]}>
+                <ViewProcurement />
               </ProtectedRoute>
             }
           />
@@ -414,8 +457,8 @@ const AppContent = () => {
           <Route
             path={PATHROUTES.settings.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1,2,3]}>
-                <SettingsPage/>
+              <ProtectedRoute allowedRoles={[1, 2, 3]}>
+                <SettingsPage />
               </ProtectedRoute>
             }
           />

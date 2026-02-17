@@ -368,8 +368,8 @@ const ManageUsersForm = () => {
         {/* Personal Details Section */}
         <div className="card">
           <div className="flex items-center space-x-3 mb-6">
-            <div className="p-2 bg-blue-50 rounded-lg">
-              <FaUser className="text-blue-600" size={20} />
+            <div className="p-2 bg-primary-50 rounded-lg">
+              <FaUser className="text-primary-600" size={20} />
             </div>
             <h2 className="text-lg font-semibold text-gray-900">Personal Details</h2>
           </div>
