@@ -148,8 +148,8 @@ const DataTable = ({
   const getSortIcon = (key) => {
     if (sortConfig.key !== key) return <FaSort className="ml-1 text-gray-400" size={14} />;
     return sortConfig.direction === "asc"
-      ? <ChevronUp className="ml-1 text-blue-600" size={16} />
-      : <ChevronDown className="ml-1 text-blue-600" size={16} />;
+      ? <ChevronUp className="ml-1 text-primary-600" size={16} />
+      : <ChevronDown className="ml-1 text-primary-600" size={16} />;
   };
 
   // Default renderers
@@ -179,7 +179,7 @@ const DataTable = ({
       {onView && (
         <button
           onClick={() => onView(item)}
-          className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+          className="p-2 rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 transition-colors"
           title="View Details"
         >
           <Eye size={16} />
@@ -227,7 +227,7 @@ const DataTable = ({
         <div className="mb-4 flex justify-end">
           <button
             onClick={onAdd}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center space-x-2"
+            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium flex items-center space-x-2"
           >
             <span>{addButtonLabel}</span>
           </button>
@@ -246,7 +246,7 @@ const DataTable = ({
                       type="checkbox"
                       checked={effectiveSelectedItems.size === filteredData.length && filteredData.length > 0}
                       onChange={effectiveOnSelectAll}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                      className="rounded border-gray-300 text-primary-600 focus:ring-2 focus:ring-primary-500"
                     />
                   </th>
                 )}
@@ -275,7 +275,7 @@ const DataTable = ({
                 <tr>
                   <td colSpan={columns.length + (enableSelection ? 1 : 0) + (showActionsColumn ? 1 : 0)} className="px-4 py-12 text-center">
                     <div className="flex flex-col items-center justify-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-4"></div>
                       <div className="text-lg font-medium text-gray-500 mb-2">
                         {loadingMessage}
                       </div>
@@ -286,7 +286,7 @@ const DataTable = ({
                 paginatedData.map((item, idx) => (
                   <tr
                     key={item.id || idx}
-                    className={`hover:bg-gray-50/50 transition-colors ${effectiveSelectedItems.has(item.id) ? "bg-blue-50" : idx % 2 === 0 ? "bg-white" : "bg-gray-50/30"
+                    className={`hover:bg-gray-50/50 transition-colors ${effectiveSelectedItems.has(item.id) ? "bg-primary-50" : idx % 2 === 0 ? "bg-white" : "bg-gray-50/30"
                       }`}
                   >
                     {enableSelection && (
@@ -295,7 +295,7 @@ const DataTable = ({
                           type="checkbox"
                           checked={effectiveSelectedItems.has(item.id)}
                           onChange={() => effectiveOnSelectRow(item.id)}
-                          className="rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                          className="rounded border-gray-300 text-primary-600 focus:ring-2 focus:ring-primary-500"
                         />
                       </td>
                     )}
@@ -333,15 +333,15 @@ const DataTable = ({
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-600">
               <div className="text-center sm:text-left">
                 Showing{" "}
-                <span className="font-medium text-blue-700">
+                <span className="font-medium text-primary-700">
                   {sortedData.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}
                 </span>{" "}
                 to{" "}
-                <span className="font-medium text-blue-700">
+                <span className="font-medium text-primary-700">
                   {Math.min(currentPage * itemsPerPage, sortedData.length)}
                 </span>{" "}
                 of{" "}
-                <span className="font-medium text-blue-700">
+                <span className="font-medium text-primary-700">
                   {sortedData.length}
                 </span>{" "}
                 items
@@ -351,7 +351,7 @@ const DataTable = ({
                 <div className="relative">
                   <button
                     onClick={() => setShowItemsPerPageDropdown(!showItemsPerPageDropdown)}
-                    className="flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[5rem] bg-white"
+                    className="flex items-center justify-between px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 min-w-[5rem] bg-white"
                   >
                     <span>{itemsPerPage}</span>
                     <ChevronDown size={16} className="ml-2" />
@@ -367,8 +367,8 @@ const DataTable = ({
                             setShowItemsPerPageDropdown(false);
                             setCurrentPage(1);
                           }}
-                          className={`block w-full text-left px-3 py-2 text-sm hover:bg-blue-50 transition-colors border-b border-gray-200 last:border-b-0 ${itemsPerPage === option
-                            ? "bg-blue-50 text-blue-600 font-medium"
+                          className={`block w-full text-left px-3 py-2 text-sm hover:bg-primary-50 transition-colors border-b border-gray-200 last:border-b-0 ${itemsPerPage === option
+                            ? "bg-primary-50 text-primary-600 font-medium"
                             : "text-gray-700"
                             }`}
                         >
@@ -383,7 +383,7 @@ const DataTable = ({
                   <button
                     onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
                     disabled={currentPage === 1}
-                    className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white whitespace-nowrap"
+                    className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white whitespace-nowrap"
                   >
                     Previous
                   </button>
@@ -402,8 +402,8 @@ const DataTable = ({
                       <button
                         key={pageNumber}
                         onClick={() => setCurrentPage(pageNumber)}
-                        className={`px-3 py-2 border rounded-lg min-w-[2.5rem] transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${currentPage === pageNumber
-                          ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white border-transparent"
+                        className={`px-3 py-2 border rounded-lg min-w-[2.5rem] transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 ${currentPage === pageNumber
+                          ? "bg-gradient-to-br from-primary-500 to-primary-600 text-white border-transparent"
                           : "border-gray-300 hover:bg-gray-50 bg-white"
                           }`}
                       >
@@ -419,8 +419,8 @@ const DataTable = ({
                   {totalPages > 5 && currentPage < totalPages - 2 && (
                     <button
                       onClick={() => setCurrentPage(totalPages)}
-                      className={`px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${currentPage === totalPages
-                        ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white border-transparent"
+                      className={`px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white ${currentPage === totalPages
+                        ? "bg-gradient-to-br from-primary-500 to-primary-600 text-white border-transparent"
                         : ""
                         }`}
                     >
@@ -431,7 +431,7 @@ const DataTable = ({
                   <button
                     onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
                     disabled={currentPage === totalPages || totalPages === 0}
-                    className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white whitespace-nowrap"
+                    className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white whitespace-nowrap"
                   >
                     Next
                   </button>

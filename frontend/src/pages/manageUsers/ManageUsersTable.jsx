@@ -499,7 +499,7 @@
 //                     <div className="flex items-center space-x-4">
 //                         <button
 //                             onClick={handleRefresh}
-//                             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center space-x-2"
+//                             className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium flex items-center space-x-2"
 //                         >
 //                             <span>Refresh</span>
 //                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -508,7 +508,7 @@
 //                         </button>
 //                         <button
 //                             onClick={handleAddUser}
-//                             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center space-x-2"
+//                             className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium flex items-center space-x-2"
 //                         >
 //                             <FaUserPlus className="w-4 h-4" />
 //                             <span>Add User</span>
@@ -520,7 +520,7 @@
 //                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 //                     <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
 //                         <div className="flex items-start justify-between">
-//                             <FaUser className="text-blue-500 opacity-60" size={40} />
+//                             <FaUser className="text-primary-500 opacity-60" size={40} />
 //                             <div className="text-right">
 //                                 <h3 className="text-2xl font-bold text-gray-900">{stats.totalUsers}</h3>
 //                                 <p className="text-gray-600">Total Users</p>
@@ -590,7 +590,7 @@
 //                                                 paginatedUsers.length > 0
 //                                             }
 //                                             onChange={toggleSelectAll}
-//                                             className="rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500/50"
+//                                             className="rounded border-gray-300 text-primary-600 focus:ring-2 focus:ring-primary-500/50"
 //                                             ref={(el) => {
 //                                                 if (el) {
 //                                                     el.indeterminate =
@@ -630,7 +630,7 @@
 //                                     <tr>
 //                                         <td colSpan="10" className="px-4 py-12 text-center">
 //                                             <div className="flex flex-col items-center justify-center">
-//                                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
+//                                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-4"></div>
 //                                                 <div className="text-lg font-medium text-gray-500 mb-2">
 //                                                     Loading users...
 //                                                 </div>
@@ -642,7 +642,7 @@
 //                                         <tr
 //                                             key={user.id}
 //                                             className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-50/50"
-//                                                 } hover:bg-blue-50/30 transition-colors ${selectedIds.includes(user.id) ? "!bg-blue-50" : ""
+//                                                 } hover:bg-primary-50/30 transition-colors ${selectedIds.includes(user.id) ? "!bg-primary-50" : ""
 //                                                 }`}
 //                                         >
 //                                             <td className="px-4 py-3 whitespace-nowrap border-r border-gray-100">
@@ -650,7 +650,7 @@
 //                                                     type="checkbox"
 //                                                     checked={selectedIds.includes(user.id)}
 //                                                     onChange={() => toggleSelect(user.id)}
-//                                                     className="rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500/50"
+//                                                     className="rounded border-gray-300 text-primary-600 focus:ring-2 focus:ring-primary-500/50"
 //                                                 />
 //                                             </td>
 //                                             <td className="px-4 py-3 whitespace-nowrap border-r border-gray-100 text-sm text-gray-700">
@@ -673,7 +673,7 @@
 //                                                 </div>
 //                                             </td>
 //                                             <td className="px-4 py-3 whitespace-nowrap border-r border-gray-100 text-sm text-gray-700">
-//                                                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+//                                                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
 //                                                     {user.Role?.name || "N/A"}
 //                                                 </span>
 //                                             </td>
@@ -704,7 +704,7 @@
 //                                                 <div className="flex items-center justify-center space-x-2">
 //                                                     <button
 //                                                         onClick={() => handleViewUser(user)}
-//                                                         className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+//                                                         className="p-2 rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/50"
 //                                                         title="View User Details"
 //                                                     >
 //                                                         <FaEye className="h-4 w-4" />
@@ -739,7 +739,7 @@
 //                                                 </p>
 //                                                 <button
 //                                                     onClick={handleAddUser}
-//                                                     className="px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all flex items-center gap-2 text-sm"
+//                                                     className="px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-all flex items-center gap-2 text-sm"
 //                                                 >
 //                                                     <FaUserPlus /> Add Your First User
 //                                                 </button>
@@ -756,15 +756,15 @@
 //                         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-600">
 //                             <div className="text-center sm:text-left">
 //                                 Showing{" "}
-//                                 <span className="font-medium text-blue-600">
+//                                 <span className="font-medium text-primary-600">
 //                                     {sortedUsers.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}
 //                                 </span>{" "}
 //                                 to{" "}
-//                                 <span className="font-medium text-blue-600">
+//                                 <span className="font-medium text-primary-600">
 //                                     {Math.min(currentPage * itemsPerPage, sortedUsers.length)}
 //                                 </span>{" "}
 //                                 of{" "}
-//                                 <span className="font-medium text-blue-600">
+//                                 <span className="font-medium text-primary-600">
 //                                     {sortedUsers.length}
 //                                 </span>{" "}
 //                                 users
@@ -776,7 +776,7 @@
 //                                         onClick={() =>
 //                                             setShowItemsPerPageDropdown(!showItemsPerPageDropdown)
 //                                         }
-//                                         className="flex items-center justify-between px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/50 min-w-[5rem] bg-white"
+//                                         className="flex items-center justify-between px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/50 min-w-[5rem] bg-white"
 //                                     >
 //                                         <span>{itemsPerPage}</span>
 //                                         <svg
@@ -801,8 +801,8 @@
 //                                                 <button
 //                                                     key={option}
 //                                                     onClick={() => handleItemsPerPageChange(option)}
-//                                                     className={`block w-full text-left px-3 py-2 text-sm hover:bg-blue-50 transition-colors border-b border-gray-200 last:border-b-0 ${itemsPerPage === option
-//                                                         ? "bg-blue-50 text-blue-600 font-medium"
+//                                                     className={`block w-full text-left px-3 py-2 text-sm hover:bg-primary-50 transition-colors border-b border-gray-200 last:border-b-0 ${itemsPerPage === option
+//                                                         ? "bg-primary-50 text-primary-600 font-medium"
 //                                                         : "text-gray-700"
 //                                                         }`}
 //                                                 >
@@ -817,7 +817,7 @@
 //                                     <button
 //                                         onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
 //                                         disabled={currentPage === 1}
-//                                         className="px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500/50 bg-white whitespace-nowrap"
+//                                         className="px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary-500/50 bg-white whitespace-nowrap"
 //                                     >
 //                                         Previous
 //                                     </button>
@@ -836,8 +836,8 @@
 //                                             <button
 //                                                 key={pageNumber}
 //                                                 onClick={() => setCurrentPage(pageNumber)}
-//                                                 className={`px-3 py-2 border rounded-lg min-w-[2.5rem] transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/50 ${currentPage === pageNumber
-//                                                     ? "bg-blue-600 text-white border-transparent"
+//                                                 className={`px-3 py-2 border rounded-lg min-w-[2.5rem] transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/50 ${currentPage === pageNumber
+//                                                     ? "bg-primary-600 text-white border-transparent"
 //                                                     : "border-gray-200 hover:bg-gray-50 bg-white"
 //                                                     }`}
 //                                             >
@@ -855,7 +855,7 @@
 //                                     {totalPages > 5 && currentPage < totalPages - 2 && (
 //                                         <button
 //                                             onClick={() => setCurrentPage(totalPages)}
-//                                             className="px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/50 bg-white"
+//                                             className="px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500/50 bg-white"
 //                                         >
 //                                             {totalPages}
 //                                         </button>
@@ -864,7 +864,7 @@
 //                                     <button
 //                                         onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
 //                                         disabled={currentPage === totalPages || totalPages === 0}
-//                                         className="px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-blue-500/50 bg-white whitespace-nowrap"
+//                                         className="px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary-500/50 bg-white whitespace-nowrap"
 //                                     >
 //                                         Next
 //                                     </button>
@@ -1630,7 +1630,7 @@ const ManageUsersTable = () => {
             onSort: () => requestSort('role'),
             sortIcon: getSortIcon('role'),
             render: (item) => (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
                     {item.Role?.name || "N/A"}
                 </span>
             )
@@ -1682,27 +1682,7 @@ const ManageUsersTable = () => {
 
     return (
         <>
-            <div className="space-y-6 bg-gray-50">
-                <Toaster
-                    position="top-center"
-                    toastOptions={{
-                        style: {
-                            background: "#363636",
-                            color: "#fff",
-                        },
-                        success: {
-                            style: {
-                                background: "#10b981",
-                            },
-                        },
-                        error: {
-                            style: {
-                                background: "#ef4444",
-                            },
-                        },
-                    }}
-                />
-
+            <div className="space-y-6 bg-gray-50 dark:bg-gray-900">
                 {/* Header Section - SellersList style */}
                 <div className="flex items-center justify-between">
                     <div>
@@ -1712,7 +1692,7 @@ const ManageUsersTable = () => {
                     <div className="flex items-center space-x-4">
                         <button
                             onClick={handleRefresh}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center space-x-2"
+                            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium flex items-center space-x-2"
                             disabled={loading}
                         >
                             <span>Refresh</span>
@@ -1720,7 +1700,7 @@ const ManageUsersTable = () => {
                         </button>
                         <button
                             onClick={handleAddUser}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center space-x-2"
+                            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium flex items-center space-x-2"
                         >
                             <FaUserPlus className="w-4 h-4" />
                             <span>Add User</span>
@@ -1732,7 +1712,7 @@ const ManageUsersTable = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
                         <div className="flex items-start justify-between">
-                            <FaUser className="text-blue-500 opacity-60" size={40} />
+                            <FaUser className="text-primary-500 opacity-60" size={40} />
                             <div className="text-right">
                                 <h3 className="text-2xl font-bold text-gray-900">{stats.totalUsers}</h3>
                                 <p className="text-gray-600">Total Users</p>
@@ -1784,7 +1764,7 @@ const ManageUsersTable = () => {
                                 <input
                                     type="text"
                                     placeholder="Search by User ID, Name, Email or Role..."
-                                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent text-sm bg-gray-50/50"
+                                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-transparent text-sm bg-gray-50/50"
                                     value={searchInput}
                                     onChange={handleSearchChange}
                                 />
@@ -1802,14 +1782,14 @@ const ManageUsersTable = () => {
                                 onClick={() => setShowFilters(!showFilters)}
                                 className={`px-4 py-2.5 border rounded-lg flex items-center gap-2 text-sm transition-all justify-center md:justify-start ${
                                     showFilters
-                                        ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white border-transparent"
+                                        ? "bg-gradient-to-br from-primary-500 to-primary-600 text-white border-transparent"
                                         : "border-gray-300 hover:bg-gray-50 text-gray-700"
                                 }`}
                             >
                                 <Filter className="w-4 h-4" />
                                 Filters
                                 {isFilterApplied && (
-                                    <span className="ml-1 px-1.5 py-0.5 bg-blue-200 text-blue-800 rounded-full text-xs">
+                                    <span className="ml-1 px-1.5 py-0.5 bg-primary-200 text-primary-800 rounded-full text-xs">
                                         •
                                     </span>
                                 )}
@@ -1851,7 +1831,7 @@ const ManageUsersTable = () => {
 
                     {/* Filters Panel - SellersList style */}
                     {showFilters && (
-                        <div className="mt-4 p-5 bg-blue-50/50 rounded-xl border border-blue-100">
+                        <div className="mt-4 p-5 bg-primary-50/50 rounded-xl border border-primary-100">
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                 {/* Role Filter */}
                                 <div>
@@ -1859,7 +1839,7 @@ const ManageUsersTable = () => {
                                         Select Role
                                     </label>
                                     <select
-                                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm"
+                                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
                                         value={tempFilters.role || ""}
                                         onChange={(e) => handleFilterChange("role", e.target.value)}
                                     >
@@ -1876,7 +1856,7 @@ const ManageUsersTable = () => {
                                         Select Status
                                     </label>
                                     <select
-                                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm"
+                                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
                                         value={tempFilters.status || ""}
                                         onChange={(e) => handleFilterChange("status", e.target.value)}
                                     >
@@ -1898,7 +1878,7 @@ const ManageUsersTable = () => {
                                         <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                                         <input
                                             type="date"
-                                            className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm"
+                                            className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
                                             value={tempFilters.fromDate || ""}
                                             max={getCurrentDate()}
                                             onChange={(e) => handleFilterChange("fromDate", e.target.value)}
@@ -1914,7 +1894,7 @@ const ManageUsersTable = () => {
                                         <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                                         <input
                                             type="date"
-                                            className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm"
+                                            className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
                                             value={tempFilters.toDate || ""}
                                             max={getCurrentDate()}
                                             min={tempFilters.fromDate || undefined}
@@ -1927,12 +1907,12 @@ const ManageUsersTable = () => {
                             <div className="mt-6 flex flex-col xs:flex-row justify-between items-start xs:items-center gap-4">
                                 <div className="text-sm text-gray-600 w-full xs:w-auto">
                                     {isFilterApplied && (
-                                        <div className="flex flex-wrap items-center gap-2 bg-gradient-to-r from-blue-100 to-blue-50 px-3 py-2 rounded-lg border border-blue-200">
-                                            <span className="inline-flex items-center px-2 py-1 rounded-md bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs">
+                                        <div className="flex flex-wrap items-center gap-2 bg-gradient-to-r from-primary-100 to-primary-50 px-3 py-2 rounded-lg border border-primary-200">
+                                            <span className="inline-flex items-center px-2 py-1 rounded-md bg-gradient-to-r from-primary-500 to-primary-600 text-white text-xs">
                                                 <Filter className="w-3 h-3 mr-1" />
                                                 Filters Applied
                                             </span>
-                                            <span className="text-blue-700 text-xs">
+                                            <span className="text-primary-700 text-xs">
                                                 {Object.keys(appliedFilters).length > 0 &&
                                                     Object.keys(appliedFilters).filter(k => appliedFilters[k]).map(key => {
                                                         if (key === 'fromDate' || key === 'toDate') {
@@ -1955,13 +1935,13 @@ const ManageUsersTable = () => {
                                     </button>
                                     <button
                                         onClick={handleCancelFilters}
-                                        className="px-4 py-2 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors border border-blue-300 whitespace-nowrap"
+                                        className="px-4 py-2 text-sm text-primary-600 hover:text-primary-800 hover:bg-primary-50 rounded-lg transition-colors border border-primary-300 whitespace-nowrap"
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         onClick={handleApplyFilters}
-                                        className="px-5 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap bg-gradient-to-br from-blue-500 to-blue-600 text-white hover:shadow-md"
+                                        className="px-5 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap bg-gradient-to-br from-primary-500 to-primary-600 text-white hover:shadow-md"
                                     >
                                         Apply Filters
                                     </button>

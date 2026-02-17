@@ -11,7 +11,6 @@ import { getId } from '../../../utils/TokenDecode/TokenDecode';
 
 const Header = ({ toggleSidebar, sidebarOpen }) => {
   const { user, logout: contextLogout } = useAuth();
-  const [showUserMenu, setShowUserMenu] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [userProfile, setUserProfile] = useState({
@@ -115,14 +114,10 @@ const Header = ({ toggleSidebar, sidebarOpen }) => {
       // Clear local storage and context
       contextLogout();
       
-      // Close user menu
-      setShowUserMenu(false);
-      
     } catch (error) {
       console.error('Logout error:', error);
       // Still logout locally even if API fails
       contextLogout();
-      setShowUserMenu(false);
     } finally {
       setLoggingOut(false);
     }
@@ -155,7 +150,7 @@ const Header = ({ toggleSidebar, sidebarOpen }) => {
               <input
                 type="search"
                 placeholder="Search animals, farmers, reports..."
-                className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent w-full text-sm transition-colors"
+                className="input-field pl-10"
               />
             </div>
           </div>
@@ -197,7 +192,6 @@ const Header = ({ toggleSidebar, sidebarOpen }) => {
             {/* User Menu */}
             <div className="relative">
               <button
-                onClick={() => setShowUserMenu(!showUserMenu)}
                 className="flex items-center space-x-2 sm:space-x-3 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                 disabled={loggingOut}
               >
@@ -222,46 +216,6 @@ const Header = ({ toggleSidebar, sidebarOpen }) => {
                 </div>
               </button>
 
-              {/* User Dropdown Menu */}
-              {showUserMenu && (
-                <>
-                  <div 
-                    className="fixed inset-0 z-40" 
-                    onClick={() => setShowUserMenu(false)}
-                  />
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
-                    <Link
-                      to={PATHROUTES.settings}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
-                      onClick={() => setShowUserMenu(false)}
-                    >
-                      <Settings size={16} />
-                      Settings
-                    </Link>
-                    <div className="border-t border-gray-200 my-1"></div>
-                    <button
-                      onClick={handleLogout}
-                      disabled={loggingOut}
-                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {loggingOut ? (
-                        <>
-                          <svg className="animate-spin h-4 w-4 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          Logging out...
-                        </>
-                      ) : (
-                        <>
-                          <LogOut size={16} />
-                          Logout
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </>
-              )}
             </div>
           </div>
         </div>

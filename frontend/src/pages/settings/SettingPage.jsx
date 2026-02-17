@@ -18,7 +18,7 @@ const SettingsPage = ({ userRole = 'user', onLogout }) => {
   const visibleTabs = tabs.filter(tab => tab.roles.includes(userRole));
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6 transition-colors duration-300">
+    <div className="min-h-screen bg-gray-50 transition-colors duration-300 dark:bg-gray-900">
       {/* Header with Dark Mode Toggle */}
       <div className="mb-8 flex justify-between items-center">
         <div>

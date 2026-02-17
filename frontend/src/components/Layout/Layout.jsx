@@ -144,7 +144,7 @@ const Layout = ({ onLogout }) => {
         </div>
         
         {/* Main Content - Scrollable */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-gray-900">
           <div className="p-3 sm:p-4 md:p-6 lg:p-8">
             <div className="max-w-full lg:max-w-7xl mx-auto">
               <Outlet />

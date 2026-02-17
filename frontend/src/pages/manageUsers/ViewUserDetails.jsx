@@ -141,8 +141,8 @@ export default function ViewUserDetails() {
             },
             pending: {
                 label: "Pending",
-                color: "text-blue-800",
-                bg: "bg-blue-100"
+                color: "text-primary-800",
+                bg: "bg-primary-100"
             },
             blocked: {
                 label: "Blocked",
@@ -162,7 +162,7 @@ export default function ViewUserDetails() {
         if (userData.roleId === 1 || userData.Role?.name === "Super Admin") {
             return { name: "Super Admin", level: "Full System Access", color: "text-purple-800", bg: "bg-purple-100" };
         } else if (userData.roleId === 2 || userData.Role?.name === "Admin") {
-            return { name: "Admin", level: "Admin Access", color: "text-blue-800", bg: "bg-blue-100" };
+            return { name: "Admin", level: "Admin Access", color: "text-primary-800", bg: "bg-primary-100" };
         } else if (userData.roleId === 3 || userData.Role?.name === "Manager") {
             return { name: "Manager", level: "Limited Access", color: "text-green-800", bg: "bg-green-100" };
         } else {
@@ -183,7 +183,7 @@ export default function ViewUserDetails() {
         return (
             <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-50 via-white to-gray-50">
                 <div className="text-center p-8 bg-white rounded-xl shadow-md">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
                     <h3 className="text-xl font-bold text-gray-700 mb-2">Loading User Details...</h3>
                     <p className="text-gray-500">Please wait while we fetch the user information.</p>
                 </div>
@@ -196,14 +196,14 @@ export default function ViewUserDetails() {
         return (
             <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-50 via-white to-gray-50">
                 <div className="text-center p-8 bg-white rounded-xl shadow-md">
-                    <div className="p-4 bg-blue-100 rounded-full mb-4 inline-block">
-                        <FaUser className="w-12 h-12 text-blue-600" />
+                    <div className="p-4 bg-primary-100 rounded-full mb-4 inline-block">
+                        <FaUser className="w-12 h-12 text-primary-600" />
                     </div>
                     <h3 className="text-xl font-bold text-gray-700 mb-2">User Not Found</h3>
                     <p className="text-gray-500 mb-6">The requested user could not be found.</p>
                     <button
                         onClick={() => navigate(PATHROUTES.userList)}
-                        className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 mx-auto"
+                        className="px-5 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 mx-auto"
                     >
                         <FaArrowLeft size={16} />
                         Back to Users
@@ -218,13 +218,14 @@ export default function ViewUserDetails() {
     const daysActive = getDaysActive();
 
     return (
+        
         <div className="space-y-6 bg-gradient-to-r from-gray-50 via-white to-gray-50">
             {/* Header Section - Only Back Button */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <button
                         onClick={() => navigate(PATHROUTES.userList)}
-                        className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="p-2 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
                     >
                         <ArrowLeft size={20} />
                     </button>
@@ -240,7 +241,7 @@ export default function ViewUserDetails() {
                 <div className="flex md:flex-row items-start md:items-center gap-6">
                     {/* Profile Image */}
                     <div className="flex-shrink-0">
-                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 border-4 border-white shadow-lg flex items-center justify-center overflow-hidden">
+                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary-100 to-primary-200 border-4 border-white shadow-lg flex items-center justify-center overflow-hidden">
                             {user.profileImg ? (
                                 <img
                                     src={getFileUrl(user.profileImg)}
@@ -303,7 +304,7 @@ export default function ViewUserDetails() {
                     <button
                         onClick={() => setActiveTab("personal")}
                         className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === "personal"
-                            ? "border-blue-600 text-blue-700"
+                            ? "border-primary-600 text-primary-700"
                             : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                             }`}
                     >
@@ -315,7 +316,7 @@ export default function ViewUserDetails() {
                     <button
                         onClick={() => setActiveTab("role")}
                         className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === "role"
-                            ? "border-blue-600 text-blue-700"
+                            ? "border-primary-600 text-primary-700"
                             : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                             }`}
                     >
@@ -327,7 +328,7 @@ export default function ViewUserDetails() {
                     <button
                         onClick={() => setActiveTab("activity")}
                         className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === "activity"
-                            ? "border-blue-600 text-blue-700"
+                            ? "border-primary-600 text-primary-700"
                             : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                             }`}
                     >
@@ -365,10 +366,10 @@ export default function ViewUserDetails() {
                         <DetailRow label="Access Level" value={roleDisplay.level} />
                     </div>
 
-                    <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="mt-6 p-4 bg-primary-50 border border-primary-200 rounded-lg">
                         <div className="flex items-center gap-3">
-                            <FaShieldAlt className="text-blue-600" size={20} />
-                            <span className="text-sm text-blue-700">
+                            <FaShieldAlt className="text-primary-600" size={20} />
+                            <span className="text-sm text-primary-700">
                                 This user has {roleDisplay.level.toLowerCase()} privileges in the system
                             </span>
                         </div>
@@ -393,9 +394,9 @@ export default function ViewUserDetails() {
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div className="flex items-center justify-between p-4 bg-primary-50 border border-primary-200 rounded-lg">
                             <div className="flex items-center gap-3">
-                                <FaCalendarAlt className="text-blue-600" size={20} />
+                                <FaCalendarAlt className="text-primary-600" size={20} />
                                 <div>
                                     <p className="text-sm font-medium text-gray-800">Last Updated</p>
                                     <p className="text-xs text-gray-500">When this user's information was last modified</p>
@@ -417,8 +418,8 @@ const DetailSection = ({ title, icon, children }) => (
     <div className="bg-white rounded-xl shadow-md overflow-hidden">
         <div className="px-5 py-4 border-b border-gray-200">
             <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-50 rounded-lg">
-                    <span className="text-blue-600">{icon}</span>
+                <div className="p-2 bg-primary-50 rounded-lg">
+                    <span className="text-primary-600">{icon}</span>
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
             </div>
