@@ -3,31 +3,43 @@ import { Model, ModelStatic, Op, WhereOptions } from "sequelize";
 interface GenericDuplicateCheckOptions<M extends Model> {
     model: ModelStatic<M>;
     payload: Record<string, any>;
-    fields: string[];    
-    ignoreField?: string;
-    ignoreValue?: string;
+    fields: string[];
+    ignoreValue?: string | number;
 }
 
 export const checkDuplicateGeneric = async <M extends Model>({
     model,
     payload,
     fields,
-    ignoreField = "uid",
     ignoreValue,
 }: GenericDuplicateCheckOptions<M>) => {
+
+    const primaryKey = model.primaryKeyAttribute;
+
     for (const field of fields) {
-        const value = payload[field];
-        if (!value) continue;
+
+        let value = payload[field];
+
+        if (value === undefined || value === null || value === "") continue;
+
+        if (typeof value === "string") {
+            value = value.trim();
+        }
 
         const where: WhereOptions = {
             [field]: value,
-            ...(ignoreValue ? { [ignoreField]: { [Op.ne]: ignoreValue } } : {}),
-        } as Record<string, any>;
+            ...(ignoreValue
+                ? { [primaryKey]: { [Op.ne]: ignoreValue } }
+                : {}),
+        };
 
         const exists = await model.findOne({ where });
 
         if (exists) {
-            return { field, message: `${field} already exists` };
+            return {
+                field,
+                message: `${field} already exists`,
+            };
         }
     }
 

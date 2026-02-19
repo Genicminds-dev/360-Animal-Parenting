@@ -255,6 +255,22 @@ export const createProcurement = async (req: Request, res: Response) => {
         const normalizePath = (file?: Express.Multer.File) =>
             file ? file.path.replace(/\\/g, "/").replace("public", "") : null;
 
+        const duplicate = await checkDuplicateGeneric({
+            model: ProcuredAnimal,
+            payload: req.body,
+            fields: [
+                "tagId",
+            ],
+        });
+
+        if (duplicate) {
+            if (files) cleanupFiles(req);
+            return res.status(409).json({
+                success: false,
+                message: duplicate.message,
+            });
+        }
+
         let uid: string = "";
         let exists = true;
 
@@ -362,6 +378,296 @@ export const createProcurement = async (req: Request, res: Response) => {
         return res.status(500).json({
             success: false,
             message: "Failed to create procurement",
+            error: error.message,
+        });
+    }
+};
+
+
+export const updateProcurement = async (req: Request, res: Response) => {
+    const transaction = await sequelize.transaction();
+
+    try {
+        if (!req.user || !req.user.id) {
+            throw new Error("Unauthorized: User not found");
+        }
+
+        const userId = req.user.id;
+
+        const { uid } = req.params;
+        const files = req.files as Record<string, Express.Multer.File[]>;
+
+        const normalizePath = (file?: Express.Multer.File) =>
+            file ? file.path.replace(/\\/g, "/").replace("public", "") : null;
+
+        const deleteOldFile = (filePath?: string | null) => {
+            if (!filePath) return;
+            const fullPath = path.join("public", filePath);
+            if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
+        };
+
+        const sourceVisit = await SourceVisit.findOne({ where: { uid } });
+
+        if (!sourceVisit) {
+            if (files) cleanupFiles(req);
+            return res.status(404).json({
+                success: false,
+                message: "Procurement not found",
+            });
+        }
+
+        const procurementId = sourceVisit.id;
+
+        const procuredAnimal = await ProcuredAnimal.findOne({ where: { procurementId } });
+        const logistic = await Logistic.findOne({ where: { procurementId } });
+        const quarantine = await QuarantineCenter.findOne({ where: { procurementId } });
+        const handover = await Handover.findOne({ where: { procurementId } });
+
+        const body = req.body;
+
+        const duplicate = await checkDuplicateGeneric({
+            model: ProcuredAnimal,
+            payload: req.body,
+            fields: ["tagId"],
+            ignoreValue: procuredAnimal?.id?.toString(),
+        });
+
+        if (duplicate) {
+            if (files) cleanupFiles(req);
+            return res.status(409).json({
+                success: false,
+                message: duplicate.message,
+            });
+        }
+
+        await sourceVisit.update(
+            {
+                procurementOfficer: body.procurementOfficer,
+                sourceType: body.sourceType,
+                sourceLocation: body.sourceLocation,
+                visitDate: body.visitDate,
+                visitTime: body.visitTime,
+                breederName: body.breederName,
+                breederContact: body.breederContact,
+                updatedBy: userId,
+            },
+            { transaction }
+        );
+
+        if (procuredAnimal) {
+
+            if (files?.animalPhotoFront?.[0] && procuredAnimal.animalPhotoFront) {
+                deleteOldFile(procuredAnimal.animalPhotoFront);
+            }
+
+            if (req.body.animalPhotoFront === "" && procuredAnimal.animalPhotoFront) {
+                deleteOldFile(procuredAnimal.animalPhotoFront);
+            }
+
+            if (files?.animalPhotoSide?.[0] && procuredAnimal.animalPhotoSide) {
+                deleteOldFile(procuredAnimal.animalPhotoSide);
+            }
+
+            if (req.body.animalPhotoSide === "" && procuredAnimal.animalPhotoSide) {
+                deleteOldFile(procuredAnimal.animalPhotoSide);
+            }
+
+            if (files?.animalPhotoRear?.[0] && procuredAnimal.animalPhotoRear) {
+                deleteOldFile(procuredAnimal.animalPhotoRear);
+            }
+
+            if (req.body.animalPhotoRear === "" && procuredAnimal.animalPhotoRear) {
+                deleteOldFile(procuredAnimal.animalPhotoRear);
+            }
+
+            if (files?.healthRecord?.[0] && procuredAnimal.healthRecord) {
+                deleteOldFile(procuredAnimal.healthRecord);
+            }
+
+            if (req.body.healthRecord === "" && procuredAnimal.healthRecord) {
+                deleteOldFile(procuredAnimal.healthRecord);
+            }
+
+            await procuredAnimal.update(
+                {
+                    tagId: body.tagId,
+                    breed: body.breed,
+                    ageYears: body.ageYears,
+                    ageMonths: body.ageMonths,
+                    milkingCapacity: body.milkingCapacity,
+                    isCalfIncluded: body.isCalfIncluded,
+                    physicalCheck: body.physicalCheck,
+                    fmdDisease: body.fmdDisease,
+                    lsdDisease: body.lsdDisease,
+
+                    animalPhotoFront: files?.animalPhotoFront?.[0]
+                        ? normalizePath(files.animalPhotoFront[0])
+                        : body.animalPhotoFront === ""
+                            ? null
+                            : procuredAnimal.animalPhotoFront,
+
+                    animalPhotoSide: files?.animalPhotoSide?.[0]
+                        ? normalizePath(files.animalPhotoSide[0])
+                        : body.animalPhotoSide === ""
+                            ? null
+                            : procuredAnimal.animalPhotoSide,
+
+                    animalPhotoRear: files?.animalPhotoRear?.[0]
+                        ? normalizePath(files.animalPhotoRear[0])
+                        : body.animalPhotoRear === ""
+                            ? null
+                            : procuredAnimal.animalPhotoRear,
+
+                    healthRecord: files?.healthRecord?.[0]
+                        ? normalizePath(files.healthRecord[0])
+                        : body.healthRecord === ""
+                            ? null
+                            : procuredAnimal.healthRecord,
+                },
+                { transaction }
+            );
+        }
+
+        if (logistic) {
+
+            if (files?.licenseCertificate?.[0] && logistic.licenseCertificate) {
+                deleteOldFile(logistic.licenseCertificate);
+            }
+
+            if (req.body.licenseCertificate === "" && logistic.licenseCertificate) {
+                deleteOldFile(logistic.licenseCertificate);
+            }
+
+            await logistic.update(
+                {
+                    vehicleNo: body.vehicleNo,
+                    driverName: body.driverName,
+                    driverDesignation: body.driverDesignation,
+                    driverMobile: body.driverMobile,
+                    driverAadhar: body.driverAadhar,
+                    drivingLicense: body.drivingLicense,
+
+                    licenseCertificate: files?.licenseCertificate?.[0]
+                        ? normalizePath(files.licenseCertificate[0])
+                        : body.licenseCertificate === ""
+                            ? null
+                            : logistic.licenseCertificate,
+                },
+                { transaction }
+            );
+        }
+
+        if (quarantine) {
+
+            if (files?.quarantineCenterPhoto?.[0] && quarantine.quarantineCenterPhoto) {
+                deleteOldFile(quarantine.quarantineCenterPhoto);
+            }
+
+            if (req.body.quarantineCenterPhoto === "" && quarantine.quarantineCenterPhoto) {
+                deleteOldFile(quarantine.quarantineCenterPhoto);
+            }
+
+            if (files?.quarantineHealthRecord?.[0] && quarantine.quarantineHealthRecord) {
+                deleteOldFile(quarantine.quarantineHealthRecord);
+            }
+
+            if (req.body.quarantineHealthRecord === "" && quarantine.quarantineHealthRecord) {
+                deleteOldFile(quarantine.quarantineHealthRecord);
+            }
+
+            if (files?.finalHealthClearance?.[0] && quarantine.finalHealthClearance) {
+                deleteOldFile(quarantine.finalHealthClearance);
+            }
+
+            if (req.body.finalHealthClearance === "" && quarantine.finalHealthClearance) {
+                deleteOldFile(quarantine.finalHealthClearance);
+            }
+
+            await quarantine.update(
+                {
+                    quarantineCenter: body.quarantineCenter,
+
+                    quarantineCenterPhoto: files?.quarantineCenterPhoto?.[0]
+                        ? normalizePath(files.quarantineCenterPhoto[0])
+                        : body.quarantineCenterPhoto === ""
+                            ? null
+                            : quarantine.quarantineCenterPhoto,
+
+                    quarantineHealthRecord: files?.quarantineHealthRecord?.[0]
+                        ? normalizePath(files.quarantineHealthRecord[0])
+                        : body.quarantineHealthRecord === ""
+                            ? null
+                            : quarantine.quarantineHealthRecord,
+
+                    finalHealthClearance: files?.finalHealthClearance?.[0]
+                        ? normalizePath(files.finalHealthClearance[0])
+                        : body.finalHealthClearance === ""
+                            ? null
+                            : quarantine.finalHealthClearance,
+                },
+                { transaction }
+            );
+        }
+
+        if (handover) {
+
+            if (files?.handoverPhoto?.[0] && handover.handoverPhoto) {
+                deleteOldFile(handover.handoverPhoto);
+            }
+
+            if (req.body.handoverPhoto === "" && handover.handoverPhoto) {
+                deleteOldFile(handover.handoverPhoto);
+            }
+
+            if (files?.handoverDocument?.[0] && handover.handoverDocument) {
+                deleteOldFile(handover.handoverDocument);
+            }
+
+            if (req.body.handoverDocument === "" && handover.handoverDocument) {
+                deleteOldFile(handover.handoverDocument);
+            }
+
+            await handover.update(
+                {
+                    handoverOfficer: body.handoverOfficer
+                        ? Number(body.handoverOfficer)
+                        : null,
+                    beneficiaryId: body.beneficiaryId,
+                    beneficiaryLocation: body.beneficiaryLocation,
+                    handoverDate: body.handoverDate,
+                    handoverTime: body.handoverTime,
+
+                    handoverPhoto: files?.handoverPhoto?.[0]
+                        ? normalizePath(files.handoverPhoto[0])
+                        : body.handoverPhoto === ""
+                            ? null
+                            : handover.handoverPhoto,
+
+                    handoverDocument: files?.handoverDocument?.[0]
+                        ? normalizePath(files.handoverDocument[0])
+                        : body.handoverDocument === ""
+                            ? null
+                            : handover.handoverDocument,
+                },
+                { transaction }
+            );
+        }
+
+        await transaction.commit();
+
+        return res.status(200).json({
+            success: true,
+            message: "Procurement updated successfully",
+        });
+
+    } catch (error: any) {
+        await transaction.rollback();
+        cleanupFiles(req);
+        console.log(error)
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to update procurement",
             error: error.message,
         });
     }
