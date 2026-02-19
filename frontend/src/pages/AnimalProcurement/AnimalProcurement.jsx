@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { 
-  User, Phone, MapPin, Calendar, Tag, Beef, 
+  User, Phone, MapPin, Calendar, Tag,
   Droplet, Baby, Eye, FileText, Camera, Truck,
   UserCircle, IdCard, File, Upload, Building,
   Award, X, Check, ChevronLeft, ChevronRight,
@@ -18,6 +18,7 @@ import { Toaster, toast } from 'react-hot-toast';
 import api from '../../services/api/api';
 import { Endpoints } from '../../services/api/EndPoint';
 import { PATHROUTES } from '../../routes/pathRoutes';
+import { GiCow } from 'react-icons/gi';
 
 const AnimalProcurement = () => {
   const navigate = useNavigate();
@@ -31,16 +32,34 @@ const AnimalProcurement = () => {
   const [hoveredStep, setHoveredStep] = useState(null);
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
 
-  // Form Data State
+  // Helper function to get current date and time in local format
+  const getCurrentDateTime = () => {
+    const now = new Date();
+    
+    // Get date in YYYY-MM-DD format
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const currentDate = `${year}-${month}-${day}`;
+    
+    // Get time in HH:MM format (24-hour)
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const currentTime = `${hours}:${minutes}`;
+    
+    return { currentDate, currentTime };
+  };
+
+  // Form Data State with default date and time for visit fields only
+  const { currentDate, currentTime } = getCurrentDateTime();
+  
   const [formData, setFormData] = useState({
     // Step 1 - Source Visit Record (Required fields only)
     procurementOfficer: '',
     sourceType: '',
     sourceLocation: '',
-    visitDate: '',
-    visitTime: '',
-    breederName: '',
-    breederContact: '',
+    visitDate: currentDate, // Set default to current date
+    visitTime: currentTime, // Set default to current time
     
     // Step 1 - Animal Details (Tag ID is required)
     tagId: '',
@@ -55,6 +74,10 @@ const AnimalProcurement = () => {
     animalPhotoFront: null,
     animalPhotoSide: null,
     animalPhotoRear: null,
+    
+    // Step 1 - Source Visit Record (continued)
+    breederName: '',
+    breederContact: '',
     
     // Step 1 - Health Records (Single file now)
     healthRecord: null,
@@ -79,31 +102,35 @@ const AnimalProcurement = () => {
     beneficiaryId: '',
     beneficiaryLocation: '',
     handoverPhoto: null,
-    handoverDateTime: '',
+    handoverDate: '', // Separate date field - no default
+    handoverTime: '', // Separate time field - no default
     handoverDocument: null
   });
 
-  // Dropdown Options
+  // Dropdown Options with disabled placeholder
   const procurementOfficers = [
-    { id: 1, name: "Rajesh Kumar", mobile: "9876543210", email: "rajesh.k@example.com" },
-    { id: 2, name: "Priya Sharma", mobile: "8765432109", email: "priya.s@example.com" },
-    { id: 3, name: "Amit Patel", mobile: "7654321098", email: "amit.p@example.com" },
-    { id: 4, name: "Sunita Reddy", mobile: "6543210987", email: "sunita.r@example.com" },
-    { id: 5, name: "Vikram Singh", mobile: "5432109876", email: "vikram.s@example.com" }
+    { id: '', name: "Select Procurement Officer", disabled: true },
+    { id: 1, name: "Rajesh Kumar - 9876543210" },
+    { id: 2, name: "Priya Sharma - 8765432109" },
+    { id: 3, name: "Amit Patel - 7654321098" },
+    { id: 4, name: "Sunita Reddy - 6543210987" },
+    { id: 5, name: "Vikram Singh - 5432109876" }
   ];
 
   const breedOptions = [
-    { value: "Gir", label: "Gir", origin: "Gujarat" },
-    { value: "Sahiwal", label: "Sahiwal", origin: "Punjab" },
-    { value: "Jersey", label: "Jersey", origin: "Foreign" },
-    { value: "Holstein Friesian", label: "Holstein Friesian", origin: "Foreign" },
-    { value: "Murrah", label: "Murrah", origin: "Haryana" },
-    { value: "Nagpuri", label: "Nagpuri", origin: "Maharashtra" },
-    { value: "Purnathadi", label: "Purnathadi", origin: "Maharashtra" },
-    { value: "Other", label: "Other", origin: "Various" }
+    { value: "", label: "Select Breed", disabled: true },
+    { value: "Gir", label: "Gir - Gujarat" },
+    { value: "Sahiwal", label: "Sahiwal - Punjab" },
+    { value: "Jersey", label: "Jersey - Foreign" },
+    { value: "Holstein Friesian", label: "Holstein Friesian - Foreign" },
+    { value: "Murrah", label: "Murrah - Haryana" },
+    { value: "Nagpuri", label: "Nagpuri - Maharashtra" },
+    { value: "Purnathadi", label: "Purnathadi - Maharashtra" },
+    { value: "Other", label: "Other - Various" }
   ];
 
   const quarantineCenters = [
+    { id: '', name: "Select Quarantine Center", disabled: true },
     { id: 1, name: "Central Quarantine Center - Nagpur" },
     { id: 2, name: "District Quarantine Facility - Pune" },
     { id: 3, name: "Regional Animal Care Center - Mumbai" },
@@ -297,12 +324,6 @@ const AnimalProcurement = () => {
     if (!formData.sourceLocation) {
       newErrors.sourceLocation = 'Source Location is required';
     }
-    if (!formData.visitDate) {
-      newErrors.visitDate = 'Visit Date is required';
-    }
-    if (!formData.visitTime) {
-      newErrors.visitTime = 'Visit Time is required';
-    }
     if (!formData.breederName) {
       newErrors.breederName = 'Breeder Name is required';
     }
@@ -372,8 +393,6 @@ const AnimalProcurement = () => {
         fieldsToTouch.procurementOfficer = true;
         fieldsToTouch.sourceType = true;
         fieldsToTouch.sourceLocation = true;
-        fieldsToTouch.visitDate = true;
-        fieldsToTouch.visitTime = true;
         fieldsToTouch.breederName = true;
         fieldsToTouch.breederContact = true;
         fieldsToTouch.tagId = true;
@@ -407,7 +426,7 @@ const AnimalProcurement = () => {
       Object.keys(formData).forEach(key => {
         if (formData[key] instanceof File) {
           formDataToSend.append(key, formData[key]);
-        } else if (formData[key] !== null && formData[key] !== undefined) {
+        } else if (formData[key] !== null && formData[key] !== undefined && formData[key] !== '') {
           formDataToSend.append(key, String(formData[key]));
         }
       });
@@ -783,9 +802,8 @@ const AnimalProcurement = () => {
               onBlur={handleBlur}
               className={`input-field pl-10 ${hasError ? "border-red-500 focus:ring-red-200" : ""}`}
             >
-              <option value="">Select {label}</option>
               {options.map(opt => (
-                <option key={opt.value} value={opt.value}>
+                <option key={opt.value} value={opt.value} disabled={opt.disabled}>
                   {opt.label}
                 </option>
               ))}
@@ -848,10 +866,9 @@ const AnimalProcurement = () => {
                   onBlur={handleBlur}
                   className={`input-field pl-10 ${errors.procurementOfficer && touchedFields.procurementOfficer ? "border-red-500 focus:ring-red-200" : ""}`}
                 >
-                  <option value="">Select Officer</option>
                   {procurementOfficers.map(officer => (
-                    <option key={officer.id} value={officer.id}>
-                      {officer.name} - {officer.mobile}
+                    <option key={officer.id} value={officer.id} disabled={officer.disabled}>
+                      {officer.name}
                     </option>
                   ))}
                 </select>
@@ -909,14 +926,14 @@ const AnimalProcurement = () => {
               {renderFieldWithValidation('sourceLocation', 'Source Location', MapPin, 'text', 'Enter location', true)}
             </div>
 
-            {/* Visit Date */}
+            {/* Visit Date - Now with default value but still editable */}
             <div>
-              {renderFieldWithValidation('visitDate', 'Visit Date', Calendar, 'date', '', true)}
+              {renderFieldWithValidation('visitDate', 'Visit Date', Calendar, 'date', '', false)}
             </div>
 
-            {/* Visit Time */}
+            {/* Visit Time - Now with default value but still editable */}
             <div>
-              {renderFieldWithValidation('visitTime', 'Visit Time', Clock, 'time', '', true)}
+              {renderFieldWithValidation('visitTime', 'Visit Time', Clock, 'time', '', false)}
             </div>
 
             {/* Breeder Name */}
@@ -937,7 +954,7 @@ const AnimalProcurement = () => {
         <div className="bg-gray-50 px-6 py-4 border-b border-gray-100">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-green-50 rounded-lg">
-              <Beef className="text-green-600" size={20} />
+              <GiCow className="text-green-600" size={20} />
             </div>
             <div>
               <h2 className="text-lg font-semibold text-gray-900">Animal Details</h2>
@@ -968,10 +985,9 @@ const AnimalProcurement = () => {
                   onChange={handleChange}
                   className="input-field pl-10"
                 >
-                  <option value="">Select Breed</option>
                   {breedOptions.map(breed => (
-                    <option key={breed.value} value={breed.value}>
-                      {breed.label} - {breed.origin}
+                    <option key={breed.value} value={breed.value} disabled={breed.disabled}>
+                      {breed.label}
                     </option>
                   ))}
                 </select>
@@ -1318,9 +1334,8 @@ const AnimalProcurement = () => {
                 onChange={handleChange}
                 className="input-field"
               >
-                <option value="">Select Quarantine Center</option>
                 {quarantineCenters.map(center => (
-                  <option key={center.id} value={center.name}>
+                  <option key={center.id} value={center.name} disabled={center.disabled}>
                     {center.name}
                   </option>
                 ))}
@@ -1452,20 +1467,37 @@ const AnimalProcurement = () => {
               />
             </div>
 
-            {/* Handover Date/Time */}
+            {/* Handover Date - Separate field, no default */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Handover Date/Time
+                Handover Date
               </label>
               <div className="relative">
                 <input
-                  type="datetime-local"
-                  name="handoverDateTime"
-                  value={formData.handoverDateTime || ''}
+                  type="date"
+                  name="handoverDate"
+                  value={formData.handoverDate || ''}
                   onChange={handleChange}
                   className="input-field pl-10"
                 />
                 <Calendar className="absolute left-3 top-3.5 text-gray-400" size={18} />
+              </div>
+            </div>
+
+            {/* Handover Time - Separate field, no default */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Handover Time
+              </label>
+              <div className="relative">
+                <input
+                  type="time"
+                  name="handoverTime"
+                  value={formData.handoverTime || ''}
+                  onChange={handleChange}
+                  className="input-field pl-10"
+                />
+                <Clock className="absolute left-3 top-3.5 text-gray-400" size={18} />
               </div>
             </div>
 

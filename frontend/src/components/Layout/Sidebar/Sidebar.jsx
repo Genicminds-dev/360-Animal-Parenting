@@ -138,10 +138,10 @@ const Sidebar = ({ toggleSidebar, onLogout, isMobile, onLogoutClick }) => {
     // { path: '/reports', label: 'Reports', icon: <FileText size={20} />, roles: [1, 2, 3] },
     
     { path: PATHROUTES.animalProcurement, label: 'Animal Registration', icon: <GiCow size={20} />, roles: [1, 2, 3] },
-    { path: PATHROUTES.animalProcuredList, label: 'Animal List', icon: <GiCow size={20} />, roles: [1, 2, 3] },
+    { path: PATHROUTES.animalProcuredList, label: 'Animal List', icon: <FileText size={20} />, roles: [1, 2, 3] },
 
 
-    { path: PATHROUTES.userList, label: 'Manage Users', icon: <Settings size={20} />, roles: [1, 2, 3] },
+    { path: PATHROUTES.userList, label: 'Manage Users', icon: <Users size={20} />, roles: [1, 2, 3] },
     { path: '/settings', label: 'Settings', icon: <Settings size={20} />, roles: [1, 2, 3] },
   ];
 

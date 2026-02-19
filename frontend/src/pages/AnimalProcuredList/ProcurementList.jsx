@@ -1,119 +1,214 @@
 // pages/procurement/ProcurementList.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Plus, Eye, Pencil, Trash2, Search, Filter,
-  Calendar, User, Truck, Home, Hand, ChevronLeft,
-  ChevronRight, Download, MoreVertical, CheckCircle,
-  XCircle, Clock, AlertCircle, FileText
+  Plus, Eye, Pencil, Trash2, Search, Filter, X,
+  Calendar, User, Truck, Home, CheckCircle,
+  XCircle, Clock, FileText, ChevronLeft, ChevronRight,
+  Beef, Minus, ChevronDown, ChevronUp, Hash, Phone,
+  MapPin, Tag, Droplet
 } from 'lucide-react';
-import { Toaster, toast } from 'react-hot-toast';
-import api from '../../services/api/api';
-import { Endpoints } from '../../services/api/EndPoint';
+import { BiSearch } from 'react-icons/bi';
+import { HiOutlineTrash } from 'react-icons/hi';
+import { toast } from 'react-hot-toast';
+import DataTable from '../../components/common/Table/DataTable';
 import { PATHROUTES } from '../../routes/pathRoutes';
 
 const ProcurementList = () => {
   const navigate = useNavigate();
   const [procurements, setProcurements] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
-  const [deleteModal, setDeleteModal] = useState({ show: false, id: null });
-  const [viewModal, setViewModal] = useState({ show: false, data: null });
+  const [filteredProcurements, setFilteredProcurements] = useState([]);
+  
+  // Search state
+  const [searchInput, setSearchInput] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const searchTimeoutRef = useRef(null);
 
-  // Mock Data
+  const [loading, setLoading] = useState(false);
+  const [filters, setFilters] = useState({});
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Filter UI state
+  const [showFilters, setShowFilters] = useState(false);
+  const [tempFilters, setTempFilters] = useState({});
+  const [isFilterApplied, setIsFilterApplied] = useState(false);
+  const [appliedFilters, setAppliedFilters] = useState({});
+
+  // Selection state
+  const [selectedProcurements, setSelectedProcurements] = useState(new Set());
+
+  // Delete modal state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
+
+  // Sorting state
+  const [sortConfig, setSortConfig] = useState({
+    key: "visitDate",
+    direction: "desc",
+  });
+
+  // Pagination state
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalRecords: 0,
+    limit: 10
+  });
+
+  // Mock Data updated to match form fields
   const MOCK_PROCUREMENTS = [
     {
       id: 1,
-      procurementId: "PROC001",
-      procurementOfficer: { id: 1, name: "Rajesh Kumar", mobile: "9876543210" },
+      animalId: "ANM001", // New field
+      tagId: "TAG-001",
+      procurementOfficer: "Rajesh Kumar",
       sourceType: "Farm",
       sourceLocation: "Green Valley Farm, Pune",
       visitDate: "2024-03-15",
       visitTime: "10:30",
       breederName: "Suresh Patil",
       breederContact: "9876543211",
-      animals: [
-        { tagId: "TAG-001", breed: "Gir", age: "5 years", milkingCapacity: "12" }
-      ],
+      breed: "Gir",
+      ageYears: "5",
+      ageMonths: "6",
+      milkingCapacity: "12",
+      isCalfIncluded: "no",
+      physicalCheck: "Healthy, active",
+      fmdDisease: false,
+      lsdDisease: false,
+      vehicleNo: "MH31AB1234",
+      driverName: "Ramesh Kumar",
+      driverMobile: "9876543210",
+      quarantineCenter: "Central Quarantine Center - Nagpur",
+      handoverOfficer: "Priya Sharma",
+      beneficiaryId: "BEN001",
       status: "Completed",
-      currentStep: 4,
       createdAt: "2024-03-15T10:30:00Z"
     },
     {
       id: 2,
-      procurementId: "PROC002",
-      procurementOfficer: { id: 2, name: "Priya Sharma", mobile: "8765432109" },
+      animalId: "ANM002",
+      tagId: "TAG-002",
+      procurementOfficer: "Priya Sharma",
       sourceType: "Bazaar",
       sourceLocation: "Animal Market, Nagpur",
       visitDate: "2024-03-14",
       visitTime: "09:15",
       breederName: "Mohan Singh",
       breederContact: "8765432112",
-      animals: [
-        { tagId: "TAG-002", breed: "Sahiwal", age: "3 years", milkingCapacity: "8" },
-        { tagId: "TAG-003", breed: "Jersey", age: "4 years", milkingCapacity: "10" }
-      ],
+      breed: "Sahiwal",
+      ageYears: "3",
+      ageMonths: "0",
+      milkingCapacity: "8",
+      isCalfIncluded: "yes",
+      physicalCheck: "Good condition",
+      fmdDisease: false,
+      lsdDisease: false,
+      vehicleNo: "MH31CD5678",
+      driverName: "Suresh Yadav",
+      driverMobile: "8765432109",
+      quarantineCenter: "District Quarantine Facility - Pune",
+      handoverOfficer: "Amit Patel",
+      beneficiaryId: "BEN002",
       status: "In Transit",
-      currentStep: 2,
       createdAt: "2024-03-14T09:15:00Z"
     },
     {
       id: 3,
-      procurementId: "PROC003",
-      procurementOfficer: { id: 3, name: "Amit Patel", mobile: "7654321098" },
+      animalId: "ANM003",
+      tagId: "TAG-003",
+      procurementOfficer: "Amit Patel",
       sourceType: "Farm",
       sourceLocation: "Dairy Farm, Ahmednagar",
       visitDate: "2024-03-13",
       visitTime: "14:45",
-            breederName: "Rajendra Yadav",
+      breederName: "Rajendra Yadav",
       breederContact: "7654321123",
-      animals: [
-        { tagId: "TAG-004", breed: "Murrah", age: "6 years", milkingCapacity: "15" }
-      ],
-      status: "In Quarantine",
-      currentStep: 3,
+      breed: "Jersey",
+      ageYears: "4",
+      ageMonths: "2",
+      milkingCapacity: "10",
+      isCalfIncluded: "no",
+      physicalCheck: "Healthy",
+      fmdDisease: false,
+      lsdDisease: false,
+      vehicleNo: "MH31EF9012",
+      driverName: "Vikram Singh",
+      driverMobile: "7654321098",
+      quarantineCenter: "Regional Animal Care Center - Mumbai",
+      handoverOfficer: "Sunita Reddy",
+      beneficiaryId: "BEN003",
+      status: "Completed",
       createdAt: "2024-03-13T14:45:00Z"
     },
     {
       id: 4,
-      procurementId: "PROC004",
-      procurementOfficer: { id: 4, name: "Sunita Reddy", mobile: "6543210987" },
+      animalId: "ANM004",
+      tagId: "TAG-004",
+      procurementOfficer: "Sunita Reddy",
       sourceType: "Bazaar",
       sourceLocation: "Livestock Market, Aurangabad",
       visitDate: "2024-03-12",
       visitTime: "11:30",
       breederName: "Kavita Deshmukh",
       breederContact: "6543211234",
-      animals: [
-        { tagId: "TAG-005", breed: "Holstein Friesian", age: "4 years", milkingCapacity: "18" },
-        { tagId: "TAG-006", breed: "Gir", age: "5 years", milkingCapacity: "14" }
-      ],
+      breed: "Murrah",
+      ageYears: "6",
+      ageMonths: "0",
+      milkingCapacity: "15",
+      isCalfIncluded: "no",
+      physicalCheck: "Good",
+      fmdDisease: false,
+      lsdDisease: false,
+      vehicleNo: "MH31GH3456",
+      driverName: "Rajesh Patil",
+      driverMobile: "6543210987",
+      quarantineCenter: "Central Quarantine Center - Nagpur",
+      handoverOfficer: "Vikram Singh",
+      beneficiaryId: "BEN004",
       status: "Pending",
-      currentStep: 1,
       createdAt: "2024-03-12T11:30:00Z"
     },
     {
       id: 5,
-      procurementId: "PROC005",
-      procurementOfficer: { id: 5, name: "Vikram Singh", mobile: "5432109876" },
+      animalId: "ANM005",
+      tagId: "TAG-005",
+      procurementOfficer: "Vikram Singh",
       sourceType: "Farm",
       sourceLocation: "Organic Dairy, Nashik",
       visitDate: "2024-03-11",
       visitTime: "16:20",
       breederName: "Harish Chavan",
       breederContact: "5432109877",
-      animals: [
-        { tagId: "TAG-007", breed: "Jersey", age: "3 years", milkingCapacity: "9" }
-      ],
+      breed: "Holstein Friesian",
+      ageYears: "3",
+      ageMonths: "6",
+      milkingCapacity: "18",
+      isCalfIncluded: "yes",
+      physicalCheck: "Excellent",
+      fmdDisease: false,
+      lsdDisease: false,
+      vehicleNo: "MH31IJ7890",
+      driverName: "Mohan Kumar",
+      driverMobile: "5432109876",
+      quarantineCenter: "Rural Quarantine Unit - Aurangabad",
+      handoverOfficer: "Rajesh Kumar",
+      beneficiaryId: "BEN005",
       status: "Completed",
-      currentStep: 4,
       createdAt: "2024-03-11T16:20:00Z"
     }
   ];
 
+  // Initialize tempFilters when component mounts
+  useEffect(() => {
+    setTempFilters(filters);
+    const hasAppliedFilters = Object.keys(filters).some(key => filters[key] !== "");
+    setIsFilterApplied(hasAppliedFilters);
+    setAppliedFilters(filters);
+  }, [filters]);
+
+  // Load procurements
   useEffect(() => {
     loadProcurements();
   }, []);
@@ -121,491 +216,785 @@ const ProcurementList = () => {
   const loadProcurements = async () => {
     setLoading(true);
     try {
-      // Try to fetch from API first
-      // const response = await api.get(Endpoints.GET_PROCUREMENTS);
-      // if (response.data.success) {
-      //   setProcurements(response.data.data);
-      // } else {
-      //   // Fallback to mock data
-      //   setProcurements(MOCK_PROCUREMENTS);
-      // }
-      
-      // Using mock data for now
-      setTimeout(() => {
-        setProcurements(MOCK_PROCUREMENTS);
-        setLoading(false);
-      }, 500);
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      setProcurements(MOCK_PROCUREMENTS);
+      setFilteredProcurements(MOCK_PROCUREMENTS);
+
+      setPagination(prev => ({
+        ...prev,
+        totalRecords: MOCK_PROCUREMENTS.length,
+        totalPages: Math.ceil(MOCK_PROCUREMENTS.length / prev.limit)
+      }));
+
     } catch (error) {
       console.error('Error loading procurements:', error);
-      setProcurements(MOCK_PROCUREMENTS);
+      toast.error("Failed to fetch procurements");
+      setProcurements([]);
+      setFilteredProcurements([]);
+    } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (id) => {
-    try {
-      // API call to delete
-      // await api.delete(`${Endpoints.DELETE_PROCUREMENT}/${id}`);
-      
-      // Mock delete
-      setProcurements(prev => prev.filter(p => p.id !== id));
-      toast.success('Procurement record deleted successfully');
-      setDeleteModal({ show: false, id: null });
-    } catch (error) {
-      console.error('Error deleting procurement:', error);
-      toast.error('Failed to delete procurement record');
+  // Debounce search
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
     }
+
+    searchTimeoutRef.current = setTimeout(() => {
+      setSearchTerm(searchInput);
+      setPagination(prev => ({ ...prev, currentPage: 1 }));
+    }, 500);
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [searchInput]);
+
+  // Apply filters function
+  const applyFilters = useCallback((filterValues) => {
+    let filtered = [...MOCK_PROCUREMENTS];
+
+    // Apply search filter
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(proc =>
+        proc.animalId?.toLowerCase().includes(searchLower) ||
+        proc.tagId?.toLowerCase().includes(searchLower) ||
+        proc.procurementOfficer?.toLowerCase().includes(searchLower) ||
+        proc.breederName?.toLowerCase().includes(searchLower) ||
+        proc.sourceLocation?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Apply status filter
+    if (filterValues.status) {
+      filtered = filtered.filter(proc => proc.status === filterValues.status);
+    }
+
+    // Apply source type filter
+    if (filterValues.sourceType) {
+      filtered = filtered.filter(proc => proc.sourceType === filterValues.sourceType);
+    }
+
+    // Apply breed filter
+    if (filterValues.breed) {
+      filtered = filtered.filter(proc => proc.breed === filterValues.breed);
+    }
+
+    // Apply date range filter
+    if (filterValues.fromDate || filterValues.toDate) {
+      filtered = filtered.filter(proc => {
+        const procDate = new Date(proc.visitDate);
+
+        if (filterValues.fromDate) {
+          const fromDate = new Date(filterValues.fromDate);
+          fromDate.setHours(0, 0, 0, 0);
+          if (procDate < fromDate) return false;
+        }
+
+        if (filterValues.toDate) {
+          const toDate = new Date(filterValues.toDate);
+          toDate.setHours(23, 59, 59, 999);
+          if (procDate > toDate) return false;
+        }
+
+        return true;
+      });
+    }
+
+    setFilteredProcurements(filtered);
+
+    setPagination(prev => ({
+      ...prev,
+      currentPage: 1,
+      totalRecords: filtered.length,
+      totalPages: Math.ceil(filtered.length / prev.limit)
+    }));
+
+  }, [searchTerm]);
+
+  // Fetch when search term changes
+  useEffect(() => {
+    applyFilters(filters);
+  }, [searchTerm, filters, applyFilters]);
+
+  // Handle filter changes
+  const handleFilterChange = (key, value) => {
+    setTempFilters(prev => ({ ...prev, [key]: value }));
   };
 
+  const handleApplyFilters = () => {
+    // Remove empty filters
+    const filtersToApply = { ...tempFilters };
+    Object.keys(filtersToApply).forEach(key => {
+      if (filtersToApply[key] === "" || filtersToApply[key] === null || filtersToApply[key] === undefined) {
+        delete filtersToApply[key];
+      }
+    });
+
+    setFilters(tempFilters);
+    applyFilters(tempFilters);
+    setAppliedFilters(tempFilters);
+
+    const hasAppliedFilters = Object.keys(tempFilters).some(key => tempFilters[key] !== "");
+    setIsFilterApplied(hasAppliedFilters);
+
+    setShowFilters(false);
+  };
+
+  const handleClearFilters = () => {
+    const emptyFilters = {
+      status: "",
+      sourceType: "",
+      breed: "",
+      fromDate: "",
+      toDate: ""
+    };
+    setTempFilters(emptyFilters);
+    setFilters(emptyFilters);
+    setAppliedFilters({});
+    setIsFilterApplied(false);
+    applyFilters(emptyFilters);
+    setShowFilters(false);
+  };
+
+  const handleCancelFilters = () => {
+    setTempFilters(filters);
+    setShowFilters(false);
+  };
+
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    setSearchInput(e.target.value);
+  };
+
+  // Clear search
+  const handleClearSearch = () => {
+    setSearchInput("");
+    setSearchTerm("");
+    applyFilters(filters);
+  };
+
+  // Sorting
+  const requestSort = useCallback((key) => {
+    setSortConfig((prev) => {
+      if (prev.key !== key) {
+        return { key, direction: "asc" };
+      }
+      if (prev.direction === "asc") {
+        return { key, direction: "desc" };
+      }
+      return { key: null, direction: null };
+    });
+  }, []);
+
+  // Apply sorting to data
+  const sortedProcurements = useMemo(() => {
+    if (!sortConfig.key || !sortConfig.direction) return filteredProcurements;
+
+    return [...filteredProcurements].sort((a, b) => {
+      const key = sortConfig.key;
+      let aValue = a[key] ?? "";
+      let bValue = b[key] ?? "";
+
+      if (key === 'visitDate' || key === 'createdAt') {
+        aValue = new Date(aValue).getTime();
+        bValue = new Date(bValue).getTime();
+      } else {
+        aValue = String(aValue).toLowerCase();
+        bValue = String(bValue).toLowerCase();
+      }
+
+      if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [filteredProcurements, sortConfig]);
+
+  // Get sort icon
+  const getSortIcon = useCallback(
+    (key) => {
+      if (sortConfig.key !== key || !sortConfig.direction) {
+        return <Minus className="ml-1 text-gray-400" size={16} />;
+      }
+
+      if (sortConfig.direction === "asc") {
+        return <ChevronUp className="ml-1 text-gray-600" size={16} />;
+      } else {
+        return <ChevronDown className="ml-1 text-gray-600" size={16} />;
+      }
+    },
+    [sortConfig]
+  );
+
+  // Get status badge
   const getStatusBadge = (status) => {
     const statusConfig = {
       'Completed': { color: 'bg-green-100 text-green-800', icon: CheckCircle },
-      'In Transit': { color: 'bg-blue-100 text-blue-800', icon: Truck },
-      'In Quarantine': { color: 'bg-yellow-100 text-yellow-800', icon: Home },
-      'Pending': { color: 'bg-gray-100 text-gray-800', icon: Clock },
-      'Rejected': { color: 'bg-red-100 text-red-800', icon: XCircle }
+      'In Transit': { color: 'bg-primary-100 text-primary-800', icon: Truck },
+      'Pending': { color: 'bg-gray-100 text-gray-800', icon: Clock }
     };
     
     const config = statusConfig[status] || statusConfig['Pending'];
     const Icon = config.icon;
     
     return (
-      <span className={`px-3 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1 ${config.color}`}>
-        <Icon size={12} />
+      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${config.color}`}>
+        <Icon className="mr-1" size={12} />
         {status}
       </span>
     );
   };
 
-  const getStepIndicator = (step) => {
-    const steps = ['Source', 'Logistic', 'Quarantine', 'Handover'];
-    return (
-      <div className="flex items-center gap-1">
-        {steps.map((s, i) => (
-          <div key={i} className="flex items-center">
-            <div className={`
-              w-6 h-6 rounded-full flex items-center justify-center text-xs
-              ${i + 1 <= step ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'}
-            `}>
-              {i + 1}
-            </div>
-            {i < steps.length - 1 && (
-              <div className={`w-4 h-0.5 ${i + 1 < step ? 'bg-green-500' : 'bg-gray-200'}`} />
-            )}
-          </div>
-        ))}
-      </div>
-    );
-  };
-
-  const filteredProcurements = procurements.filter(proc => {
-    const matchesSearch = 
-      proc.procurementId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      proc.sourceLocation?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      proc.breederName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      proc.procurementOfficer?.name?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = statusFilter === 'all' || proc.status === statusFilter;
-    
-    return matchesSearch && matchesStatus;
-  });
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredProcurements.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredProcurements.length / itemsPerPage);
-
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric'
-    });
-  };
-
-  const formatDateTime = (dateTimeString) => {
-    if (!dateTimeString) return 'N/A';
-    const date = new Date(dateTimeString);
-    return date.toLocaleString('en-GB', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading procurement records...</p>
+  // Table columns - Updated with 7 columns as requested
+  const columns = useMemo(() => [
+    {
+      key: "animalId",
+      label: "Animal ID",
+      sortable: true,
+      onSort: () => requestSort('animalId'),
+      sortIcon: getSortIcon('animalId'),
+      render: (item) => (
+        <div className="font-medium text-primary-600">{item.animalId}</div>
+      )
+    },
+    {
+      key: "tagId",
+      label: "Tag ID",
+      sortable: true,
+      onSort: () => requestSort('tagId'),
+      sortIcon: getSortIcon('tagId'),
+      render: (item) => (
+        <div className="flex items-center gap-2">
+          <Hash size={14} className="text-gray-400" />
+          <span className="text-sm text-gray-900">{item.tagId}</span>
         </div>
-      </div>
-    );
-  }
+      )
+    },
+    {
+      key: "procurementOfficer",
+      label: "Officer",
+      sortable: true,
+      onSort: () => requestSort('procurementOfficer'),
+      sortIcon: getSortIcon('procurementOfficer'),
+      render: (item) => (
+        <div className="flex items-center gap-2">
+          <User size={14} className="text-gray-400" />
+          <span className="text-sm text-gray-900">{item.procurementOfficer}</span>
+        </div>
+      )
+    },
+    {
+      key: "breederName",
+      label: "Breeder",
+      sortable: true,
+      onSort: () => requestSort('breederName'),
+      sortIcon: getSortIcon('breederName'),
+      render: (item) => (
+        <div>
+          <div className="text-sm text-gray-900">{item.breederName}</div>
+          <div className="text-xs text-gray-500 flex items-center gap-1">
+            <Phone size={10} />
+            {item.breederContact}
+          </div>
+        </div>
+      )
+    },
+    {
+      key: "visitDate",
+      label: "Date & Time",
+      sortable: true,
+      onSort: () => requestSort('visitDate'),
+      sortIcon: getSortIcon('visitDate'),
+      render: (item) => {
+        const date = new Date(item.visitDate);
+        return (
+          <div className="flex items-center gap-2">
+            <Calendar size={14} className="text-gray-400" />
+            <div>
+              <div className="text-sm text-gray-900">
+                {date.toLocaleDateString('en-US', { 
+                  day: '2-digit', 
+                  month: '2-digit', 
+                  year: 'numeric' 
+                })}
+              </div>
+              <div className="text-xs text-gray-500">{item.visitTime}</div>
+            </div>
+          </div>
+        );
+      }
+    },
+    {
+      key: "breed",
+      label: "Breed",
+      sortable: true,
+      onSort: () => requestSort('breed'),
+      sortIcon: getSortIcon('breed'),
+      render: (item) => (
+        <div className="flex items-center gap-2">
+          <Tag size={14} className="text-gray-400" />
+          <span className="text-sm text-gray-900">{item.breed}</span>
+        </div>
+      )
+    }
+  ], [getSortIcon, requestSort]);
+
+  // Selection handlers
+  const toggleSelectProcurement = (id) => {
+    if (!id) return;
+    setSelectedProcurements((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    const allIds = filteredProcurements.map(proc => proc.id).filter(Boolean);
+    if (selectedProcurements.size === allIds.length && allIds.length > 0) {
+      setSelectedProcurements(new Set());
+    } else {
+      setSelectedProcurements(new Set(allIds));
+    }
+  };
+
+  // Refactored Edit Handler
+  const handleEdit = (procurement) => {
+    navigate(`/procurement/edit/${procurement.animalId}`, { state: { procurement } });
+  };
+
+  // Refactored View Handler
+  const handleView = (procurement) => {
+    navigate(`${PATHROUTES.animalProcurementView}/${procurement.animalId}`, {
+      state: { procurement }
+    });
+  };
+  
+
+  // Refactored Delete Handler
+  const handleDelete = (id) => {
+    const procurement = procurements.find(p => p.id === id);
+    if (!procurement) {
+      toast.error("Cannot delete procurement: Invalid procurement ID");
+      return;
+    }
+    setDeleteTarget("single");
+    setDeleteId(id);
+    setShowDeleteModal(true);
+  };
+
+  // Refactored Bulk Delete Handler
+  const handleBulkDelete = (ids) => {
+    if (!ids || ids.size === 0) {
+      toast.error("Please select procurements to delete");
+      return;
+    }
+    setDeleteTarget("selected");
+    setDeleteId(Array.from(ids));
+    setShowDeleteModal(true);
+  };
+
+  // Refactored Confirm Delete Handler
+  const confirmDelete = async () => {
+    if (isDeleting) return;
+
+    try {
+      setIsDeleting(true);
+      setLoading(true);
+
+      if (deleteTarget === "selected") {
+        // Simulate API call for bulk delete
+        await new Promise(resolve => setTimeout(resolve, 800));
+
+        // Remove from local state
+        const idsToDelete = deleteId;
+        setProcurements(prev => prev.filter(procurement => !idsToDelete.includes(procurement.id)));
+        setFilteredProcurements(prev => prev.filter(procurement => !idsToDelete.includes(procurement.id)));
+
+        // Clear selection
+        setSelectedProcurements(new Set());
+
+        // Update pagination
+        setPagination(prev => ({
+          ...prev,
+          totalRecords: filteredProcurements.length - idsToDelete.length,
+          totalPages: Math.ceil((filteredProcurements.length - idsToDelete.length) / prev.limit)
+        }));
+
+        toast.success(`${idsToDelete.length} procurement(s) deleted successfully!`);
+
+      } else if (deleteTarget === "single" && deleteId) {
+        // Simulate API call for single delete
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Remove from local state
+        setProcurements(prev => prev.filter(procurement => procurement.id !== deleteId));
+        setFilteredProcurements(prev => prev.filter(procurement => procurement.id !== deleteId));
+
+        // Remove from selection if present
+        setSelectedProcurements((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(deleteId);
+          return newSet;
+        });
+
+        // Update pagination
+        setPagination(prev => ({
+          ...prev,
+          totalRecords: filteredProcurements.length - 1,
+          totalPages: Math.ceil((filteredProcurements.length - 1) / prev.limit)
+        }));
+
+        toast.success("Procurement deleted successfully!");
+      }
+    } catch (error) {
+      console.error("Error in delete operation:", error);
+      toast.error("Failed to delete procurement");
+    } finally {
+      setShowDeleteModal(false);
+      setDeleteTarget(null);
+      setDeleteId(null);
+      setIsDeleting(false);
+      setLoading(false);
+    }
+  };
+
+  const handlePageChange = (page) => {
+    setPagination(prev => ({ ...prev, currentPage: page }));
+  };
+
+  const handleLimitChange = (newLimit) => {
+    setPagination(prev => ({
+      ...prev,
+      limit: newLimit,
+      currentPage: 1,
+      totalPages: Math.ceil(prev.totalRecords / newLimit)
+    }));
+  };
+
+  const getCurrentDate = () => {
+    return new Date().toISOString().split("T")[0];
+  };
+
+  // Get unique values for filter dropdowns
+  const uniqueSourceTypes = useMemo(() => {
+    const types = [...new Set(MOCK_PROCUREMENTS.map(p => p.sourceType))];
+    return types.sort();
+  }, []);
+
+  const uniqueBreeds = useMemo(() => {
+    const breeds = [...new Set(MOCK_PROCUREMENTS.map(p => p.breed))];
+    return breeds.sort();
+  }, []);
+
+  const totalDisplayedRecords = filteredProcurements.length;
 
   return (
     <div className="space-y-6">
-
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Procurement Management</h1>
-          <p className="text-gray-600 mt-1">Manage animal procurement records</p>
+          <p className="text-gray-600">Manage animal procurement records</p>
         </div>
+        <button
+          onClick={loadProcurements}
+          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium flex items-center space-x-2"
+          disabled={loading}
+        >
+          <span>Refresh</span>
+        </button>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white rounded-xl shadow-md p-4">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-            <input
-              type="text"
-              placeholder="Search by ID, location, breeder..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          <div className="sm:w-64">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="all">All Status</option>
-              <option value="Pending">Pending</option>
-              <option value="In Transit">In Transit</option>
-              <option value="In Quarantine">In Quarantine</option>
-              <option value="Completed">Completed</option>
-              <option value="Rejected">Rejected</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Table */}
-      <div className="bg-white rounded-xl shadow-md overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Officer</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Breeder</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Animals</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Visit Date</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {currentItems.length > 0 ? (
-                currentItems.map((proc) => (
-                  <tr key={proc.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <span className="text-sm font-medium text-gray-900">{proc.procurementId}</span>
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{proc.procurementOfficer.name}</div>
-                      <div className="text-xs text-gray-500">{proc.procurementOfficer.mobile}</div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="text-sm text-gray-900">{proc.sourceLocation}</div>
-                      <div className="text-xs text-gray-500">{proc.sourceType}</div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="text-sm text-gray-900">{proc.breederName}</div>
-                      <div className="text-xs text-gray-500">{proc.breederContact}</div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="text-sm text-gray-900">
-                        {proc.animals.length} animal{proc.animals.length > 1 ? 's' : ''}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {proc.animals.map(a => a.tagId).join(', ')}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{formatDate(proc.visitDate)}</div>
-                      <div className="text-xs text-gray-500">{proc.visitTime}</div>
-                    </td>
-                    <td className="px-4 py-3">
-                      {getStepIndicator(proc.currentStep)}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      {getStatusBadge(proc.status)}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => setViewModal({ show: true, data: proc })}
-                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                          title="View Details"
-                        >
-                          <Eye size={16} />
-                        </button>
-                        <button
-                          onClick={() => navigate(PATHROUTES.procurementForm, { 
-                            state: { procurementData: proc, isEdit: true } 
-                          })}
-                          className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                          title="Edit"
-                        >
-                          <Pencil size={16} />
-                        </button>
-                        <button
-                          onClick={() => setDeleteModal({ show: true, id: proc.id })}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Delete"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="9" className="px-4 py-12 text-center">
-                    <div className="flex flex-col items-center justify-center">
-                      <FileText className="text-gray-400 mb-3" size={48} />
-                      <h3 className="text-lg font-medium text-gray-500 mb-2">No procurement records found</h3>
-                      <p className="text-gray-400 text-sm mb-6">Try adjusting your search or filters</p>
-                      <button
-                        onClick={() => {
-                          setSearchTerm('');
-                          setStatusFilter('all');
-                        }}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                      >
-                        Clear Filters
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+      {/* Search and Filter Section */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          {/* Left Side: Search and Filter Toggle */}
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+            {/* Search Input */}
+            <div className="relative w-full sm:w-80">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <BiSearch className="w-4 h-4 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search by Animal ID, Tag ID, Officer..."
+                className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-transparent text-sm bg-gray-50/50"
+                value={searchInput}
+                onChange={handleSearchChange}
+              />
+              {searchTerm && (
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                    {filteredProcurements.length} found
+                  </span>
+                </div>
               )}
-            </tbody>
-          </table>
+            </div>
+
+            {/* Filter Toggle Button */}
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`px-4 py-2.5 border rounded-lg flex items-center gap-2 text-sm transition-all justify-center md:justify-start ${
+                showFilters
+                  ? "bg-gradient-to-br from-primary-500 to-primary-600 text-white border-transparent"
+                  : "border-gray-300 hover:bg-gray-50 text-gray-700"
+              }`}
+            >
+              <Filter className="w-4 h-4" />
+              Filters
+              {isFilterApplied && (
+                <span className="ml-1 px-1.5 py-0.5 bg-primary-200 text-primary-800 rounded-full text-xs">
+                  •
+                </span>
+              )}
+            </button>
+          </div>
+
+          {/* Right Side: Action Buttons */}
+          <div className="flex flex-wrap gap-2 w-full md:w-auto justify-center md:justify-start">
+            {/* Bulk Delete Button */}
+            {selectedProcurements.size > 0 && (
+              <button
+                onClick={() => handleBulkDelete(selectedProcurements)}
+                className="px-4 py-2.5 bg-gradient-to-br from-red-500 to-red-600 text-white rounded-lg hover:shadow-md hover:opacity-90 transition-colors flex items-center gap-2 text-sm"
+              >
+                <HiOutlineTrash className="w-4 h-4" />
+                Delete ({selectedProcurements.size})
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* Pagination */}
-        {filteredProcurements.length > 0 && (
-          <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
-            <div className="text-sm text-gray-700">
-              Showing <span className="font-medium">{indexOfFirstItem + 1}</span> to{' '}
-              <span className="font-medium">
-                {Math.min(indexOfLastItem, filteredProcurements.length)}
-              </span>{' '}
-              of <span className="font-medium">{filteredProcurements.length}</span> results
+        {/* Filters Panel */}
+        {showFilters && (
+          <div className="mt-4 p-5 bg-primary-50/50 rounded-xl border border-primary-100">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+              {/* Status Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Status
+                </label>
+                <select
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
+                  value={tempFilters.status || ""}
+                  onChange={(e) => handleFilterChange("status", e.target.value)}
+                >
+                  <option value="">All Status</option>
+                  <option value="Pending">Pending</option>
+                  <option value="In Transit">In Transit</option>
+                  <option value="Completed">Completed</option>
+                </select>
+              </div>
+
+              {/* Source Type Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Source Type
+                </label>
+                <select
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
+                  value={tempFilters.sourceType || ""}
+                  onChange={(e) => handleFilterChange("sourceType", e.target.value)}
+                >
+                  <option value="">All Types</option>
+                  {uniqueSourceTypes.map(type => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Breed Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Breed
+                </label>
+                <select
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
+                  value={tempFilters.breed || ""}
+                  onChange={(e) => handleFilterChange("breed", e.target.value)}
+                >
+                  <option value="">All Breeds</option>
+                  {uniqueBreeds.map(breed => (
+                    <option key={breed} value={breed}>{breed}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Date Range Filters */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  From Date
+                </label>
+                <div className="relative">
+                  <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="date"
+                    className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
+                    value={tempFilters.fromDate || ""}
+                    max={getCurrentDate()}
+                    onChange={(e) => handleFilterChange("fromDate", e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  To Date
+                </label>
+                <div className="relative">
+                  <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="date"
+                    className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
+                    value={tempFilters.toDate || ""}
+                    max={getCurrentDate()}
+                    min={tempFilters.fromDate || undefined}
+                    onChange={(e) => handleFilterChange("toDate", e.target.value)}
+                  />
+                </div>
+              </div>
             </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className={`p-2 rounded-lg border ${
-                  currentPage === 1
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-white text-gray-600 hover:bg-gray-50'
-                }`}
-              >
-                <ChevronLeft size={18} />
-              </button>
-              <span className="px-4 py-2 bg-blue-600 text-white rounded-lg">
-                Page {currentPage} of {totalPages}
-              </span>
-              <button
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-                className={`p-2 rounded-lg border ${
-                  currentPage === totalPages
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-white text-gray-600 hover:bg-gray-50'
-                }`}
-              >
-                <ChevronRight size={18} />
-              </button>
+
+            <div className="mt-6 flex flex-col xs:flex-row justify-between items-start xs:items-center gap-4">
+              <div className="text-sm text-gray-600 w-full xs:w-auto">
+                {isFilterApplied && (
+                  <div className="flex flex-wrap items-center gap-2 bg-gradient-to-r from-primary-100 to-primary-50 px-3 py-2 rounded-lg border border-primary-200">
+                    <span className="inline-flex items-center px-2 py-1 rounded-md bg-gradient-to-r from-primary-500 to-primary-600 text-white text-xs">
+                      <Filter className="w-3 h-3 mr-1" />
+                      Filters Applied
+                    </span>
+                    <span className="text-primary-700 text-xs">
+                      {Object.keys(appliedFilters).length > 0 &&
+                        Object.keys(appliedFilters).filter(k => appliedFilters[k]).map(key => {
+                          if (key === 'fromDate' || key === 'toDate') {
+                            return key === 'fromDate' ? `From: ${appliedFilters[key]}` : `To: ${appliedFilters[key]}`;
+                          }
+                          return `${key}: ${appliedFilters[key]}`;
+                        }).join(', ')}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex flex-wrap gap-2 w-full xs:w-auto justify-start xs:justify-end">
+                <button
+                  onClick={handleClearFilters}
+                  className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors border border-gray-300 whitespace-nowrap"
+                >
+                  <X size={14} className="inline mr-1" />
+                  Clear All
+                </button>
+                <button
+                  onClick={handleCancelFilters}
+                  className="px-4 py-2 text-sm text-primary-600 hover:text-primary-800 hover:bg-primary-50 rounded-lg transition-colors border border-primary-300 whitespace-nowrap"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleApplyFilters}
+                  className="px-5 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap bg-gradient-to-br from-primary-500 to-primary-600 text-white hover:shadow-md"
+                >
+                  Apply Filters
+                </button>
+              </div>
             </div>
           </div>
         )}
       </div>
 
-      {/* View Modal */}
-      {viewModal.show && viewModal.data && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-gray-900">Procurement Details</h2>
-                <button
-                  onClick={() => setViewModal({ show: false, data: null })}
-                  className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-
-              <div className="space-y-6">
-                {/* Basic Info */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="font-semibold text-gray-900 mb-3">Basic Information</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div>
-                      <p className="text-xs text-gray-500">Procurement ID</p>
-                      <p className="text-sm font-medium">{viewModal.data.procurementId}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500">Status</p>
-                      <div className="mt-1">{getStatusBadge(viewModal.data.status)}</div>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500">Created At</p>
-                      <p className="text-sm">{formatDateTime(viewModal.data.createdAt)}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500">Current Step</p>
-                      <p className="text-sm">Step {viewModal.data.currentStep} of 4</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Source Visit */}
-                <div className="border rounded-lg p-4">
-                  <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                    <User size={18} className="text-blue-600" />
-                    Source Visit Details
-                  </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div>
-                      <p className="text-xs text-gray-500">Officer</p>
-                      <p className="text-sm font-medium">{viewModal.data.procurementOfficer.name}</p>
-                      <p className="text-xs text-gray-500">{viewModal.data.procurementOfficer.mobile}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500">Source Type</p>
-                      <p className="text-sm">{viewModal.data.sourceType}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500">Location</p>
-                      <p className="text-sm">{viewModal.data.sourceLocation}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500">Visit Date/Time</p>
-                      <p className="text-sm">{formatDate(viewModal.data.visitDate)} {viewModal.data.visitTime}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500">Breeder</p>
-                      <p className="text-sm">{viewModal.data.breederName}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-500">Breeder Contact</p>
-                      <p className="text-sm">{viewModal.data.breederContact}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Animals */}
-                <div className="border rounded-lg p-4">
-                  <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                    <Beef size={18} className="text-green-600" />
-                    Animal Details
-                  </h3>
-                  <div className="space-y-3">
-                    {viewModal.data.animals.map((animal, index) => (
-                      <div key={index} className="bg-gray-50 p-3 rounded-lg">
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                          <div>
-                            <p className="text-xs text-gray-500">Tag ID</p>
-                            <p className="text-sm font-medium">{animal.tagId}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-500">Breed</p>
-                            <p className="text-sm">{animal.breed}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-500">Age</p>
-                            <p className="text-sm">{animal.age}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-500">Milking Capacity</p>
-                            <p className="text-sm">{animal.milkingCapacity} Ltr/day</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Progress Steps */}
-                <div className="border rounded-lg p-4">
-                  <h3 className="font-semibold text-gray-900 mb-3">Progress Status</h3>
-                  <div className="space-y-3">
-                    {['Source Visit', 'Logistic & Transit', 'Quarantine & Care', 'Handover'].map((step, index) => (
-                      <div key={index} className="flex items-center gap-3">
-                        <div className={`
-                          w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0
-                          ${index + 1 <= viewModal.data.currentStep ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'}
-                        `}>
-                          {index + 1 <= viewModal.data.currentStep ? <CheckCircle size={16} /> : index + 1}
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">{step}</p>
-                          <p className="text-xs text-gray-500">
-                            {index + 1 <= viewModal.data.currentStep ? 'Completed' : 'Pending'}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-end mt-6 pt-4 border-t">
-                <button
-                  onClick={() => setViewModal({ show: false, data: null })}
-                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Data Table */}
+      <DataTable
+        columns={columns}
+        data={sortedProcurements}
+        loading={loading}
+        onEdit={handleEdit}
+        onView={handleView}
+        onDelete={handleDelete}
+        onBulkDelete={handleBulkDelete}
+        addButtonLabel="Add Procurement"
+        emptyStateMessage="No procurement records found. Try adjusting your filters or add new procurement."
+        loadingMessage="Loading procurement data..."
+        enableSelection={true}
+        enablePagination={true}
+        selectedRows={selectedProcurements}
+        onSelectRow={toggleSelectProcurement}
+        onSelectAll={toggleSelectAll}
+        pagination={{
+          currentPage: pagination.currentPage,
+          totalPages: pagination.totalPages,
+          totalRecords: totalDisplayedRecords,
+          onPageChange: handlePageChange,
+          onLimitChange: handleLimitChange,
+          limit: pagination.limit,
+          limitOptions: [5, 10, 25, 50, 100]
+        }}
+        hideAddButton={true}
+        disableInternalDeleteModal={true}
+      />
 
       {/* Delete Confirmation Modal */}
-      {deleteModal.show && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6">
-            <div className="text-center">
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
-                <Trash2 className="h-6 w-6 text-red-600" />
+      {showDeleteModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 overflow-y-auto"
+          style={{ top: 0, left: 0, right: 0, bottom: 0 }}
+        >
+          <div className="relative w-full max-w-md bg-white rounded-md shadow-xl mx-2">
+            <div className="flex justify-center mb-4 mt-4">
+              <div className="p-3 bg-red-50 rounded-full">
+                <HiOutlineTrash className="w-10 h-10 text-red-500" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Procurement Record</h3>
-              <p className="text-gray-500 mb-6">
-                Are you sure you want to delete this procurement record? This action cannot be undone.
+            </div>
+
+            <div className="text-center mb-6">
+              <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-2">
+                Confirm Deletion
+              </h3>
+              <p className="text-gray-500 text-sm sm:text-base leading-relaxed p-3">
+                {deleteTarget === "selected"
+                  ? `You're about to delete ${deleteId?.length || 0} selected procurement(s). This action cannot be undone.`
+                  : "You're about to delete this procurement record. This action cannot be undone."}
               </p>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setDeleteModal({ show: false, id: null })}
-                  className="px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex-1"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => handleDelete(deleteModal.id)}
-                  className="px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex-1"
-                >
-                  Delete
-                </button>
-              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row justify-center gap-3 px-4 pb-4">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setDeleteTarget(null);
+                  setDeleteId(null);
+                  setIsDeleting(false);
+                }}
+                className="flex-1 px-2 sm:px-5 py-1 border sm:py-2 border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors duration-150 text-sm font-medium focus:outline-none"
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={isDeleting}
+                className="flex-1 px-2 sm:px-5 py-1 sm:py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors duration-150 text-sm font-medium focus:outline-none shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isDeleting ? (
+                  <>
+                    <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <span>Delete</span>
+                )}
+              </button>
             </div>
           </div>
         </div>

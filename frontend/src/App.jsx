@@ -8,12 +8,15 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 // Import Layout component
 import Layout from './components/Layout/Layout';
 
+// Import Route Components
+import PrivateRoute from './routes/PrivateRoute';
+import PublicRoute from './routes/PublicRoute';
+
 // Pages
 import Login from './pages/Auth/Login';
 import Dashboard from './pages/Dashboard/Dashboard';
 import SellerRegistration from './pages/procurement/SellerRegistration';
 import AnimalRegistration from './pages/procurement/AnimalRegistration';
-
 import AgentRegistration from './pages/procurement/AgentRegistration';
 import ForgotPassword from './pages/Auth/ForgotPassword';
 import ResetPassword from './pages/Auth/ResetPassword';
@@ -28,7 +31,7 @@ import { PATHROUTES } from './routes/pathRoutes';
 // Import API and endpoints
 import api from "./services/api/api";
 import { Endpoints } from "./services/api/EndPoint";
-import SessionTimeoutModal from './components/SessionTimeoutModal';
+import SessionTimeoutModal from './components/Layout/Session/SessionTimeoutModal';
 import HealthCheckupList from './pages/procurement/HealthCheckupList';
 import AgentDetails from './pages/management/agents/AgentDetails';
 import EditAgent from './pages/management/agents/EditAgent';
@@ -38,61 +41,11 @@ import HealthCheckupForm from './pages/procurement/HealthCheckupForm';
 import ManageUsersForm from './pages/manageUsers/ManageUsersForm';
 import ManageUsersTable from './pages/manageUsers/ManageUsersTable';
 import ViewUserDetails from './pages/manageUsers/ViewUserDetails';
-import { Edit3Icon } from 'lucide-react';
 import EditAnimal from './pages/management/animals/EditAnimal';
 import SettingsPage from './pages/settings/SettingPage';
 import AnimalProcurement from './pages/AnimalProcurement/AnimalProcurement';
+import ProcurementView from './pages/AnimalProcuredList/ProcurementView';
 import ProcurementList from './pages/AnimalProcuredList/ProcurementList';
-import ViewProcurement from './pages/AnimalProcuredList/ViewProcurement';
-
-// ProtectedRoute Component
-const ProtectedRoute = ({ children, allowedRoles = [1, 2, 3] }) => {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return <LoadingSpinner />;
-  }
-
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  // If no specific roles required, allow access
-  if (allowedRoles.length === 0) {
-    return children;
-  }
-
-  // Check if user has required role
-  if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  return children;
-};
-
-// PublicRoute Component
-const PublicRoute = ({ children, restricted = false }) => {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return <LoadingSpinner />;
-  }
-
-  if (restricted && user) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  return children;
-};
-
-// Loading Spinner Component
-const LoadingSpinner = () => {
-  return (
-    <div className="fixed inset-0 flex items-center justify-center bg-white">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#f48563]"></div>
-    </div>
-  );
-};
 
 // Placeholder component for incomplete pages
 const Placeholder = ({ title }) => (
@@ -108,7 +61,7 @@ const Placeholder = ({ title }) => (
 const AppContent = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, isAuthenticated, loginSuccess, logout } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [sessionExpired, setSessionExpired] = useState(false);
 
@@ -202,9 +155,9 @@ const AppContent = () => {
         <Route
           path="/"
           element={
-            <ProtectedRoute>
+            <PrivateRoute>
               <Layout onLogout={handleLogout} />
-            </ProtectedRoute>
+            </PrivateRoute>
           }
         >
           <Route index element={<Navigate to={PATHROUTES.dashboard} replace />} />
@@ -214,42 +167,42 @@ const AppContent = () => {
           <Route
             path={PATHROUTES.agentRegistration.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1, 2]}>
+              <PrivateRoute allowedRoles={[1, 2]}>
                 <AgentRegistration />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
           <Route
             path={PATHROUTES.sellerRegistration.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1, 2]}>
+              <PrivateRoute allowedRoles={[1, 2]}>
                 <SellerRegistration />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
           <Route
             path={PATHROUTES.animalRegistration.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1, 2, 3]}>
+              <PrivateRoute allowedRoles={[1, 2, 3]}>
                 <AnimalRegistration />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
 
           <Route
             path={PATHROUTES.healthCheckupList.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1, 2, 3]}>
+              <PrivateRoute allowedRoles={[1, 2, 3]}>
                 <HealthCheckupList />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
           <Route
             path={PATHROUTES.healthCheckupForm.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1, 2, 3]}>
+              <PrivateRoute allowedRoles={[1, 2, 3]}>
                 <HealthCheckupForm />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
 
@@ -257,73 +210,73 @@ const AppContent = () => {
           <Route
             path={PATHROUTES.sellersList.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1, 2]}>
+              <PrivateRoute allowedRoles={[1, 2]}>
                 <SellersList />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
           <Route
             path={PATHROUTES.editSeller.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1, 2]}>
+              <PrivateRoute allowedRoles={[1, 2]}>
                 <EditSeller />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
           <Route
             path={PATHROUTES.sellerDetails.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1, 2]}>
+              <PrivateRoute allowedRoles={[1, 2]}>
                 <SellerDetails />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
           <Route
             path={PATHROUTES.agentsList.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1, 2]}>
+              <PrivateRoute allowedRoles={[1, 2]}>
                 <AgentsList />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
           <Route
             path={PATHROUTES.agentDetails.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1, 2]}>
+              <PrivateRoute allowedRoles={[1, 2]}>
                 <AgentDetails />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
           <Route
             path={PATHROUTES.editAgent.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1, 2]}>
+              <PrivateRoute allowedRoles={[1, 2]}>
                 <EditAgent />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
           <Route
             path={PATHROUTES.animalsList.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1, 2, 3]}>
+              <PrivateRoute allowedRoles={[1, 2, 3]}>
                 <AnimalsList />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
           <Route
             path={PATHROUTES.animalDetails.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1, 2, 3]}>
+              <PrivateRoute allowedRoles={[1, 2, 3]}>
                 <AnimalDetails />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
           <Route
             path={PATHROUTES.editAnimal.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1, 2, 3]}>
+              <PrivateRoute allowedRoles={[1, 2, 3]}>
                 <EditAnimal />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
 
@@ -331,9 +284,9 @@ const AppContent = () => {
           <Route
             path={PATHROUTES.transporters.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1, 2]}>
+              <PrivateRoute allowedRoles={[1, 2]}>
                 <Placeholder title="Transporters" />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
 
@@ -341,9 +294,9 @@ const AppContent = () => {
           <Route
             path={PATHROUTES.suppliers.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1, 2]}>
+              <PrivateRoute allowedRoles={[1, 2]}>
                 <Placeholder title="Suppliers" />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
 
@@ -351,9 +304,9 @@ const AppContent = () => {
           <Route
             path={PATHROUTES.beneficiaries.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1]}>
+              <PrivateRoute allowedRoles={[1]}>
                 <Placeholder title="Beneficiaries" />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
 
@@ -361,9 +314,9 @@ const AppContent = () => {
           <Route
             path={PATHROUTES.team.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1]}>
+              <PrivateRoute allowedRoles={[1]}>
                 <Placeholder title="Team Members" />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
 
@@ -371,85 +324,72 @@ const AppContent = () => {
           <Route
             path={PATHROUTES.reports.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1, 2]}>
+              <PrivateRoute allowedRoles={[1, 2]}>
                 <Placeholder title="Reports" />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
-
-
-          <Route
-            path={PATHROUTES.animalsList.replace('/', '')}
-            element={
-              <ProtectedRoute allowedRoles={[1, 2, 3]}>
-                <AnimalsList />
-              </ProtectedRoute>
-            }
-          />
-
-
 
           <Route
             path={PATHROUTES.animalProcurement.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1, 2]}>
+              <PrivateRoute allowedRoles={[1, 2, 3]}>
                 <AnimalProcurement />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
 
           <Route
             path={PATHROUTES.animalProcuredList.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1, 2]}>
+              <PrivateRoute allowedRoles={[1, 2, 3]}>
                 <ProcurementList />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
 
+          <Route
+            path={`${PATHROUTES.animalProcurementView.replace('/', '')}/:id`}
+            element={
+              <PrivateRoute allowedRoles={[1, 2, 3]}>
+                <ProcurementView />
+              </PrivateRoute>
+            }
+          />
 
           <Route
             path={PATHROUTES.userList.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1, 2]}>
+              <PrivateRoute allowedRoles={[1, 2]}>
                 <ManageUsersTable />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
 
           <Route
             path={PATHROUTES.addUsers.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1, 2]}>
+              <PrivateRoute allowedRoles={[1, 2]}>
                 <ManageUsersForm />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path={PATHROUTES.animalProcurementView.replace('/', '')}
-            element={
-              <ProtectedRoute allowedRoles={[1, 2]}>
-                <ViewProcurement />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
 
           <Route
             path={`${PATHROUTES.editUsers.replace('/', '')}/:id`}
             element={
-              <ProtectedRoute allowedRoles={[1, 2]}>
+              <PrivateRoute allowedRoles={[1, 2]}>
                 <ManageUsersForm />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
 
           <Route
             path={`${PATHROUTES.viewUsers}/:id`}
             element={
-              <ProtectedRoute allowedRoles={[1, 2]}>
+              <PrivateRoute allowedRoles={[1, 2]}>
                 <ViewUserDetails />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
 
@@ -457,9 +397,9 @@ const AppContent = () => {
           <Route
             path={PATHROUTES.settings.replace('/', '')}
             element={
-              <ProtectedRoute allowedRoles={[1, 2, 3]}>
+              <PrivateRoute allowedRoles={[1, 2, 3]}>
                 <SettingsPage />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
         </Route>

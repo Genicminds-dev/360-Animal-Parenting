@@ -183,7 +183,7 @@ export default function ViewUserDetails() {
         return (
             <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-50 via-white to-gray-50">
                 <div className="text-center p-8 bg-white rounded-xl shadow-md">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto mb-4"></div>
                     <h3 className="text-xl font-bold text-gray-700 mb-2">Loading User Details...</h3>
                     <p className="text-gray-500">Please wait while we fetch the user information.</p>
                 </div>
@@ -304,7 +304,7 @@ export default function ViewUserDetails() {
                     <button
                         onClick={() => setActiveTab("personal")}
                         className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === "personal"
-                            ? "border-primary-600 text-primary-700"
+                            ? "border-primary-500 text-primary-600"
                             : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                             }`}
                     >
@@ -316,7 +316,7 @@ export default function ViewUserDetails() {
                     <button
                         onClick={() => setActiveTab("role")}
                         className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === "role"
-                            ? "border-primary-600 text-primary-700"
+                            ? "border-primary-500 text-primary-600"
                             : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                             }`}
                     >
@@ -328,7 +328,7 @@ export default function ViewUserDetails() {
                     <button
                         onClick={() => setActiveTab("activity")}
                         className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === "activity"
-                            ? "border-primary-600 text-primary-700"
+                            ? "border-primary-500 text-primary-600"
                             : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                             }`}
                     >
@@ -369,7 +369,7 @@ export default function ViewUserDetails() {
                     <div className="mt-6 p-4 bg-primary-50 border border-primary-200 rounded-lg">
                         <div className="flex items-center gap-3">
                             <FaShieldAlt className="text-primary-600" size={20} />
-                            <span className="text-sm text-primary-700">
+                            <span className="text-sm text-primary-600">
                                 This user has {roleDisplay.level.toLowerCase()} privileges in the system
                             </span>
                         </div>
