@@ -19,6 +19,8 @@ import { getSellers, getSellerByUid, getSellerList, createSeller, updateSeller, 
 import { createUserSchema, updateUserProfileSchema, updateUserSchema, changePasswordSchema, editPasswordSchema } from '../validations/userValidation';
 import { CreateCommissionAgentSchema, UpdateCommissionAgentSchema } from '../validations/commissionAgentValidation';
 import { CreateSellerSchema, UpdateSellerSchema } from '../validations/sellerValidation';
+import { createAnimal, deleteAnimal, getAnimalByUid, getAnimals, updateAnimal } from '../controllers/admin/animalController';
+import { createProcurement, deleteProcuredAnimal, getProcuredAnimalbyUid, getProcuredAnimals, getProcurementOfficers } from '../controllers/admin/procuredAnimalController';
 
 // Role Routes
 router.get('/roles', verifyToken, checkRole([1, 2]), getAllRoles);
@@ -48,5 +50,19 @@ router.get("/seller-list", verifyToken, checkRole([1, 2, 3]), getSellerList);
 router.post("/seller", verifyToken, checkRole([1, 2, 3]), upload.fields([{ name: "profileImg", maxCount: 1 }]), handleMulterError, validate(CreateSellerSchema), sanitizeInput, setAudit, createSeller);
 router.put("/seller/:uid", verifyToken, checkRole([1, 2, 3]), upload.fields([{ name: "profileImg", maxCount: 1 }]), handleMulterError, validate(UpdateSellerSchema), sanitizeInput, setAudit, updateSeller);
 router.delete("/seller/:uid", verifyToken, checkRole([1, 2, 3]), deleteSeller);
+
+
+router.get("/animal", verifyToken, checkRole([1, 2, 3]), getAnimals);
+router.get("/animal/:uid", verifyToken, checkRole([1, 2, 3]), getAnimalByUid);
+router.post("/animal", verifyToken, checkRole([1, 2, 3]), upload.any(), handleMulterError, sanitizeInput, createAnimal);
+router.put("/animal/:uid", verifyToken, checkRole([1, 2, 3]), upload.fields([{ name: "frontPhoto", maxCount: 1 }, { name: "sidePhoto", maxCount: 1 }, { name: "backPhoto", maxCount: 1 }, { name: "animalVideo", maxCount: 1 }, { name: "calfPhoto", maxCount: 1 }, { name: "calfVideo", maxCount: 1 }]), handleMulterError, sanitizeInput, setAudit, updateAnimal);
+router.delete("/animal/:uid", verifyToken, checkRole([1, 2, 3]), deleteAnimal);
+
+// Animal Procurement Routes
+router.get("/procurement-officers", verifyToken, checkRole([1, 2, 3]), getProcurementOfficers);
+router.get("/procured-animal", verifyToken, checkRole([1, 2, 3]), getProcuredAnimals);
+router.get("/procured-animal/:uid", verifyToken, checkRole([1, 2, 3]), getProcuredAnimalbyUid);
+router.post("/procured-animal", verifyToken, checkRole([1, 2, 3]), upload.fields([{ name: "animalPhotoFront", maxCount: 1 }, { name: "animalPhotoSide", maxCount: 1 }, { name: "animalPhotoRear", maxCount: 1 }, { name: "healthRecord", maxCount: 1 }, { name: "licenseCertificate", maxCount: 1 }, { name: "quarantineCenterPhoto", maxCount: 1 }, { name: "quarantineHealthRecord", maxCount: 1 }, { name: "finalHealthClearance", maxCount: 1 }, { name: "handoverPhoto", maxCount: 1 }, { name: "handoverDocument", maxCount: 1 }]), handleMulterError, sanitizeInput, setAudit, createProcurement);
+router.delete("/procured-animal/:uid", verifyToken, checkRole([1, 2, 3]), deleteProcuredAnimal);
 
 export default router;

@@ -37,6 +37,70 @@ export const FIELD_RULES: Record<
     label: "Aadhaar file",
     types: ["image", "pdf"],
   },
+  frontPhoto: {
+    label: "Front photo",
+    types: ["image"],
+  },
+  sidePhoto: {
+    label: "Side photo",
+    types: ["image"],
+  },
+  backPhoto: {
+    label: "Back photo",
+    types: ["image"],
+  },
+  animalVideo: {
+    label: "Animal video",
+    types: ["video"],
+  },
+  calfPhoto: {
+    label: "Calf photo",
+    types: ["image"],
+  },
+  calfVideo: {
+    label: "Calf video",
+    types: ["video"],
+  },
+  animalPhotoFront: {
+    label: "Animal photo (Front view)",
+    types: ["image"],
+  },
+  animalPhotoSide: {
+    label: "Animal photo (Side view)",
+    types: ["image"],
+  },
+  animalPhotoRear: {
+    label: "Animal photo (Rear view)",
+    types: ["image"],
+  },
+  healthRecord: {
+    label: "Health record",
+    types: ["image", "pdf"],
+  },
+  licenseCertificate: {
+    label: "License certificate",
+    types: ["image", "pdf"],
+  },
+  quarantineCenterPhoto: {
+    label: "Quarantine center photo",
+    types: ["image", "pdf"],
+  },
+  quarantineHealthRecord: {
+    label: "Quarantine center health record",
+    types: ["image", "pdf"],
+  },
+  finalHealthClearance: {
+    label: "Final health clearance record",
+    types: ["image", "pdf"],
+  },
+  handoverPhoto: {
+    label: "Handover photo",
+    types: ["image"],
+  },
+  handoverDocument: {
+    label: "Handover document",
+    types: ["image", "pdf"],
+  },
 };
 
 const isValidImage = (file: Express.Multer.File) =>
@@ -86,7 +150,15 @@ export const upload = multer({
       return cb(new Error("PSD files are not allowed"));
     }
 
-    const rule = FIELD_RULES[file.fieldname];
+    let cleanField = file.fieldname;
+
+    if (file.fieldname.startsWith("animals[")) {
+      const parts = file.fieldname.split("[");
+      const lastPart = parts[parts.length - 1];
+      cleanField = lastPart.replace("]", "");
+    }
+
+    const rule = FIELD_RULES[cleanField];
 
     if (!rule) {
       return cb(
@@ -118,29 +190,27 @@ export const validateUploadedFiles = (
   res: Response,
   next: NextFunction
 ) => {
-  const files = req.files as Record<string, Express.Multer.File[]>;
+  const files = req.files as Express.Multer.File[];
   let totalSize = 0;
 
   if (!files) return next();
 
-  for (const field in files) {
-    for (const file of files[field]) {
-      totalSize += file.size;
+  for (const file of files) {
+    totalSize += file.size;
 
-      if (file.mimetype.startsWith("image/") && file.size > IMAGE_LIMIT) {
-        cleanupFiles(req);
-        return res.status(400).json({ message: "Image must be under 5MB" });
-      }
+    if (file.mimetype.startsWith("image/") && file.size > IMAGE_LIMIT) {
+      cleanupFiles(req);
+      return res.status(400).json({ message: "Image must be under 5MB" });
+    }
 
-      if (file.mimetype === "application/pdf" && file.size > PDF_LIMIT) {
-        cleanupFiles(req);
-        return res.status(400).json({ message: "PDF must be under 5MB" });
-      }
+    if (file.mimetype === "application/pdf" && file.size > PDF_LIMIT) {
+      cleanupFiles(req);
+      return res.status(400).json({ message: "PDF must be under 5MB" });
+    }
 
-      if (file.mimetype.startsWith("video/") && file.size > VIDEO_LIMIT) {
-        cleanupFiles(req);
-        return res.status(400).json({ message: "Video must be under 50MB" });
-      }
+    if (file.mimetype.startsWith("video/") && file.size > VIDEO_LIMIT) {
+      cleanupFiles(req);
+      return res.status(400).json({ message: "Video must be under 50MB" });
     }
   }
 
@@ -155,17 +225,17 @@ export const validateUploadedFiles = (
 };
 
 export const cleanupFiles = (req: Request) => {
-  const files = req.files as Record<string, Express.Multer.File[]>;
-  if (!files) return;
+  const files = req.files as Express.Multer.File[];
 
-  for (const field in files) {
-    for (const file of files[field]) {
-      if (file?.path && fs.existsSync(file.path)) {
-        fs.unlinkSync(file.path);
-      }
+  if (!files || !Array.isArray(files)) return;
+
+  for (const file of files) {
+    if (file?.path && fs.existsSync(file.path)) {
+      fs.unlinkSync(file.path);
     }
   }
 };
+
 
 export const handleMulterError = (
   err: any,
