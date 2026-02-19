@@ -5,19 +5,23 @@ type GenerateUIDParams = {
     prefix: string;
     start?: number;
     end?: number;
+    transaction?: any;
 };
+
 
 export const generateUID = async ({
     table,
     prefix,
     start = 10001,
     end = 99999,
+    transaction
 }: GenerateUIDParams): Promise<string> => {
 
     const lastRecord = await table.findOne({
         paranoid: false,
         order: [["createdAt", "DESC"]],
         attributes: ["uid"],
+        transaction
     });
 
     let nextNumber = start;
