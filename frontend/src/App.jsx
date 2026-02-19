@@ -330,11 +330,33 @@ const AppContent = () => {
             }
           />
 
+
+
+
+
+
+
+
+
+
+
+
+
+
           <Route
             path={PATHROUTES.animalProcurement.replace('/', '')}
             element={
               <PrivateRoute allowedRoles={[1, 2, 3]}>
                 <AnimalProcurement />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path={`${PATHROUTES.editanimalProcurement.replace('/', '')}/:id`}
+            element={
+              <PrivateRoute allowedRoles={[1, 2]}>
+                <ManageUsersForm />
               </PrivateRoute>
             }
           />
@@ -356,6 +378,29 @@ const AppContent = () => {
               </PrivateRoute>
             }
           />
+
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
           <Route
             path={PATHROUTES.userList.replace('/', '')}

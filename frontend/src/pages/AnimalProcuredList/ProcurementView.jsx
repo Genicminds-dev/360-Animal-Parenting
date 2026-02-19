@@ -1,6 +1,6 @@
 // pages/procurement/ProcurementView.jsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   FaTimesCircle,
   FaArrowLeft,
@@ -47,14 +47,14 @@ import { toast } from 'react-hot-toast';
 import { GiCow } from 'react-icons/gi';
 import ProcurementPDFDownload from '../AnimalProcuredList/ProcurementPDFDownload';
 import ProcurementExcelDownload from '../AnimalProcuredList/ProcurementExcelDownload';
-import { formatDate, formatValue } from '../../utils/helpers/formatters';
+import { formatDate } from '../../utils/helpers/formatters';
+import api, { baseURLFile } from '../../services/api/api';
 
 const ProcurementView = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const location = useLocation();
-  const [procurement, setProcurement] = useState(location.state?.procurement || null);
-  const [loading, setLoading] = useState(!location.state?.procurement);
+  const [procurement, setProcurement] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('source');
   const [selectedImage, setSelectedImage] = useState(null);
   const [showImageModal, setShowImageModal] = useState(false);
@@ -63,72 +63,103 @@ const ProcurementView = () => {
   const [downloading, setDownloading] = useState({ pdf: false, excel: false });
 
   useEffect(() => {
-    if (!procurement) {
-      fetchProcurementData();
-    }
+    fetchProcurementData();
   }, [id]);
+
+  // Helper function to get full URL for files
+  const getFileUrl = (filePath) => {
+    if (!filePath) return null;
+    // If it's already a full URL, return as is
+    if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
+      return filePath;
+    }
+    // Remove any leading slash to avoid double slashes
+    const cleanPath = filePath.startsWith('/') ? filePath.slice(1) : filePath;
+    return `${baseURLFile}/${cleanPath}`;
+  };
+
+  // Transform API response to match the view component's expected structure
+  const transformProcurementData = (apiData) => {
+    const animal = apiData.procured_animal && apiData.procured_animal[0] ? apiData.procured_animal[0] : {};
+    const logistic = apiData.logistic && apiData.logistic[0] ? apiData.logistic[0] : {};
+    const quarantine = apiData.quarantine_center && apiData.quarantine_center[0] ? apiData.quarantine_center[0] : {};
+    const handover = apiData.handover && apiData.handover[0] ? apiData.handover[0] : {};
+
+    return {
+      // Source & Procurement Officer
+      procurementOfficer: apiData.users ? `${apiData.users.firstName} ${apiData.users.lastName} - ${apiData.users.mobile}` : "N/A",
+      sourceType: apiData.sourceType || "N/A",
+      sourceLocation: apiData.sourceLocation || "N/A",
+      visitDate: apiData.visitDate,
+      visitTime: apiData.visitTime,
+
+      // Animal Details
+      tagId: animal.tagId || "N/A",
+      breed: animal.breed || "N/A",
+      ageYears: animal.ageYears,
+      ageMonths: animal.ageMonths,
+      milkingCapacity: animal.milkingCapacity,
+      isCalfIncluded: animal.isCalfIncluded ? "yes" : "no",
+      physicalCheck: animal.physicalCheck || "N/A",
+      fmdDisease: animal.fmdDisease || false,
+      lsdDisease: animal.lsdDisease || false,
+      animalPhotoFront: animal.animalPhotoFront,
+      animalPhotoSide: animal.animalPhotoSide,
+      animalPhotoRear: animal.animalPhotoRear,
+
+      // Breeder Information
+      breederName: apiData.breederName || "N/A",
+      breederContact: apiData.breederContact || "N/A",
+
+      // Health Record
+      healthRecord: animal.healthRecord,
+
+      // Logistics - Always include these fields even if null
+      vehicleNo: logistic.vehicleNo || "N/A",
+      driverName: logistic.driverName || "N/A",
+      driverDesignation: logistic.driverDesignation || "N/A",
+      driverMobile: logistic.driverMobile || "N/A",
+      driverAadhar: logistic.driverAadhar || "N/A",
+      drivingLicense: logistic.drivingLicense || "N/A",
+      licenseCertificate: logistic.licenseCertificate,
+
+      // Quarantine - Always include these fields even if null
+      quarantineCenter: quarantine.quarantineCenter || "N/A",
+      quarantineCenterPhoto: quarantine.quarantineCenterPhoto,
+      quarantineHealthRecord: quarantine.quarantineHealthRecord,
+      finalHealthClearance: quarantine.finalHealthClearance,
+
+      // Handover - Always include these fields even if null
+      handoverOfficer: handover.handoverOfficer || "N/A",
+      beneficiaryId: handover.beneficiaryId || "N/A",
+      beneficiaryLocation: handover.beneficiaryLocation || "N/A",
+      handoverPhoto: handover.handoverPhoto,
+      handoverDocument: handover.handoverDocument,
+      handoverDate: handover.handoverDate,
+      handoverTime: handover.handoverTime,
+
+      // Metadata
+      remarks: "", // Add remarks if available in your API
+      createdAt: apiData.createdAt,
+      updatedAt: new Date().toISOString(), // You might want to add updatedAt to your API response
+      createdBy: apiData.users ? `${apiData.users.firstName} ${apiData.users.lastName}` : "N/A"
+    };
+  };
 
   const fetchProcurementData = async () => {
     setLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 800));
+      const response = await api.get(`/admin/procured-animal/${id}`);
 
-      const mockProcurement = {
-        procurementOfficer: "Rajesh Kumar - 9876543210",
-        sourceType: "farm",
-        sourceLocation: "Green Valley Farm, Pune",
-        visitDate: "2024-03-15",
-        visitTime: "10:30",
-
-        tagId: "TAG-001",
-        breed: "Gir",
-        ageYears: "5",
-        ageMonths: "6",
-        milkingCapacity: "12",
-        isCalfIncluded: "no",
-        physicalCheck: "Healthy, active, good body condition. No visible injuries or abnormalities. Clear eyes, healthy coat, normal gait.",
-        fmdDisease: false,
-        lsdDisease: false,
-        animalPhotoFront: "https://images.unsplash.com/photo-1570042225831-d98af3d3b6d4?w=500&auto=format",
-        animalPhotoSide: "https://images.unsplash.com/photo-1570042225831-d98af3d3b6d4?w=500&auto=format&fit=crop&angle=90",
-        animalPhotoRear: "https://images.unsplash.com/photo-1570042225831-d98af3d3b6d4?w=500&auto=format&fit=crop&angle=180",
-
-        breederName: "Suresh Patil",
-        breederContact: "9876543211",
-
-        healthRecord: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-
-        vehicleNo: "MH31AB1234",
-        driverName: "Ramesh Kumar",
-        driverDesignation: "Senior Driver",
-        driverMobile: "9876543210",
-        driverAadhar: "123456789012",
-        drivingLicense: "MH1234567890",
-        licenseCertificate: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-
-        quarantineCenter: "Central Quarantine Center - Nagpur",
-        quarantineCenterPhoto: "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=500&auto=format",
-        quarantineHealthRecord: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-        finalHealthClearance: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-
-        handoverOfficer: "Priya Sharma",
-        beneficiaryId: "BEN001",
-        beneficiaryLocation: "Village Development Office, Pune",
-        handoverPhoto: "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=500&auto=format",
-        handoverDate: "2024-03-20",
-        handoverTime: "14:30",
-        handoverDocument: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-
-        remarks: "Animal is healthy and ready for distribution. All documentation complete.",
-        createdAt: "2024-03-15T10:30:00Z",
-        updatedAt: "2024-03-20T14:45:00Z",
-        createdBy: "Admin User"
-      };
-
-      setProcurement(mockProcurement);
+      if (response.data.success) {
+        const transformedData = transformProcurementData(response.data.data);
+        setProcurement(transformedData);
+      } else {
+        toast.error(response.data.message || "Failed to fetch procurement details");
+      }
     } catch (error) {
       console.error('Error fetching procurement:', error);
-      toast.error("Failed to fetch procurement details");
+      toast.error(error.response?.data?.message || "Failed to fetch procurement details");
     } finally {
       setLoading(false);
     }
@@ -138,14 +169,16 @@ const ProcurementView = () => {
     navigate(-1);
   };
 
-  const openImageModal = (imageUrl, title) => {
-    if (!imageUrl) return;
+  const openImageModal = (imagePath, title) => {
+    if (!imagePath) return;
+    const imageUrl = getFileUrl(imagePath);
     setSelectedImage({ url: imageUrl, title });
     setShowImageModal(true);
   };
 
-  const openDocumentModal = (documentUrl, title) => {
-    if (!documentUrl) return;
+  const openDocumentModal = (documentPath, title) => {
+    if (!documentPath) return;
+    const documentUrl = getFileUrl(documentPath);
     setSelectedDocument({ url: documentUrl, title });
     setShowDocumentModal(true);
   };
@@ -158,7 +191,7 @@ const ProcurementView = () => {
 
   const isPDFFile = (url) => {
     if (!url) return false;
-    return url.toLowerCase().includes('.pdf');
+    return url.toLowerCase().includes('.pdf') || url.toLowerCase().endsWith('.pdf');
   };
 
   const getDiseaseStatus = (hasDisease) => {
@@ -173,6 +206,20 @@ const ProcurementView = () => {
         Not Detected
       </span>
     );
+  };
+
+    const formatTime = (timeStr) => {
+    if (!timeStr) return "";
+
+    const [hours, minutes] = timeStr.split(":");
+    const date = new Date();
+    date.setHours(hours, minutes);
+
+    return date.toLocaleTimeString([], {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
   };
 
   if (loading) {
@@ -301,80 +348,70 @@ const ProcurementView = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <ProcurementPDFDownload 
-            procurement={procurement} 
-            downloading={downloading} 
-            setDownloading={setDownloading} 
+          <ProcurementPDFDownload
+            procurement={procurement}
+            downloading={downloading}
+            setDownloading={setDownloading}
           />
-          <ProcurementExcelDownload 
-            procurement={procurement} 
-            downloading={downloading} 
-            setDownloading={setDownloading} 
+          <ProcurementExcelDownload
+            procurement={procurement}
+            downloading={downloading}
+            setDownloading={setDownloading}
           />
         </div>
       </div>
 
-      {/* Tabs */}
+      {/* Tabs - Always show all tabs with "N/A" data */}
       <div className="border-b border-gray-200">
         <nav className="flex space-x-2 overflow-x-auto">
           <button
             onClick={() => setActiveTab("source")}
-            className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-              activeTab === "source"
-                ? "border-primary-500 text-primary-600"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-            }`}
+            className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === "source"
+              ? "border-primary-500 text-primary-600"
+              : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              }`}
           >
             <div className="flex items-center gap-2">
               <ClipboardList size={18} />
               Source & Animal
             </div>
           </button>
-          {procurement.vehicleNo && (
-            <button
-              onClick={() => setActiveTab("logistics")}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                activeTab === "logistics"
-                  ? "border-primary-500 text-primary-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+          <button
+            onClick={() => setActiveTab("logistics")}
+            className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === "logistics"
+              ? "border-primary-500 text-primary-600"
+              : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
               }`}
-            >
-              <div className="flex items-center gap-2">
-                <TruckIcon2 size={18} />
-                Logistics
-              </div>
-            </button>
-          )}
-          {procurement.quarantineCenter && (
-            <button
-              onClick={() => setActiveTab("quarantine")}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                activeTab === "quarantine"
-                  ? "border-primary-500 text-primary-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+          >
+            <div className="flex items-center gap-2">
+              <TruckIcon2 size={18} />
+              Logistics
+            </div>
+          </button>
+          <button
+            onClick={() => setActiveTab("quarantine")}
+            className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === "quarantine"
+              ? "border-primary-500 text-primary-600"
+              : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
               }`}
-            >
-              <div className="flex items-center gap-2">
-                <HomeIcon size={18} />
-                Quarantine
-              </div>
-            </button>
-          )}
-          {procurement.handoverOfficer && (
-            <button
-              onClick={() => setActiveTab("handover")}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                activeTab === "handover"
-                  ? "border-primary-500 text-primary-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+          >
+            <div className="flex items-center gap-2">
+              <HomeIcon size={18} />
+              Quarantine
+            </div>
+          </button>
+          <button
+            onClick={() => setActiveTab("handover")}
+            className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === "handover"
+              ? "border-primary-500 text-primary-600"
+              : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
               }`}
-            >
-              <div className="flex items-center gap-2">
-                <Hand size={18} />
-                Handover
-              </div>
-            </button>
-          )}
+          >
+            <div className="flex items-center gap-2">
+              <Hand size={18} />
+              Handover
+            </div>
+          </button>
         </nav>
       </div>
 
@@ -385,63 +422,57 @@ const ProcurementView = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <DetailRow
                 label="Procurement Officer"
-                value={formatValue(procurement.procurementOfficer)}
+                value={procurement.procurementOfficer}
                 icon={<User size={16} className="text-gray-400" />}
               />
               <DetailRow
                 label="Source Type"
-                value={procurement.sourceType === 'bazaar' ? 'Bazaar' : 'Farm'}
+                value={procurement.sourceType}
                 icon={<MapPin size={16} className="text-gray-400" />}
               />
               <DetailRow
                 label="Source Location"
-                value={formatValue(procurement.sourceLocation)}
+                value={procurement.sourceLocation}
                 icon={<Map size={16} className="text-gray-400" />}
               />
               <DetailRow
                 label="Visit Date"
-                value={procurement.visitDate ? formatDate(procurement.visitDate) : 'Not provided'}
+                value={procurement.visitDate ? formatDate(procurement.visitDate) : 'N/A'}
                 icon={<CalendarIcon size={16} className="text-gray-400" />}
               />
               <DetailRow
                 label="Visit Time"
-                value={formatValue(procurement.visitTime)}
+                value={formatTime(procurement.visitTime) || 'N/A'}
                 icon={<ClockIcon size={16} className="text-gray-400" />}
               />
             </div>
           </DetailSection>
 
-          {(procurement.breederName || procurement.breederContact) && (
-            <DetailSection title="Breeder Information" icon={<User size={20} />}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {procurement.breederName && (
-                  <DetailRow
-                    label="Breeder Name"
-                    value={formatValue(procurement.breederName)}
-                    icon={<UserCheck size={16} className="text-gray-400" />}
-                  />
-                )}
-                {procurement.breederContact && (
-                  <DetailRow
-                    label="Contact Number"
-                    value={formatValue(procurement.breederContact)}
-                    icon={<Phone size={16} className="text-gray-400" />}
-                  />
-                )}
-              </div>
-            </DetailSection>
-          )}
+          <DetailSection title="Breeder Information" icon={<User size={20} />}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <DetailRow
+                label="Breeder Name"
+                value={procurement.breederName}
+                icon={<UserCheck size={16} className="text-gray-400" />}
+              />
+              <DetailRow
+                label="Contact Number"
+                value={procurement.breederContact}
+                icon={<Phone size={16} className="text-gray-400" />}
+              />
+            </div>
+          </DetailSection>
 
           <DetailSection title="Animal Details" icon={<GiCow size={20} />}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <DetailRow
                 label="Tag ID"
-                value={formatValue(procurement.tagId)}
+                value={procurement.tagId}
                 icon={<FaIdCard size={16} className="text-gray-400" />}
               />
               <DetailRow
                 label="Breed"
-                value={formatValue(procurement.breed)}
+                value={procurement.breed}
                 icon={<GiCow size={16} className="text-gray-400" />}
               />
               <DetailRow
@@ -451,7 +482,7 @@ const ProcurementView = () => {
               />
               <DetailRow
                 label="Milking Capacity"
-                value={procurement.milkingCapacity ? `${procurement.milkingCapacity} L/day` : 'Not provided'}
+                value={procurement.milkingCapacity ? `${procurement.milkingCapacity} L/day` : 'N/A'}
                 icon={<Activity size={16} className="text-gray-400" />}
               />
               <DetailRow
@@ -461,16 +492,14 @@ const ProcurementView = () => {
               />
             </div>
 
-            {procurement.physicalCheck && (
-              <div className="mt-4">
-                <DetailRow
-                  label="Physical Check Notes"
-                  value={procurement.physicalCheck}
-                  fullWidth
-                  icon={<Stethoscope size={16} className="text-gray-400" />}
-                />
-              </div>
-            )}
+            <div className="mt-4">
+              <DetailRow
+                label="Physical Check Notes"
+                value={procurement.physicalCheck}
+                fullWidth
+                icon={<Stethoscope size={16} className="text-gray-400" />}
+              />
+            </div>
 
             <div className="mt-4">
               <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-2 flex items-center gap-2">
@@ -500,21 +529,24 @@ const ProcurementView = () => {
                 <Camera size={14} />
                 Animal Photos
               </label>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-4">
                 <ImageCard
                   image={procurement.animalPhotoFront}
                   title="Front View"
                   onClick={() => openImageModal(procurement.animalPhotoFront, "Front View")}
+                  getFileUrl={getFileUrl}
                 />
                 <ImageCard
                   image={procurement.animalPhotoSide}
                   title="Side View"
                   onClick={() => openImageModal(procurement.animalPhotoSide, "Side View")}
+                  getFileUrl={getFileUrl}
                 />
                 <ImageCard
                   image={procurement.animalPhotoRear}
                   title="Rear View"
                   onClick={() => openImageModal(procurement.animalPhotoRear, "Rear View")}
+                  getFileUrl={getFileUrl}
                 />
               </div>
             </div>
@@ -527,57 +559,48 @@ const ProcurementView = () => {
                 title="Health Record"
                 type="pdf"
                 onClick={() => openDocumentModal(procurement.healthRecord, "Health Record")}
+                getFileUrl={getFileUrl}
               />
             ) : (
-              <EmptyDocumentCard title="No Health Record Available" />
+              <EmptyDocumentCard title="Health Record (Not Available)" />
             )}
           </DetailSection>
         </div>
       )}
 
-      {activeTab === "logistics" && procurement.vehicleNo && (
+      {activeTab === "logistics" && (
         <DetailSection title="Logistic & Transit Details" icon={<TruckIcon2 size={20} />}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <DetailRow
               label="Vehicle Number"
-              value={formatValue(procurement.vehicleNo)}
+              value={procurement.vehicleNo}
               icon={<Car size={16} className="text-gray-400" />}
             />
-            {procurement.driverName && (
-              <DetailRow
-                label="Driver Name"
-                value={formatValue(procurement.driverName)}
-                icon={<User size={16} className="text-gray-400" />}
-              />
-            )}
-            {procurement.driverDesignation && (
-              <DetailRow
-                label="Designation"
-                value={formatValue(procurement.driverDesignation)}
-                icon={<Award size={16} className="text-gray-400" />}
-              />
-            )}
-            {procurement.driverMobile && (
-              <DetailRow
-                label="Mobile Number"
-                value={formatValue(procurement.driverMobile)}
-                icon={<Phone size={16} className="text-gray-400" />}
-              />
-            )}
-            {procurement.driverAadhar && (
-              <DetailRow
-                label="Aadhar Number"
-                value={formatValue(procurement.driverAadhar)}
-                icon={<CreditCard size={16} className="text-gray-400" />}
-              />
-            )}
-            {procurement.drivingLicense && (
-              <DetailRow
-                label="Driving License"
-                value={formatValue(procurement.drivingLicense)}
-                icon={<FileCheck size={16} className="text-gray-400" />}
-              />
-            )}
+            <DetailRow
+              label="Driver Name"
+              value={procurement.driverName}
+              icon={<User size={16} className="text-gray-400" />}
+            />
+            <DetailRow
+              label="Designation"
+              value={procurement.driverDesignation}
+              icon={<Award size={16} className="text-gray-400" />}
+            />
+            <DetailRow
+              label="Mobile Number"
+              value={procurement.driverMobile}
+              icon={<Phone size={16} className="text-gray-400" />}
+            />
+            <DetailRow
+              label="Aadhar Number"
+              value={procurement.driverAadhar}
+              icon={<CreditCard size={16} className="text-gray-400" />}
+            />
+            <DetailRow
+              label="Driving License"
+              value={procurement.drivingLicense}
+              icon={<FileCheck size={16} className="text-gray-400" />}
+            />
           </div>
 
           <div className="mt-6">
@@ -591,20 +614,21 @@ const ProcurementView = () => {
                 title="Driving License Certificate"
                 type="pdf"
                 onClick={() => openDocumentModal(procurement.licenseCertificate, "Driving License Certificate")}
+                getFileUrl={getFileUrl}
               />
             ) : (
-              <EmptyDocumentCard title="No License Certificate Available" />
+              <EmptyDocumentCard title="License Certificate (Not Available)" />
             )}
           </div>
         </DetailSection>
       )}
 
-      {activeTab === "quarantine" && procurement.quarantineCenter && (
+      {activeTab === "quarantine" && (
         <DetailSection title="Quarantine & Care Details" icon={<HomeIcon size={20} />}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <DetailRow
               label="Quarantine Center"
-              value={formatValue(procurement.quarantineCenter)}
+              value={procurement.quarantineCenter}
               icon={<Building2 size={16} className="text-gray-400" />}
             />
           </div>
@@ -614,11 +638,14 @@ const ProcurementView = () => {
               <Camera size={14} />
               Quarantine Center Photo
             </label>
-            <ImageCard
-              image={procurement.quarantineCenterPhoto}
-              title="Quarantine Center"
-              onClick={() => openImageModal(procurement.quarantineCenterPhoto, "Quarantine Center")}
-            />
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-3">
+              <ImageCard
+                image={procurement.quarantineCenterPhoto}
+                title="Quarantine Center"
+                onClick={() => openImageModal(procurement.quarantineCenterPhoto, "Quarantine Center")}
+                getFileUrl={getFileUrl}
+              />
+            </div>
           </div>
 
           <div className="mt-6">
@@ -633,9 +660,10 @@ const ProcurementView = () => {
                   title="Health Record"
                   type="pdf"
                   onClick={() => openDocumentModal(procurement.quarantineHealthRecord, "Quarantine Health Record")}
+                  getFileUrl={getFileUrl}
                 />
               ) : (
-                <EmptyDocumentCard title="No Health Record Available" />
+                <EmptyDocumentCard title="Health Record (Not Available)" />
               )}
               {procurement.finalHealthClearance ? (
                 <DocumentCard
@@ -643,51 +671,44 @@ const ProcurementView = () => {
                   title="Final Health Clearance"
                   type="pdf"
                   onClick={() => openDocumentModal(procurement.finalHealthClearance, "Final Health Clearance")}
+                  getFileUrl={getFileUrl}
                 />
               ) : (
-                <EmptyDocumentCard title="No Final Clearance Available" />
+                <EmptyDocumentCard title="Final Health Clearance (Not Available)" />
               )}
             </div>
           </div>
         </DetailSection>
       )}
 
-      {activeTab === "handover" && procurement.handoverOfficer && (
+      {activeTab === "handover" && (
         <DetailSection title="Handover Details" icon={<Hand size={20} />}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <DetailRow
               label="Handover Officer"
-              value={formatValue(procurement.handoverOfficer)}
+              value={procurement.handoverOfficer}
               icon={<UserCheck size={16} className="text-gray-400" />}
             />
-            {procurement.beneficiaryId && (
-              <DetailRow
-                label="Beneficiary ID"
-                value={formatValue(procurement.beneficiaryId)}
-                icon={<FaIdCard size={16} className="text-gray-400" />}
-              />
-            )}
-            {procurement.beneficiaryLocation && (
-              <DetailRow
-                label="Beneficiary Location"
-                value={formatValue(procurement.beneficiaryLocation)}
-                icon={<MapPin size={16} className="text-gray-400" />}
-              />
-            )}
-            {procurement.handoverDate && (
-              <DetailRow
-                label="Handover Date"
-                value={procurement.handoverDate ? formatDate(procurement.handoverDate) : 'Not provided'}
-                icon={<CalendarIcon size={16} className="text-gray-400" />}
-              />
-            )}
-            {procurement.handoverTime && (
-              <DetailRow
-                label="Handover Time"
-                value={formatValue(procurement.handoverTime)}
-                icon={<ClockIcon size={16} className="text-gray-400" />}
-              />
-            )}
+            <DetailRow
+              label="Beneficiary ID"
+              value={procurement.beneficiaryId}
+              icon={<FaIdCard size={16} className="text-gray-400" />}
+            />
+            <DetailRow
+              label="Beneficiary Location"
+              value={procurement.beneficiaryLocation}
+              icon={<MapPin size={16} className="text-gray-400" />}
+            />
+            <DetailRow
+              label="Handover Date"
+              value={procurement.handoverDate ? formatDate(procurement.handoverDate) : 'N/A'}
+              icon={<CalendarIcon size={16} className="text-gray-400" />}
+            />
+            <DetailRow
+              label="Handover Time"
+              value={procurement.handoverTime || 'N/A'}
+              icon={<ClockIcon size={16} className="text-gray-400" />}
+            />
           </div>
 
           <div className="mt-6">
@@ -695,11 +716,14 @@ const ProcurementView = () => {
               <Camera size={14} />
               Handover Photo
             </label>
-            <ImageCard
-              image={procurement.handoverPhoto}
-              title="Handover with Beneficiary"
-              onClick={() => openImageModal(procurement.handoverPhoto, "Handover with Beneficiary")}
-            />
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-3">
+              <ImageCard
+                image={procurement.handoverPhoto}
+                title="Handover with Beneficiary"
+                onClick={() => openImageModal(procurement.handoverPhoto, "Handover with Beneficiary")}
+                getFileUrl={getFileUrl}
+              />
+            </div>
           </div>
 
           <div className="mt-6">
@@ -713,9 +737,10 @@ const ProcurementView = () => {
                 title="Handover Document"
                 type="pdf"
                 onClick={() => openDocumentModal(procurement.handoverDocument, "Handover Document")}
+                getFileUrl={getFileUrl}
               />
             ) : (
-              <EmptyDocumentCard title="No Handover Document Available" />
+              <EmptyDocumentCard title="Handover Document (Not Available)" />
             )}
           </div>
         </DetailSection>
@@ -749,7 +774,7 @@ const ProcurementView = () => {
         <div className="flex items-center gap-2">
           <User size={14} className="text-gray-400" />
           <span>
-            <span className="font-medium">Created By:</span> {procurement.createdBy || 'Not provided'}
+            <span className="font-medium">Created By:</span> {procurement.createdBy}
           </span>
         </div>
       </div>
@@ -779,15 +804,16 @@ const DetailRow = ({ label, value, fullWidth = false, icon }) => (
       {label}
     </label>
     <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-sm text-gray-800 break-words">
-      {value || "Not provided"}
+      {value || "N/A"}
     </div>
   </div>
 );
 
-const ImageCard = ({ image, title, onClick }) => {
+const ImageCard = ({ image, title, onClick, getFileUrl }) => {
   const [imageError, setImageError] = useState(false);
+  const imageUrl = image ? getFileUrl(image) : null;
 
-  if (!image) {
+  if (!image || !imageUrl) {
     return (
       <div className="relative rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
         <div className="w-full h-32 flex flex-col items-center justify-center">
@@ -805,7 +831,7 @@ const ImageCard = ({ image, title, onClick }) => {
     >
       {!imageError ? (
         <img
-          src={image}
+          src={imageUrl}
           alt={title}
           className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
           onError={() => setImageError(true)}
@@ -826,13 +852,15 @@ const ImageCard = ({ image, title, onClick }) => {
   );
 };
 
-const DocumentCard = ({ document, title, type = 'pdf', onClick }) => {
-  if (!document) {
+const DocumentCard = ({ document, title, type = 'pdf', onClick, getFileUrl }) => {
+  const documentUrl = document ? getFileUrl(document) : null;
+
+  if (!document || !documentUrl) {
     return (
       <div className="flex items-center p-3 border border-gray-200 rounded-lg bg-gray-50">
         <FileText className="text-gray-400 mr-3 flex-shrink-0" size={24} />
         <div className="flex-1 min-w-0">
-          <p className="text-sm text-gray-500 truncate">{title} (Not Available)</p>
+          <p className="text-sm text-gray-500 truncate">{title}</p>
         </div>
       </div>
     );

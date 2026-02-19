@@ -1,7 +1,7 @@
 // pages/procurement/ProcurementList.jsx
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
+import {
   Plus, Eye, Pencil, Trash2, Search, Filter, X,
   Calendar, User, Truck, Home, CheckCircle,
   XCircle, Clock, FileText, ChevronLeft, ChevronRight,
@@ -13,12 +13,13 @@ import { HiOutlineTrash } from 'react-icons/hi';
 import { toast } from 'react-hot-toast';
 import DataTable from '../../components/common/Table/DataTable';
 import { PATHROUTES } from '../../routes/pathRoutes';
+import api from '../../services/api/api';
 
 const ProcurementList = () => {
   const navigate = useNavigate();
   const [procurements, setProcurements] = useState([]);
   const [filteredProcurements, setFilteredProcurements] = useState([]);
-  
+
   // Search state
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -40,7 +41,8 @@ const ProcurementList = () => {
   // Delete modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
-  const [deleteId, setDeleteId] = useState(null);
+  const [deleteIds, setDeleteIds] = useState([]);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Sorting state
   const [sortConfig, setSortConfig] = useState({
@@ -53,152 +55,8 @@ const ProcurementList = () => {
     currentPage: 1,
     totalPages: 1,
     totalRecords: 0,
-    limit: 10
+    limit: 20
   });
-
-  // Mock Data updated to match form fields
-  const MOCK_PROCUREMENTS = [
-    {
-      id: 1,
-      animalId: "ANM001", // New field
-      tagId: "TAG-001",
-      procurementOfficer: "Rajesh Kumar",
-      sourceType: "Farm",
-      sourceLocation: "Green Valley Farm, Pune",
-      visitDate: "2024-03-15",
-      visitTime: "10:30",
-      breederName: "Suresh Patil",
-      breederContact: "9876543211",
-      breed: "Gir",
-      ageYears: "5",
-      ageMonths: "6",
-      milkingCapacity: "12",
-      isCalfIncluded: "no",
-      physicalCheck: "Healthy, active",
-      fmdDisease: false,
-      lsdDisease: false,
-      vehicleNo: "MH31AB1234",
-      driverName: "Ramesh Kumar",
-      driverMobile: "9876543210",
-      quarantineCenter: "Central Quarantine Center - Nagpur",
-      handoverOfficer: "Priya Sharma",
-      beneficiaryId: "BEN001",
-      status: "Completed",
-      createdAt: "2024-03-15T10:30:00Z"
-    },
-    {
-      id: 2,
-      animalId: "ANM002",
-      tagId: "TAG-002",
-      procurementOfficer: "Priya Sharma",
-      sourceType: "Bazaar",
-      sourceLocation: "Animal Market, Nagpur",
-      visitDate: "2024-03-14",
-      visitTime: "09:15",
-      breederName: "Mohan Singh",
-      breederContact: "8765432112",
-      breed: "Sahiwal",
-      ageYears: "3",
-      ageMonths: "0",
-      milkingCapacity: "8",
-      isCalfIncluded: "yes",
-      physicalCheck: "Good condition",
-      fmdDisease: false,
-      lsdDisease: false,
-      vehicleNo: "MH31CD5678",
-      driverName: "Suresh Yadav",
-      driverMobile: "8765432109",
-      quarantineCenter: "District Quarantine Facility - Pune",
-      handoverOfficer: "Amit Patel",
-      beneficiaryId: "BEN002",
-      status: "In Transit",
-      createdAt: "2024-03-14T09:15:00Z"
-    },
-    {
-      id: 3,
-      animalId: "ANM003",
-      tagId: "TAG-003",
-      procurementOfficer: "Amit Patel",
-      sourceType: "Farm",
-      sourceLocation: "Dairy Farm, Ahmednagar",
-      visitDate: "2024-03-13",
-      visitTime: "14:45",
-      breederName: "Rajendra Yadav",
-      breederContact: "7654321123",
-      breed: "Jersey",
-      ageYears: "4",
-      ageMonths: "2",
-      milkingCapacity: "10",
-      isCalfIncluded: "no",
-      physicalCheck: "Healthy",
-      fmdDisease: false,
-      lsdDisease: false,
-      vehicleNo: "MH31EF9012",
-      driverName: "Vikram Singh",
-      driverMobile: "7654321098",
-      quarantineCenter: "Regional Animal Care Center - Mumbai",
-      handoverOfficer: "Sunita Reddy",
-      beneficiaryId: "BEN003",
-      status: "Completed",
-      createdAt: "2024-03-13T14:45:00Z"
-    },
-    {
-      id: 4,
-      animalId: "ANM004",
-      tagId: "TAG-004",
-      procurementOfficer: "Sunita Reddy",
-      sourceType: "Bazaar",
-      sourceLocation: "Livestock Market, Aurangabad",
-      visitDate: "2024-03-12",
-      visitTime: "11:30",
-      breederName: "Kavita Deshmukh",
-      breederContact: "6543211234",
-      breed: "Murrah",
-      ageYears: "6",
-      ageMonths: "0",
-      milkingCapacity: "15",
-      isCalfIncluded: "no",
-      physicalCheck: "Good",
-      fmdDisease: false,
-      lsdDisease: false,
-      vehicleNo: "MH31GH3456",
-      driverName: "Rajesh Patil",
-      driverMobile: "6543210987",
-      quarantineCenter: "Central Quarantine Center - Nagpur",
-      handoverOfficer: "Vikram Singh",
-      beneficiaryId: "BEN004",
-      status: "Pending",
-      createdAt: "2024-03-12T11:30:00Z"
-    },
-    {
-      id: 5,
-      animalId: "ANM005",
-      tagId: "TAG-005",
-      procurementOfficer: "Vikram Singh",
-      sourceType: "Farm",
-      sourceLocation: "Organic Dairy, Nashik",
-      visitDate: "2024-03-11",
-      visitTime: "16:20",
-      breederName: "Harish Chavan",
-      breederContact: "5432109877",
-      breed: "Holstein Friesian",
-      ageYears: "3",
-      ageMonths: "6",
-      milkingCapacity: "18",
-      isCalfIncluded: "yes",
-      physicalCheck: "Excellent",
-      fmdDisease: false,
-      lsdDisease: false,
-      vehicleNo: "MH31IJ7890",
-      driverName: "Mohan Kumar",
-      driverMobile: "5432109876",
-      quarantineCenter: "Rural Quarantine Unit - Aurangabad",
-      handoverOfficer: "Rajesh Kumar",
-      beneficiaryId: "BEN005",
-      status: "Completed",
-      createdAt: "2024-03-11T16:20:00Z"
-    }
-  ];
 
   // Initialize tempFilters when component mounts
   useEffect(() => {
@@ -208,35 +66,10 @@ const ProcurementList = () => {
     setAppliedFilters(filters);
   }, [filters]);
 
-  // Load procurements
+  // Load procurements on mount and when dependencies change
   useEffect(() => {
     loadProcurements();
-  }, []);
-
-  const loadProcurements = async () => {
-    setLoading(true);
-    try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 800));
-
-      setProcurements(MOCK_PROCUREMENTS);
-      setFilteredProcurements(MOCK_PROCUREMENTS);
-
-      setPagination(prev => ({
-        ...prev,
-        totalRecords: MOCK_PROCUREMENTS.length,
-        totalPages: Math.ceil(MOCK_PROCUREMENTS.length / prev.limit)
-      }));
-
-    } catch (error) {
-      console.error('Error loading procurements:', error);
-      toast.error("Failed to fetch procurements");
-      setProcurements([]);
-      setFilteredProcurements([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [pagination.currentPage, pagination.limit, searchTerm, filters]);
 
   // Debounce search
   useEffect(() => {
@@ -256,73 +89,99 @@ const ProcurementList = () => {
     };
   }, [searchInput]);
 
-  // Apply filters function
-  const applyFilters = useCallback((filterValues) => {
-    let filtered = [...MOCK_PROCUREMENTS];
+  // Transform API response to match your frontend data structure
+  const transformApiResponse = (apiData) => {
+    return apiData.map(item => {
+      // Get the first animal from procured_animal array
+      const animal = item.procured_animal && item.procured_animal[0] ? item.procured_animal[0] : {};
+      // Get the first logistic record
+      const logistic = item.logistic && item.logistic[0] ? item.logistic[0] : {};
+      // Get the first quarantine center record
+      const quarantine = item.quarantine_center && item.quarantine_center[0] ? item.quarantine_center[0] : {};
+      // Get the first handover record
+      const handover = item.handover && item.handover[0] ? item.handover[0] : {};
 
-    // Apply search filter
-    if (searchTerm) {
-      const searchLower = searchTerm.toLowerCase();
-      filtered = filtered.filter(proc =>
-        proc.animalId?.toLowerCase().includes(searchLower) ||
-        proc.tagId?.toLowerCase().includes(searchLower) ||
-        proc.procurementOfficer?.toLowerCase().includes(searchLower) ||
-        proc.breederName?.toLowerCase().includes(searchLower) ||
-        proc.sourceLocation?.toLowerCase().includes(searchLower)
-      );
-    }
+      return {
+        id: item.uid, // Use uid as unique identifier
+        animalId: item.uid,
+        tagId: animal.tagId || "N/A",
+        procurementOfficer: item.users ? `${item.users.firstName} ${item.users.lastName}` : "N/A",
+        officerId: item.procurementOfficer,
+        sourceType: item.sourceType || "N/A",
+        sourceLocation: item.sourceLocation || "N/A",
+        visitDate: item.visitDate,
+        visitTime: item.visitTime,
+        breederName: item.breederName || "N/A",
+        breederContact: item.breederContact || "N/A",
+        breed: animal.breed || "N/A",
+        ageYears: animal.ageYears,
+        ageMonths: animal.ageMonths,
+        milkingCapacity: animal.milkingCapacity,
+        isCalfIncluded: animal.isCalfIncluded ? "yes" : "no",
+        physicalCheck: animal.physicalCheck || "N/A",
+        fmdDisease: animal.fmdDisease || false,
+        lsdDisease: animal.lsdDisease || false,
+        vehicleNo: logistic.vehicleNo || "N/A",
+        driverName: logistic.driverName || "N/A",
+        driverMobile: logistic.driverMobile || "N/A",
+        quarantineCenter: quarantine.quarantineCenter || "N/A",
+        handoverOfficer: handover.handoverOfficer,
+        beneficiaryId: handover.beneficiaryId,
+        createdAt: item.createdAt,
+        // Store minimal data for view navigation - we'll fetch full details in view page
+        uid: item.uid
+      };
+    });
+  };
 
-    // Apply status filter
-    if (filterValues.status) {
-      filtered = filtered.filter(proc => proc.status === filterValues.status);
-    }
-
-    // Apply source type filter
-    if (filterValues.sourceType) {
-      filtered = filtered.filter(proc => proc.sourceType === filterValues.sourceType);
-    }
-
-    // Apply breed filter
-    if (filterValues.breed) {
-      filtered = filtered.filter(proc => proc.breed === filterValues.breed);
-    }
-
-    // Apply date range filter
-    if (filterValues.fromDate || filterValues.toDate) {
-      filtered = filtered.filter(proc => {
-        const procDate = new Date(proc.visitDate);
-
-        if (filterValues.fromDate) {
-          const fromDate = new Date(filterValues.fromDate);
-          fromDate.setHours(0, 0, 0, 0);
-          if (procDate < fromDate) return false;
-        }
-
-        if (filterValues.toDate) {
-          const toDate = new Date(filterValues.toDate);
-          toDate.setHours(23, 59, 59, 999);
-          if (procDate > toDate) return false;
-        }
-
-        return true;
+  // Load procurements from API
+  const loadProcurements = async () => {
+    setLoading(true);
+    try {
+      // Build query parameters
+      const params = new URLSearchParams({
+        page: pagination.currentPage,
+        limit: pagination.limit,
+        search: searchTerm || ""
       });
+
+      // Add filter parameters if they exist
+      if (filters.sourceType) params.append('sourceType', filters.sourceType);
+      if (filters.breed) params.append('breed', filters.breed);
+      if (filters.fromDate) params.append('fromDate', filters.fromDate);
+      if (filters.toDate) params.append('toDate', filters.toDate);
+
+      const response = await api.get(`/admin/procured-animal?${params.toString()}`);
+
+      if (response.data.success) {
+        const transformedData = transformApiResponse(response.data.data);
+        setProcurements(transformedData);
+        setFilteredProcurements(transformedData);
+
+        // Update pagination from API response
+        if (response.data.pagination) {
+          setPagination({
+            currentPage: response.data.pagination.currentPage,
+            totalPages: response.data.pagination.totalPages,
+            totalRecords: response.data.pagination.totalRecords,
+            limit: response.data.pagination.limit
+          });
+        }
+
+        // Clear selections after successful load
+        setSelectedProcurements(new Set());
+      } else {
+        toast.error(response.data.message || "Failed to fetch procurements");
+      }
+    } catch (error) {
+      console.error('Error loading procurements:', error);
+      toast.error(error.response?.data?.message || "Failed to fetch procurements");
+      setProcurements([]);
+      setFilteredProcurements([]);
+    } finally {
+      setLoading(false);
     }
-
-    setFilteredProcurements(filtered);
-
-    setPagination(prev => ({
-      ...prev,
-      currentPage: 1,
-      totalRecords: filtered.length,
-      totalPages: Math.ceil(filtered.length / prev.limit)
-    }));
-
-  }, [searchTerm]);
-
-  // Fetch when search term changes
-  useEffect(() => {
-    applyFilters(filters);
-  }, [searchTerm, filters, applyFilters]);
+  };
 
   // Handle filter changes
   const handleFilterChange = (key, value) => {
@@ -338,29 +197,22 @@ const ProcurementList = () => {
       }
     });
 
-    setFilters(tempFilters);
-    applyFilters(tempFilters);
-    setAppliedFilters(tempFilters);
+    setFilters(filtersToApply);
+    setAppliedFilters(filtersToApply);
+    setPagination(prev => ({ ...prev, currentPage: 1 })); // Reset to first page
 
-    const hasAppliedFilters = Object.keys(tempFilters).some(key => tempFilters[key] !== "");
+    const hasAppliedFilters = Object.keys(filtersToApply).length > 0;
     setIsFilterApplied(hasAppliedFilters);
-
     setShowFilters(false);
   };
 
   const handleClearFilters = () => {
-    const emptyFilters = {
-      status: "",
-      sourceType: "",
-      breed: "",
-      fromDate: "",
-      toDate: ""
-    };
+    const emptyFilters = {};
     setTempFilters(emptyFilters);
     setFilters(emptyFilters);
     setAppliedFilters({});
     setIsFilterApplied(false);
-    applyFilters(emptyFilters);
+    setPagination(prev => ({ ...prev, currentPage: 1 }));
     setShowFilters(false);
   };
 
@@ -378,7 +230,7 @@ const ProcurementList = () => {
   const handleClearSearch = () => {
     setSearchInput("");
     setSearchTerm("");
-    applyFilters(filters);
+    setPagination(prev => ({ ...prev, currentPage: 1 }));
   };
 
   // Sorting
@@ -433,26 +285,21 @@ const ProcurementList = () => {
     [sortConfig]
   );
 
-  // Get status badge
-  const getStatusBadge = (status) => {
-    const statusConfig = {
-      'Completed': { color: 'bg-green-100 text-green-800', icon: CheckCircle },
-      'In Transit': { color: 'bg-primary-100 text-primary-800', icon: Truck },
-      'Pending': { color: 'bg-gray-100 text-gray-800', icon: Clock }
-    };
-    
-    const config = statusConfig[status] || statusConfig['Pending'];
-    const Icon = config.icon;
-    
-    return (
-      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${config.color}`}>
-        <Icon className="mr-1" size={12} />
-        {status}
-      </span>
-    );
+  const formatTime = (timeStr) => {
+    if (!timeStr) return "";
+
+    const [hours, minutes] = timeStr.split(":");
+    const date = new Date();
+    date.setHours(hours, minutes);
+
+    return date.toLocaleTimeString([], {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
   };
 
-  // Table columns - Updated with 7 columns as requested
+  // Table columns
   const columns = useMemo(() => [
     {
       key: "animalId",
@@ -519,13 +366,13 @@ const ProcurementList = () => {
             <Calendar size={14} className="text-gray-400" />
             <div>
               <div className="text-sm text-gray-900">
-                {date.toLocaleDateString('en-US', { 
-                  day: '2-digit', 
-                  month: '2-digit', 
-                  year: 'numeric' 
+                {date.toLocaleDateString('en-US', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric'
                 })}
               </div>
-              <div className="text-xs text-gray-500">{item.visitTime}</div>
+              <div className="text-xs text-gray-500">{formatTime(item.visitTime)}</div>
             </div>
           </div>
         );
@@ -542,6 +389,16 @@ const ProcurementList = () => {
           <Tag size={14} className="text-gray-400" />
           <span className="text-sm text-gray-900">{item.breed}</span>
         </div>
+      )
+    },
+    {
+      key: "sourceType",
+      label: "Source Type",
+      sortable: true,
+      onSort: () => requestSort('sourceType'),
+      sortIcon: getSortIcon('sourceType'),
+      render: (item) => (
+        <span className="text-sm text-gray-900">{item.sourceType}</span>
       )
     }
   ], [getSortIcon, requestSort]);
@@ -569,20 +426,17 @@ const ProcurementList = () => {
     }
   };
 
-  // Refactored Edit Handler
+  // Edit Handler
   const handleEdit = (procurement) => {
-    navigate(`/procurement/edit/${procurement.animalId}`, { state: { procurement } });
+    navigate(`/procurement/edit/${procurement.animalId}`, { state: { procurement: procurement.originalData } });
   };
 
-  // Refactored View Handler
+  // View Handler - Updated to navigate without state, we'll fetch data in view page
   const handleView = (procurement) => {
-    navigate(`${PATHROUTES.animalProcurementView}/${procurement.animalId}`, {
-      state: { procurement }
-    });
+    navigate(`${PATHROUTES.animalProcurementView}/${procurement.animalId}`);
   };
-  
 
-  // Refactored Delete Handler
+  // Delete single procurement
   const handleDelete = (id) => {
     const procurement = procurements.find(p => p.id === id);
     if (!procurement) {
@@ -590,113 +444,126 @@ const ProcurementList = () => {
       return;
     }
     setDeleteTarget("single");
-    setDeleteId(id);
+    setDeleteIds([id]);
     setShowDeleteModal(true);
   };
 
-  // Refactored Bulk Delete Handler
+  // Bulk Delete Handler
   const handleBulkDelete = (ids) => {
     if (!ids || ids.size === 0) {
       toast.error("Please select procurements to delete");
       return;
     }
     setDeleteTarget("selected");
-    setDeleteId(Array.from(ids));
+    setDeleteIds(Array.from(ids));
     setShowDeleteModal(true);
   };
 
-  // Refactored Confirm Delete Handler
+  // Confirm Delete Handler - Integrated with the delete endpoint
   const confirmDelete = async () => {
-    if (isDeleting) return;
+    if (deleteLoading || deleteIds.length === 0) return;
+
+    setDeleteLoading(true);
+    let successCount = 0;
+    let failCount = 0;
 
     try {
-      setIsDeleting(true);
-      setLoading(true);
+      // Show loading toast
+      const loadingToast = toast.loading(
+        deleteTarget === "selected"
+          ? `Deleting ${deleteIds.length} procurement(s)...`
+          : "Deleting procurement..."
+      );
 
-      if (deleteTarget === "selected") {
-        // Simulate API call for bulk delete
-        await new Promise(resolve => setTimeout(resolve, 800));
+      // Delete each procurement sequentially using the endpoint /admin/procured-animal/:uid?status=false
+      for (const uid of deleteIds) {
+        try {
+          // Make the DELETE request with status=false query parameter
+          const response = await api.delete(`/admin/procured-animal/${uid}?status=false`);
 
-        // Remove from local state
-        const idsToDelete = deleteId;
-        setProcurements(prev => prev.filter(procurement => !idsToDelete.includes(procurement.id)));
-        setFilteredProcurements(prev => prev.filter(procurement => !idsToDelete.includes(procurement.id)));
-
-        // Clear selection
-        setSelectedProcurements(new Set());
-
-        // Update pagination
-        setPagination(prev => ({
-          ...prev,
-          totalRecords: filteredProcurements.length - idsToDelete.length,
-          totalPages: Math.ceil((filteredProcurements.length - idsToDelete.length) / prev.limit)
-        }));
-
-        toast.success(`${idsToDelete.length} procurement(s) deleted successfully!`);
-
-      } else if (deleteTarget === "single" && deleteId) {
-        // Simulate API call for single delete
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        // Remove from local state
-        setProcurements(prev => prev.filter(procurement => procurement.id !== deleteId));
-        setFilteredProcurements(prev => prev.filter(procurement => procurement.id !== deleteId));
-
-        // Remove from selection if present
-        setSelectedProcurements((prev) => {
-          const newSet = new Set(prev);
-          newSet.delete(deleteId);
-          return newSet;
-        });
-
-        // Update pagination
-        setPagination(prev => ({
-          ...prev,
-          totalRecords: filteredProcurements.length - 1,
-          totalPages: Math.ceil((filteredProcurements.length - 1) / prev.limit)
-        }));
-
-        toast.success("Procurement deleted successfully!");
+          if (response.data.success) {
+            successCount++;
+          } else {
+            failCount++;
+            console.error(`Failed to delete procurement ${uid}:`, response.data.message);
+          }
+        } catch (error) {
+          failCount++;
+          console.error(`Error deleting procurement ${uid}:`, error);
+        }
       }
+
+      // Dismiss loading toast
+      toast.dismiss(loadingToast);
+
+      // Show success/failure summary
+      if (successCount > 0) {
+        if (deleteTarget === "selected") {
+          if (failCount === 0) {
+            toast.success(`Successfully deleted ${successCount} procurement(s)`);
+          } else {
+            toast.success(`Deleted ${successCount} procurement(s), ${failCount} failed`);
+          }
+        } else {
+          if (failCount === 0) {
+            toast.success("Procurement deleted successfully");
+          } else {
+            toast.error("Failed to delete procurement");
+          }
+        }
+      } else if (failCount > 0) {
+        toast.error(`Failed to delete ${failCount} procurement(s)`);
+      }
+
+      // Refresh the procurement list
+      await loadProcurements();
+
     } catch (error) {
       console.error("Error in delete operation:", error);
-      toast.error("Failed to delete procurement");
+      toast.error("An error occurred while deleting procurements");
     } finally {
+      // Reset delete modal state
       setShowDeleteModal(false);
       setDeleteTarget(null);
-      setDeleteId(null);
-      setIsDeleting(false);
-      setLoading(false);
+      setDeleteIds([]);
+      setDeleteLoading(false);
+
+      // Clear selection if bulk delete was successful or partially successful
+      if (successCount > 0) {
+        setSelectedProcurements(new Set());
+      }
     }
   };
 
+  // Handle page change
   const handlePageChange = (page) => {
     setPagination(prev => ({ ...prev, currentPage: page }));
   };
 
+  // Handle limit change
   const handleLimitChange = (newLimit) => {
     setPagination(prev => ({
       ...prev,
       limit: newLimit,
-      currentPage: 1,
-      totalPages: Math.ceil(prev.totalRecords / newLimit)
+      currentPage: 1
     }));
   };
 
+  // Get current date for date inputs
   const getCurrentDate = () => {
     return new Date().toISOString().split("T")[0];
   };
 
-  // Get unique values for filter dropdowns
+  // Get unique values for filter dropdowns from current data
   const uniqueSourceTypes = useMemo(() => {
-    const types = [...new Set(MOCK_PROCUREMENTS.map(p => p.sourceType))];
+    const types = [...new Set(procurements.map(p => p.sourceType).filter(Boolean))];
     return types.sort();
-  }, []);
+  }, [procurements]);
 
   const uniqueBreeds = useMemo(() => {
-    const breeds = [...new Set(MOCK_PROCUREMENTS.map(p => p.breed))];
+    const breeds = [...new Set(procurements.map(p => p.breed).filter(Boolean))];
     return breeds.sort();
-  }, []);
+  }, [procurements]);
 
   const totalDisplayedRecords = filteredProcurements.length;
 
@@ -737,7 +604,7 @@ const ProcurementList = () => {
               {searchTerm && (
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                   <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                    {filteredProcurements.length} found
+                    {totalDisplayedRecords} found
                   </span>
                 </div>
               )}
@@ -746,11 +613,10 @@ const ProcurementList = () => {
             {/* Filter Toggle Button */}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`px-4 py-2.5 border rounded-lg flex items-center gap-2 text-sm transition-all justify-center md:justify-start ${
-                showFilters
-                  ? "bg-gradient-to-br from-primary-500 to-primary-600 text-white border-transparent"
-                  : "border-gray-300 hover:bg-gray-50 text-gray-700"
-              }`}
+              className={`px-4 py-2.5 border rounded-lg flex items-center gap-2 text-sm transition-all justify-center md:justify-start ${showFilters
+                ? "bg-gradient-to-br from-primary-500 to-primary-600 text-white border-transparent"
+                : "border-gray-300 hover:bg-gray-50 text-gray-700"
+                }`}
             >
               <Filter className="w-4 h-4" />
               Filters
@@ -769,6 +635,7 @@ const ProcurementList = () => {
               <button
                 onClick={() => handleBulkDelete(selectedProcurements)}
                 className="px-4 py-2.5 bg-gradient-to-br from-red-500 to-red-600 text-white rounded-lg hover:shadow-md hover:opacity-90 transition-colors flex items-center gap-2 text-sm"
+                disabled={loading || deleteLoading}
               >
                 <HiOutlineTrash className="w-4 h-4" />
                 Delete ({selectedProcurements.size})
@@ -780,24 +647,7 @@ const ProcurementList = () => {
         {/* Filters Panel */}
         {showFilters && (
           <div className="mt-4 p-5 bg-primary-50/50 rounded-xl border border-primary-100">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-              {/* Status Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Status
-                </label>
-                <select
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
-                  value={tempFilters.status || ""}
-                  onChange={(e) => handleFilterChange("status", e.target.value)}
-                >
-                  <option value="">All Status</option>
-                  <option value="Pending">Pending</option>
-                  <option value="In Transit">In Transit</option>
-                  <option value="Completed">Completed</option>
-                </select>
-              </div>
-
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Source Type Filter */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -809,9 +659,8 @@ const ProcurementList = () => {
                   onChange={(e) => handleFilterChange("sourceType", e.target.value)}
                 >
                   <option value="">All Types</option>
-                  {uniqueSourceTypes.map(type => (
-                    <option key={type} value={type}>{type}</option>
-                  ))}
+                  <option value="Farm">Farm</option>
+                  <option value="Bazaar">Bazaar</option>
                 </select>
               </div>
 
@@ -826,9 +675,10 @@ const ProcurementList = () => {
                   onChange={(e) => handleFilterChange("breed", e.target.value)}
                 >
                   <option value="">All Breeds</option>
-                  {uniqueBreeds.map(breed => (
-                    <option key={breed} value={breed}>{breed}</option>
-                  ))}
+                  <option value="Gir">Gir</option>
+                  <option value="Sahiwal">Sahiwal</option>
+                  <option value="Jersey">Jersey</option>
+                  <option value="Other">Other</option>
                 </select>
               </div>
 
@@ -918,7 +768,7 @@ const ProcurementList = () => {
       <DataTable
         columns={columns}
         data={sortedProcurements}
-        loading={loading}
+        loading={loading || deleteLoading}
         onEdit={handleEdit}
         onView={handleView}
         onDelete={handleDelete}
@@ -934,7 +784,7 @@ const ProcurementList = () => {
         pagination={{
           currentPage: pagination.currentPage,
           totalPages: pagination.totalPages,
-          totalRecords: totalDisplayedRecords,
+          totalRecords: pagination.totalRecords,
           onPageChange: handlePageChange,
           onLimitChange: handleLimitChange,
           limit: pagination.limit,
@@ -963,7 +813,7 @@ const ProcurementList = () => {
               </h3>
               <p className="text-gray-500 text-sm sm:text-base leading-relaxed p-3">
                 {deleteTarget === "selected"
-                  ? `You're about to delete ${deleteId?.length || 0} selected procurement(s). This action cannot be undone.`
+                  ? `You're about to delete ${deleteIds?.length || 0} selected procurement(s). This action cannot be undone.`
                   : "You're about to delete this procurement record. This action cannot be undone."}
               </p>
             </div>
@@ -973,20 +823,20 @@ const ProcurementList = () => {
                 onClick={() => {
                   setShowDeleteModal(false);
                   setDeleteTarget(null);
-                  setDeleteId(null);
-                  setIsDeleting(false);
+                  setDeleteIds([]);
+                  setDeleteLoading(false);
                 }}
                 className="flex-1 px-2 sm:px-5 py-1 border sm:py-2 border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors duration-150 text-sm font-medium focus:outline-none"
-                disabled={isDeleting}
+                disabled={deleteLoading}
               >
                 Cancel
               </button>
               <button
                 onClick={confirmDelete}
-                disabled={isDeleting}
+                disabled={deleteLoading}
                 className="flex-1 px-2 sm:px-5 py-1 sm:py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors duration-150 text-sm font-medium focus:outline-none shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isDeleting ? (
+                {deleteLoading ? (
                   <>
                     <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                     <span>Deleting...</span>
