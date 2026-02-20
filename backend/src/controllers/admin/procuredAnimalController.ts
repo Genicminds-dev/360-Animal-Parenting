@@ -7,6 +7,57 @@ import { checkDuplicateGeneric } from "../../utils/checkDuplicateHelper";
 import { cleanupFiles } from "../../middlewares/multerMiddleWare";
 import { User, SourceVisit, ProcuredAnimal, Logistic, QuarantineCenter, Handover, sequelize } from "../../models";
 
+const sanitizePayload = (body: any) => {
+
+    const numberFields = [
+        "ageYears",
+        "ageMonths",
+        "milkingCapacity",
+    ];
+
+    const booleanFields = [
+        "fmdDisease",
+        "lsdDisease"
+    ];
+
+    const dateFields = [
+        "handoverDate",
+        "handoverTime"
+    ];
+
+    numberFields.forEach((field) => {
+        if (body[field] === "" || body[field] === undefined) {
+            body[field] = null;
+        } else if (body[field] !== null) {
+            body[field] = Number(body[field]);
+        }
+    });
+
+    booleanFields.forEach((field) => {
+        const value = body[field];
+
+        if (
+            value === true ||
+            value === "true" ||
+            value === 1 ||
+            value === "1"
+        ) {
+            body[field] = true;
+        } else {
+            body[field] = false;
+        }
+    });
+
+    dateFields.forEach((field) => {
+        if (body[field] === "" || body[field] === undefined) {
+            body[field] = null;
+        } else {
+            body[field];
+        }
+    });
+
+    return body;
+};
 
 export const getProcurementOfficers = async (req: Request, res: Response) => {
     try {
@@ -249,7 +300,7 @@ export const createProcurement = async (req: Request, res: Response) => {
         }
 
         const userId = req.user.id;
-        const body = req.body;
+        const body = sanitizePayload(req.body);
         const files = req.files as Record<string, Express.Multer.File[]>;
 
         const normalizePath = (file?: Express.Multer.File) =>
@@ -423,7 +474,7 @@ export const updateProcurement = async (req: Request, res: Response) => {
         const quarantine = await QuarantineCenter.findOne({ where: { procurementId } });
         const handover = await Handover.findOne({ where: { procurementId } });
 
-        const body = req.body;
+        const body = sanitizePayload(req.body);
 
         const duplicate = await checkDuplicateGeneric({
             model: ProcuredAnimal,
