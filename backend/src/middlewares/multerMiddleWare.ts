@@ -83,7 +83,7 @@ export const FIELD_RULES: Record<
   },
   quarantineCenterPhoto: {
     label: "Quarantine center photo",
-    types: ["image", "pdf"],
+    types: ["image"],
   },
   quarantineHealthRecord: {
     label: "Quarantine center health record",
@@ -225,17 +225,18 @@ export const validateUploadedFiles = (
 };
 
 export const cleanupFiles = (req: Request) => {
-  const files = req.files as Express.Multer.File[];
+  const files = req.files as Record<string, Express.Multer.File[]>;
 
-  if (!files || !Array.isArray(files)) return;
+  if (!files) return;
 
-  for (const file of files) {
-    if (file?.path && fs.existsSync(file.path)) {
-      fs.unlinkSync(file.path);
-    }
-  }
+  Object.values(files).forEach((fileArray) => {
+    fileArray.forEach((file) => {
+      if (file?.path && fs.existsSync(file.path)) {
+        fs.unlinkSync(file.path);
+      }
+    });
+  });
 };
-
 
 export const handleMulterError = (
   err: any,

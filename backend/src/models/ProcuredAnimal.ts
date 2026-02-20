@@ -10,7 +10,7 @@ interface ProcuredAnimalAttributes {
   ageYears?: number | null;
   ageMonths?: number | null;
   milkingCapacity?: number | null;
-  isCalfIncluded?: boolean | null;
+  isCalfIncluded?: string | null;
   physicalCheck?: string | null;
 
   fmdDisease?: boolean | null;
@@ -40,7 +40,7 @@ interface ProcuredAnimalCreationAttributes
     | "animalPhotoSide"
     | "animalPhotoRear"
     | "healthRecord"
-  > {}
+  > { }
 
 class ProcuredAnimal
   extends Model<
@@ -57,7 +57,7 @@ class ProcuredAnimal
   public ageYears!: number | null;
   public ageMonths!: number | null;
   public milkingCapacity!: number | null;
-  public isCalfIncluded!: boolean | null;
+  public isCalfIncluded!: string | null;
   public physicalCheck!: string | null;
 
   public fmdDisease!: boolean | null;
@@ -118,7 +118,7 @@ ProcuredAnimal.init(
     },
 
     isCalfIncluded: {
-      type: DataTypes.BOOLEAN,
+      type: DataTypes.STRING,
       allowNull: true,
     },
 
@@ -130,11 +130,13 @@ ProcuredAnimal.init(
     fmdDisease: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
+      defaultValue: false,
     },
 
     lsdDisease: {
       type: DataTypes.BOOLEAN,
       allowNull: true,
+      defaultValue: false,
     },
 
     animalPhotoFront: {

@@ -14,13 +14,14 @@ import { getAllRoles } from '../controllers/admin/roleController';
 import { getAllUsers, getUserById, createUser, updateUser, deleteUser, updateUserProfile, changePassword, editPassword } from '../controllers/admin/userController';
 import { getCommissionAgents, getCommissionAgentByUid, getCommissionAgentList, createCommissionAgent, updateCommissionAgent, deleteCommissionAgent } from '../controllers/admin/commissionAgentController';
 import { getSellers, getSellerByUid, getSellerList, createSeller, updateSeller, deleteSeller } from '../controllers/admin/sellerController';
+import { getAnimals, getAnimalByUid, createAnimal, updateAnimal, deleteAnimal } from '../controllers/admin/animalController';
+import { getProcuredAnimals, getProcuredAnimalbyUid, getProcurementOfficers, createProcurement, updateProcurement, deleteProcuredAnimal } from '../controllers/admin/procuredAnimalController';
 
 // Validation Schema
 import { createUserSchema, updateUserProfileSchema, updateUserSchema, changePasswordSchema, editPasswordSchema } from '../validations/userValidation';
 import { CreateCommissionAgentSchema, UpdateCommissionAgentSchema } from '../validations/commissionAgentValidation';
 import { CreateSellerSchema, UpdateSellerSchema } from '../validations/sellerValidation';
-import { createAnimal, deleteAnimal, getAnimalByUid, getAnimals, updateAnimal } from '../controllers/admin/animalController';
-import { createProcurement, deleteProcuredAnimal, getProcuredAnimalbyUid, getProcuredAnimals, getProcurementOfficers } from '../controllers/admin/procuredAnimalController';
+import { CreateProcuredAnimalSchema, UpdateProcuredAnimalSchema } from '../validations/procuredAnimalValidation';
 
 // Role Routes
 router.get('/roles', verifyToken, checkRole([1, 2]), getAllRoles);
@@ -51,7 +52,7 @@ router.post("/seller", verifyToken, checkRole([1, 2, 3]), upload.fields([{ name:
 router.put("/seller/:uid", verifyToken, checkRole([1, 2, 3]), upload.fields([{ name: "profileImg", maxCount: 1 }]), handleMulterError, validate(UpdateSellerSchema), sanitizeInput, setAudit, updateSeller);
 router.delete("/seller/:uid", verifyToken, checkRole([1, 2, 3]), deleteSeller);
 
-
+// Animal Routes
 router.get("/animal", verifyToken, checkRole([1, 2, 3]), getAnimals);
 router.get("/animal/:uid", verifyToken, checkRole([1, 2, 3]), getAnimalByUid);
 router.post("/animal", verifyToken, checkRole([1, 2, 3]), upload.any(), handleMulterError, sanitizeInput, createAnimal);
@@ -59,10 +60,11 @@ router.put("/animal/:uid", verifyToken, checkRole([1, 2, 3]), upload.fields([{ n
 router.delete("/animal/:uid", verifyToken, checkRole([1, 2, 3]), deleteAnimal);
 
 // Animal Procurement Routes
-router.get("/procurement-officers", verifyToken, checkRole([1, 2, 3]), getProcurementOfficers);
 router.get("/procured-animal", verifyToken, checkRole([1, 2, 3]), getProcuredAnimals);
 router.get("/procured-animal/:uid", verifyToken, checkRole([1, 2, 3]), getProcuredAnimalbyUid);
-router.post("/procured-animal", verifyToken, checkRole([1, 2, 3]), upload.fields([{ name: "animalPhotoFront", maxCount: 1 }, { name: "animalPhotoSide", maxCount: 1 }, { name: "animalPhotoRear", maxCount: 1 }, { name: "healthRecord", maxCount: 1 }, { name: "licenseCertificate", maxCount: 1 }, { name: "quarantineCenterPhoto", maxCount: 1 }, { name: "quarantineHealthRecord", maxCount: 1 }, { name: "finalHealthClearance", maxCount: 1 }, { name: "handoverPhoto", maxCount: 1 }, { name: "handoverDocument", maxCount: 1 }]), handleMulterError, sanitizeInput, setAudit, createProcurement);
+router.get("/procurement-officers", verifyToken, checkRole([1, 2, 3]), getProcurementOfficers);
+router.post("/procured-animal", verifyToken, checkRole([1, 2, 3]), upload.fields([{ name: "animalPhotoFront", maxCount: 1 }, { name: "animalPhotoSide", maxCount: 1 }, { name: "animalPhotoRear", maxCount: 1 }, { name: "healthRecord", maxCount: 1 }, { name: "licenseCertificate", maxCount: 1 }, { name: "quarantineCenterPhoto", maxCount: 1 }, { name: "quarantineHealthRecord", maxCount: 1 }, { name: "finalHealthClearance", maxCount: 1 }, { name: "handoverPhoto", maxCount: 1 }, { name: "handoverDocument", maxCount: 1 }]), handleMulterError, validate(CreateProcuredAnimalSchema), sanitizeInput, setAudit, createProcurement);
+router.put("/procured-animal/:uid", verifyToken, checkRole([1, 2, 3]), upload.fields([{ name: "animalPhotoFront", maxCount: 1 }, { name: "animalPhotoSide", maxCount: 1 }, { name: "animalPhotoRear", maxCount: 1 }, { name: "healthRecord", maxCount: 1 }, { name: "licenseCertificate", maxCount: 1 }, { name: "quarantineCenterPhoto", maxCount: 1 }, { name: "quarantineHealthRecord", maxCount: 1 }, { name: "finalHealthClearance", maxCount: 1 }, { name: "handoverPhoto", maxCount: 1 }, { name: "handoverDocument", maxCount: 1 }]), handleMulterError, validate(UpdateProcuredAnimalSchema), sanitizeInput, setAudit, updateProcurement);
 router.delete("/procured-animal/:uid", verifyToken, checkRole([1, 2, 3]), deleteProcuredAnimal);
 
 export default router;
