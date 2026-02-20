@@ -353,10 +353,10 @@ const AppContent = () => {
           />
 
           <Route
-            path={`${PATHROUTES.editanimalProcurement.replace('/', '')}/:id`}
+            path={PATHROUTES.editanimalProcurement}
             element={
-              <PrivateRoute allowedRoles={[1, 2]}>
-                <ManageUsersForm />
+              <PrivateRoute allowedRoles={[1, 2, 3]}>
+                <AnimalProcurement />
               </PrivateRoute>
             }
           />
