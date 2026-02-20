@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { statusCode } from '../../utils/StatusCode/StatusCode';
 
-export const baseURL = 'http://localhost:7001';
-export const baseURLFile = 'http://localhost:7001';
-// export const baseURL = 'https://animal.parenting.genicminds.com/api';
-// export const baseURLFile = 'https://animal.parenting.genicminds.com/api';
+// export const baseURL = 'http://localhost:7001';
+// export const baseURLFile = 'http://localhost:7001';
+export const baseURL = 'https://animal.parenting.genicminds.com/api';
+export const baseURLFile = 'https://animal.parenting.genicminds.com/api';
 
 const api = axios.create({
     baseURL,
