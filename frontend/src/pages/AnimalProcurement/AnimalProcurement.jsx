@@ -3,34 +3,35 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { 
   User, Phone, MapPin, Calendar, Tag,
-  Droplet, Baby, Eye, FileText, Camera, Truck,
-  UserCircle, IdCard, File, Upload, Building,
-  Award, X, Check, ChevronLeft, ChevronRight,
-  AlertCircle, Heart, Activity, Shield, Home,
-  Hand, Save, Image, Download, ArrowRight,
-  CheckCircle, Clock, Map, Users, TruckIcon,
-  HomeIcon, ClipboardList, Settings, Mail,
-  Fingerprint, CreditCard, Hash, FileCheck,
-  BadgeCheck, ShieldCheck, Truck as TruckIcon2,
-  FileUp, FilePlus, Link
+  Droplet, Eye, FileText, Camera, Truck,
+  IdCard, File, Upload, 
+  X, Check, ChevronLeft, ChevronRight,
+  AlertCircle, Home,
+  Hand, Save, ArrowRight,
+  CheckCircle, Clock, 
+  HomeIcon, ClipboardList, 
+  CreditCard, Hash,
+  BadgeCheck, Truck as TruckIcon2,
+  FileUp
 } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
-import api from '../../services/api/api';
-import { Endpoints } from '../../services/api/EndPoint';
 import { PATHROUTES } from '../../routes/pathRoutes';
 import { GiCow } from 'react-icons/gi';
+import api from '../../services/api/api';
 
 const AnimalProcurement = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { uid } = useParams();
   const location = useLocation();
-  const isEditMode = !!id || location.state?.isEdit;
+  const isEditMode = !!uid || location.state?.isEdit;
 
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewUrls, setPreviewUrls] = useState({});
   const [hoveredStep, setHoveredStep] = useState(null);
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
+  const [procurementOfficers, setProcurementOfficers] = useState([]);
+  const [isLoadingOfficers, setIsLoadingOfficers] = useState(false);
 
   // Helper function to get current date and time in local format
   const getCurrentDateTime = () => {
@@ -58,8 +59,8 @@ const AnimalProcurement = () => {
     procurementOfficer: '',
     sourceType: '',
     sourceLocation: '',
-    visitDate: currentDate, // Set default to current date
-    visitTime: currentTime, // Set default to current time
+    visitDate: currentDate,
+    visitTime: currentTime,
     
     // Step 1 - Animal Details (Tag ID is required)
     tagId: '',
@@ -67,7 +68,7 @@ const AnimalProcurement = () => {
     ageYears: '',
     ageMonths: '',
     milkingCapacity: '',
-    isCalfIncluded: 'no',
+    isCalfIncluded: '',
     physicalCheck: '',
     fmdDisease: false,
     lsdDisease: false,
@@ -102,30 +103,38 @@ const AnimalProcurement = () => {
     beneficiaryId: '',
     beneficiaryLocation: '',
     handoverPhoto: null,
-    handoverDate: '', // Separate date field - no default
-    handoverTime: '', // Separate time field - no default
+    handoverDate: '',
+    handoverTime: '',
     handoverDocument: null
   });
 
-  // Dropdown Options with disabled placeholder
-  const procurementOfficers = [
-    { id: '', name: "Select Procurement Officer", disabled: true },
-    { id: 1, name: "Rajesh Kumar - 9876543210" },
-    { id: 2, name: "Priya Sharma - 8765432109" },
-    { id: 3, name: "Amit Patel - 7654321098" },
-    { id: 4, name: "Sunita Reddy - 6543210987" },
-    { id: 5, name: "Vikram Singh - 5432109876" }
-  ];
+  // Fetch procurement officers on component mount
+  useEffect(() => {
+    fetchProcurementOfficers();
+  }, []);
 
+  // Fetch procurement officers
+  const fetchProcurementOfficers = async () => {
+    setIsLoadingOfficers(true);
+    try {
+      const response = await api.get('/admin/procurement-officers');
+      if (response.data.success) {
+        setProcurementOfficers(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching procurement officers:', error);
+      toast.error('Failed to load procurement officers');
+    } finally {
+      setIsLoadingOfficers(false);
+    }
+  };
+
+  // Dropdown Options
   const breedOptions = [
     { value: "", label: "Select Breed", disabled: true },
     { value: "Gir", label: "Gir - Gujarat" },
     { value: "Sahiwal", label: "Sahiwal - Punjab" },
     { value: "Jersey", label: "Jersey - Foreign" },
-    { value: "Holstein Friesian", label: "Holstein Friesian - Foreign" },
-    { value: "Murrah", label: "Murrah - Haryana" },
-    { value: "Nagpuri", label: "Nagpuri - Maharashtra" },
-    { value: "Purnathadi", label: "Purnathadi - Maharashtra" },
     { value: "Other", label: "Other - Various" }
   ];
 
@@ -145,7 +154,7 @@ const AnimalProcurement = () => {
     if (isEditMode) {
       loadProcurementData();
     }
-  }, [isEditMode, id, location.state]);
+  }, [isEditMode, uid, location.state]);
 
   // Cleanup preview URLs on unmount
   useEffect(() => {
@@ -170,18 +179,117 @@ const AnimalProcurement = () => {
 
   const loadProcurementData = () => {
     if (location.state?.procurementData) {
-      setFormData(location.state.procurementData);
-    } else if (id) {
-      fetchProcurementById(id);
+      // Transform the nested data structure back to flat form structure
+      const data = location.state.procurementData;
+      setFormData({
+        // Source Visit
+        procurementOfficer: data.sourceVisit?.procurementOfficer || '',
+        sourceType: data.sourceVisit?.sourceType || '',
+        sourceLocation: data.sourceVisit?.sourceLocation || '',
+        visitDate: data.sourceVisit?.visitDate?.split('T')[0] || '',
+        visitTime: data.sourceVisit?.visitTime || '',
+        breederName: data.sourceVisit?.breederName || '',
+        breederContact: data.sourceVisit?.breederContact || '',
+        
+        // Animal Details
+        tagId: data.procuredAnimal?.tagId || '',
+        breed: data.procuredAnimal?.breed || '',
+        ageYears: data.procuredAnimal?.ageYears || '',
+        ageMonths: data.procuredAnimal?.ageMonths || '',
+        milkingCapacity: data.procuredAnimal?.milkingCapacity || '',
+        isCalfIncluded: data.procuredAnimal?.isCalfIncluded ? 'yes' : 'no',
+        physicalCheck: data.procuredAnimal?.physicalCheck || '',
+        fmdDisease: data.procuredAnimal?.fmdDisease || false,
+        lsdDisease: data.procuredAnimal?.lsdDisease || false,
+        animalPhotoFront: data.procuredAnimal?.animalPhotoFront || null,
+        animalPhotoSide: data.procuredAnimal?.animalPhotoSide || null,
+        animalPhotoRear: data.procuredAnimal?.animalPhotoRear || null,
+        healthRecord: data.procuredAnimal?.healthRecord || null,
+        
+        // Logistic
+        vehicleNo: data.logistic?.vehicleNo || '',
+        driverName: data.logistic?.driverName || '',
+        driverDesignation: data.logistic?.driverDesignation || '',
+        driverMobile: data.logistic?.driverMobile || '',
+        driverAadhar: data.logistic?.driverAadhar || '',
+        drivingLicense: data.logistic?.drivingLicense || '',
+        licenseCertificate: data.logistic?.licenseCertificate || null,
+        
+        // Quarantine
+        quarantineCenter: data.quarantine?.quarantineCenter || '',
+        quarantineCenterPhoto: data.quarantine?.quarantineCenterPhoto || null,
+        quarantineHealthRecord: data.quarantine?.quarantineHealthRecord || null,
+        finalHealthClearance: data.quarantine?.finalHealthClearance || null,
+        
+        // Handover
+        handoverOfficer: data.handover?.handoverOfficer || '',
+        beneficiaryId: data.handover?.beneficiaryId || '',
+        beneficiaryLocation: data.handover?.beneficiaryLocation || '',
+        handoverPhoto: data.handover?.handoverPhoto || null,
+        handoverDate: data.handover?.handoverDate || '',
+        handoverTime: data.handover?.handoverTime || '',
+        handoverDocument: data.handover?.handoverDocument || null
+      });
+    } else if (uid) {
+      fetchProcurementByUid(uid);
     }
   };
 
-  const fetchProcurementById = async (procurementId) => {
+  const fetchProcurementByUid = async (procurementUid) => {
     try {
       setIsSubmitting(true);
-      const response = await api.get(`${Endpoints.GET_PROCUREMENT}/${procurementId}`);
+      const response = await api.get(`/admin/procured-animal/${procurementUid}`);
       if (response.data.success) {
-        setFormData(response.data.data);
+        const data = response.data.data;
+        setFormData({
+          // Source Visit
+          procurementOfficer: data.sourceVisit?.procurementOfficer || '',
+          sourceType: data.sourceVisit?.sourceType || '',
+          sourceLocation: data.sourceVisit?.sourceLocation || '',
+          visitDate: data.sourceVisit?.visitDate?.split('T')[0] || '',
+          visitTime: data.sourceVisit?.visitTime || '',
+          breederName: data.sourceVisit?.breederName || '',
+          breederContact: data.sourceVisit?.breederContact || '',
+          
+          // Animal Details
+          tagId: data.procuredAnimal?.tagId || '',
+          breed: data.procuredAnimal?.breed || '',
+          ageYears: data.procuredAnimal?.ageYears || '',
+          ageMonths: data.procuredAnimal?.ageMonths || '',
+          milkingCapacity: data.procuredAnimal?.milkingCapacity || '',
+          isCalfIncluded: data.procuredAnimal?.isCalfIncluded ? 'yes' : 'no',
+          physicalCheck: data.procuredAnimal?.physicalCheck || '',
+          fmdDisease: data.procuredAnimal?.fmdDisease || false,
+          lsdDisease: data.procuredAnimal?.lsdDisease || false,
+          animalPhotoFront: data.procuredAnimal?.animalPhotoFront || null,
+          animalPhotoSide: data.procuredAnimal?.animalPhotoSide || null,
+          animalPhotoRear: data.procuredAnimal?.animalPhotoRear || null,
+          healthRecord: data.procuredAnimal?.healthRecord || null,
+          
+          // Logistic
+          vehicleNo: data.logistic?.vehicleNo || '',
+          driverName: data.logistic?.driverName || '',
+          driverDesignation: data.logistic?.driverDesignation || '',
+          driverMobile: data.logistic?.driverMobile || '',
+          driverAadhar: data.logistic?.driverAadhar || '',
+          drivingLicense: data.logistic?.drivingLicense || '',
+          licenseCertificate: data.logistic?.licenseCertificate || null,
+          
+          // Quarantine
+          quarantineCenter: data.quarantine?.quarantineCenter || '',
+          quarantineCenterPhoto: data.quarantine?.quarantineCenterPhoto || null,
+          quarantineHealthRecord: data.quarantine?.quarantineHealthRecord || null,
+          finalHealthClearance: data.quarantine?.finalHealthClearance || null,
+          
+          // Handover
+          handoverOfficer: data.handover?.handoverOfficer || '',
+          beneficiaryId: data.handover?.beneficiaryId || '',
+          beneficiaryLocation: data.handover?.beneficiaryLocation || '',
+          handoverPhoto: data.handover?.handoverPhoto || null,
+          handoverDate: data.handover?.handoverDate || '',
+          handoverTime: data.handover?.handoverTime || '',
+          handoverDocument: data.handover?.handoverDocument || null
+        });
       }
     } catch (error) {
       console.error('Error fetching procurement:', error);
@@ -412,6 +520,7 @@ const AnimalProcurement = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // COMPLETE FIXED handleSubmit function
   const handleSubmit = async () => {
     if (!validateStep4()) {
       toast.error('Please check all fields for errors');
@@ -423,26 +532,69 @@ const AnimalProcurement = () => {
       
       const formDataToSend = new FormData();
       
+      // Append all form fields
       Object.keys(formData).forEach(key => {
-        if (formData[key] instanceof File) {
-          formDataToSend.append(key, formData[key]);
-        } else if (formData[key] !== null && formData[key] !== undefined && formData[key] !== '') {
-          formDataToSend.append(key, String(formData[key]));
+        const value = formData[key];
+        
+        // Skip null or undefined values
+        if (value === null || value === undefined) {
+          return;
+        }
+        
+        // Check if it's a File object using property check (no instanceof)
+        const isFileObject = value && 
+                             typeof value === 'object' && 
+                             'name' in value && 
+                             'size' in value && 
+                             'type' in value;
+        
+        // Handle File objects
+        if (isFileObject) {
+          formDataToSend.append(key, value);
+        } 
+        // Handle boolean values
+        else if (typeof value === 'boolean') {
+          formDataToSend.append(key, String(value));
+        }
+        // Handle numbers
+        else if (typeof value === 'number') {
+          formDataToSend.append(key, String(value));
+        }
+        // Handle non-empty strings
+        else if (typeof value === 'string' && value.trim() !== '') {
+          formDataToSend.append(key, value);
+        }
+        // Handle objects that might be file paths from API (don't send them)
+        else if (typeof value === 'object') {
+          // Skip objects that aren't Files (like file paths from API)
+          console.log(`Skipping non-file object for field: ${key}`, value);
+          return;
+        }
+        // Skip empty strings
+        else if (typeof value === 'string' && value.trim() === '') {
+          return;
         }
       });
       
-      const endpoint = isEditMode 
-        ? `${Endpoints.UPDATE_PROCUREMENT}/${id}` 
-        : Endpoints.CREATE_PROCUREMENT;
+      let response;
       
-      const response = await api.post(endpoint, formDataToSend, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      if (isEditMode && uid) {
+        // Update existing procurement
+        response = await api.put(`/admin/procured-animal/${uid}`, formDataToSend, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      } else {
+        // Create new procurement
+        response = await api.post('/admin/procured-animal', formDataToSend, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      }
       
       if (response.data.success) {
         setShowSuccessAnimation(true);
         toast.success(isEditMode ? 'Procurement updated successfully!' : 'Procurement created successfully!');
         
+        // Cleanup preview URLs
         Object.values(previewUrls).forEach(url => {
           if (url && typeof url === 'string' && url.startsWith('blob:')) {
             URL.revokeObjectURL(url);
@@ -543,7 +695,26 @@ const AnimalProcurement = () => {
     </div>
   );
 
-  // File Upload Component
+  // Safe file check function - completely avoids instanceof
+  const isFileObject = (value) => {
+    if (!value || typeof value !== 'object') return false;
+    
+    // Check for common File object properties without using instanceof
+    return (
+      value !== null &&
+      typeof value === 'object' &&
+      'name' in value &&
+      'size' in value &&
+      'type' in value &&
+      'lastModified' in value &&
+      typeof value.name === 'string' &&
+      typeof value.size === 'number' &&
+      typeof value.type === 'string' &&
+      typeof value.lastModified === 'number'
+    );
+  };
+
+  // File Upload Component - FIXED VERSION
   const FileUploadField = ({ 
     field, 
     label, 
@@ -556,7 +727,13 @@ const AnimalProcurement = () => {
     const hasFile = formData[field] !== null && formData[field] !== undefined && formData[field] !== '';
     const file = formData[field];
     const previewUrl = previewUrls[field];
-    const isImageFile = file?.type?.startsWith('image/') || previewUrl;
+    
+    // Safer check for file type
+    const isFileLike = file && typeof file === 'object' && 'type' in file;
+    const isImageFile = previewUrl || (isFileLike && file.type && file.type.startsWith('image/'));
+    
+    // Check if we have a valid file object
+    const hasValidFile = hasFile && (previewUrl || (file && typeof file === 'object' && 'name' in file));
 
     const handleRemove = (e) => {
       e.preventDefault();
@@ -564,7 +741,7 @@ const AnimalProcurement = () => {
       removeFile(field);
     };
 
-    if (hasFile) {
+    if (hasValidFile) {
       return (
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:border-primary-300 transition-all duration-300">
           <div className="p-4">
@@ -580,7 +757,7 @@ const AnimalProcurement = () => {
                   </div>
                 ) : (
                   <div className="w-20 h-20 rounded-lg bg-gradient-to-br from-primary-50 to-indigo-50 border border-gray-200 flex items-center justify-center">
-                    {file?.type === 'application/pdf' ? (
+                    {file && file.type === 'application/pdf' ? (
                       <FileText size={32} className="text-red-500" />
                     ) : (
                       <File size={32} className="text-gray-400" />
@@ -596,9 +773,9 @@ const AnimalProcurement = () => {
                       {label}
                     </p>
                     <p className="text-sm text-gray-600 truncate max-w-[300px]">
-                      {file?.name || 'Uploaded file'}
+                      {file && file.name ? file.name : 'Uploaded file'}
                     </p>
-                    {file?.size && (
+                    {file && file.size && (
                       <p className="text-xs text-gray-500 mt-1">
                         {(file.size / 1024).toFixed(1)} KB
                       </p>
@@ -628,14 +805,16 @@ const AnimalProcurement = () => {
                   </div>
                 </div>
 
-                <div className="flex gap-2 mt-2">
-                  <span className="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-lg">
-                    {file?.type?.split('/')[1]?.toUpperCase() || 'FILE'}
-                  </span>
-                  <span className="inline-flex items-center px-2 py-1 bg-primary-50 text-primary-600 text-xs rounded-lg">
-                    {(file?.size / 1024).toFixed(0)} KB
-                  </span>
-                </div>
+                {file && file.type && file.size && (
+                  <div className="flex gap-2 mt-2">
+                    <span className="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-lg">
+                      {file.type.split('/')[1]?.toUpperCase() || 'FILE'}
+                    </span>
+                    <span className="inline-flex items-center px-2 py-1 bg-primary-50 text-primary-600 text-xs rounded-lg">
+                      {(file.size / 1024).toFixed(0)} KB
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -695,11 +874,14 @@ const AnimalProcurement = () => {
     );
   };
 
-  // Image Upload Component
+  // Image Upload Component - FIXED VERSION
   const ImageUploadField = ({ field, label, required = false, description = null }) => {
     const hasFile = formData[field] !== null && formData[field] !== undefined && formData[field] !== '';
     const file = formData[field];
     const previewUrl = previewUrls[field];
+    
+    // Check if we have a valid file
+    const hasValidFile = hasFile && (previewUrl || (file && typeof file === 'object'));
 
     const handleRemove = (e) => {
       e.preventDefault();
@@ -707,7 +889,7 @@ const AnimalProcurement = () => {
       removeFile(field);
     };
 
-    if (hasFile && previewUrl) {
+    if (hasValidFile && previewUrl) {
       return (
         <div className="relative group rounded-xl overflow-hidden shadow-sm border border-gray-200 bg-white hover:border-primary-300 transition-all duration-300">
           <img
@@ -853,7 +1035,7 @@ const AnimalProcurement = () => {
 
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Procurement Officer */}
+            {/* Procurement Officer - Integrated with API */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Procurement Officer <span className="text-red-500">*</span>
@@ -865,10 +1047,12 @@ const AnimalProcurement = () => {
                   onChange={handleChange}
                   onBlur={handleBlur}
                   className={`input-field pl-10 ${errors.procurementOfficer && touchedFields.procurementOfficer ? "border-red-500 focus:ring-red-200" : ""}`}
+                  disabled={isLoadingOfficers}
                 >
+                  <option value="">{isLoadingOfficers ? 'Loading officers...' : 'Select Procurement Officer'}</option>
                   {procurementOfficers.map(officer => (
-                    <option key={officer.id} value={officer.id} disabled={officer.disabled}>
-                      {officer.name}
+                    <option key={officer.id} value={officer.id}>
+                      {officer.firstName} {officer.lastName} - {officer.mobile}
                     </option>
                   ))}
                 </select>
@@ -892,8 +1076,8 @@ const AnimalProcurement = () => {
                   <input
                     type="radio"
                     name="sourceType"
-                    value="bazaar"
-                    checked={formData.sourceType === 'bazaar'}
+                    value="Bazaar"
+                    checked={formData.sourceType === 'Bazaar'}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     className="w-4 h-4 text-primary-600"
@@ -904,8 +1088,8 @@ const AnimalProcurement = () => {
                   <input
                     type="radio"
                     name="sourceType"
-                    value="farm"
-                    checked={formData.sourceType === 'farm'}
+                    value="Farm"
+                    checked={formData.sourceType === 'Farm'}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     className="w-4 h-4 text-primary-600"
@@ -1401,20 +1585,26 @@ const AnimalProcurement = () => {
 
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Handover Officer */}
+            {/* Handover Officer - Integrated with same API */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Handover Officer Name
               </label>
               <div className="relative">
-                <input
-                  type="text"
+                <select
                   name="handoverOfficer"
                   value={formData.handoverOfficer || ''}
                   onChange={handleChange}
                   className="input-field pl-10"
-                  placeholder="Enter officer name"
-                />
+                  disabled={isLoadingOfficers}
+                >
+                  <option value="">Select Handover Officer</option>
+                  {procurementOfficers.map(officer => (
+                    <option key={officer.id} value={officer.id}>
+                      {officer.firstName} {officer.lastName} - {officer.mobile}
+                    </option>
+                  ))}
+                </select>
                 <User className="absolute left-3 top-3.5 text-gray-400" size={18} />
               </div>
             </div>

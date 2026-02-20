@@ -51,6 +51,7 @@ export const PATHROUTES = {
 
 
   animalProcurement: "/animal-registration",
+  editanimalProcurement: "edit-animal-details",
   animalProcuredList: "/animal-list",
   animalProcurementView: "/view-animal-details"
 
