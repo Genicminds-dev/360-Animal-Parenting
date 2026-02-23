@@ -243,7 +243,7 @@ const Sidebar = ({ toggleSidebar, onLogout, isMobile, onLogoutClick }) => {
       </nav>
 
       {/* User Profile & Logout Section - Fixed at bottom */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
+      {/* <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
         <div className="flex items-center space-x-2 sm:space-x-3 p-2 sm:p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 transition-colors">
           <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary-600 dark:bg-primary-500 text-white rounded-full flex items-center justify-center font-semibold flex-shrink-0 text-sm sm:text-base">
             {getProfileImage() ? (
@@ -274,6 +274,18 @@ const Sidebar = ({ toggleSidebar, onLogout, isMobile, onLogoutClick }) => {
             <LogOut size={18} />
           </button>
         </div>
+      </div> */}
+
+
+      <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
+        <button
+          onClick={onLogoutClick}
+          className="w-full flex items-center justify-center gap-2 p-2 sm:p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-200 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors font-medium"
+          title="Logout"
+        >
+          <LogOut size={18} />
+          <span>Logout</span>
+        </button>
       </div>
     </div>
   );

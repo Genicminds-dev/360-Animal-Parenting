@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Header/Header';
 
@@ -56,6 +56,15 @@ const Layout = ({ onLogout }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const location = useLocation();
+  const mainRef = useRef(null);
+
+  useEffect(() => {
+  mainRef.current?.scrollTo({
+    top: 0,
+    behavior: "instant"
+  });
+}, [location.pathname]);
 
   // Detect screen size for responsive behavior
   useEffect(() => {
@@ -144,8 +153,11 @@ const Layout = ({ onLogout }) => {
         </div>
         
         {/* Main Content - Scrollable */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-gray-900">
-          <div className="p-3 sm:p-4 md:p-6 lg:p-8">
+        <main
+          ref={mainRef}
+          className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-gray-900"
+        > 
+         <div className="p-3 sm:p-4 md:p-6 lg:p-8">
             <div className="max-w-full lg:max-w-7xl mx-auto">
               <Outlet />
             </div>

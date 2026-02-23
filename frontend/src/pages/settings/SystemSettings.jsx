@@ -1,8 +1,8 @@
 // src/components/settings/SystemSettings.jsx
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  FiSettings, FiShield, FiUsers, FiDatabase, 
+import {
+  FiSettings, FiShield, FiUsers, FiDatabase,
   FiSave, FiRefreshCw, FiGlobe, FiMoon, FiSun,
   FiMonitor, FiCheckCircle
 } from 'react-icons/fi';
@@ -11,7 +11,7 @@ import { useTheme } from '../../contexts/ThemeContext'; // Import the hook
 
 const SystemSettings = ({ userRole }) => { // Remove darkMode prop
   const { darkMode, theme, updateTheme } = useTheme(); // Use theme context
-  
+
   const [systemConfig, setSystemConfig] = useState({
     siteName: 'My Application',
     siteUrl: 'https://myapp.com',
@@ -59,10 +59,10 @@ const SystemSettings = ({ userRole }) => { // Remove darkMode prop
 
   const handleSave = async () => {
     setLoading(true);
-    
+
     // Apply theme setting globally using context
     updateTheme(systemConfig.theme);
-    
+
     // Here you would also save other settings to your backend
     // For now, we'll simulate an API call
     setTimeout(() => {
@@ -338,7 +338,7 @@ const SystemSettings = ({ userRole }) => { // Remove darkMode prop
               </div>
             </div>
           </motion.section>
-          
+
           {/* Dark Mode Settings Section - Enhanced with gradient background */}
           <motion.section
             variants={sectionVariants}
@@ -364,8 +364,8 @@ const SystemSettings = ({ userRole }) => { // Remove darkMode prop
               {/* Light Mode Option */}
               <label className={`
                 relative cursor-pointer rounded-xl p-4 border-2 transition-all duration-300
-                ${systemConfig.theme === 'light' 
-                  ? 'border-primary-500 bg-white shadow-lg scale-105' 
+                ${systemConfig.theme === 'light'
+                  ? 'border-primary-500 bg-white shadow-lg scale-105'
                   : 'border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 hover:border-primary-300 dark:hover:border-primary-700'
                 }
               `}>
@@ -378,11 +378,10 @@ const SystemSettings = ({ userRole }) => { // Remove darkMode prop
                   className="sr-only"
                 />
                 <div className="flex flex-col items-center text-center space-y-3">
-                  <div className={`p-3 rounded-full transition-colors ${
-                    systemConfig.theme === 'light' 
-                      ? 'bg-primary-100 text-primary-600' 
+                  <div className={`p-3 rounded-full transition-colors ${systemConfig.theme === 'light'
+                      ? 'bg-primary-100 text-primary-600'
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
-                  }`}>
+                    }`}>
                     <FiSun size={28} />
                   </div>
                   <div>
@@ -398,8 +397,8 @@ const SystemSettings = ({ userRole }) => { // Remove darkMode prop
               {/* Dark Mode Option */}
               <label className={`
                 relative cursor-pointer rounded-xl p-4 border-2 transition-all duration-300
-                ${systemConfig.theme === 'dark' 
-                  ? 'border-primary-500 bg-gray-800 shadow-lg scale-105' 
+                ${systemConfig.theme === 'dark'
+                  ? 'border-primary-500 bg-gray-800 shadow-lg scale-105'
                   : 'border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 hover:border-primary-300 dark:hover:border-primary-700'
                 }
               `}>
@@ -412,11 +411,10 @@ const SystemSettings = ({ userRole }) => { // Remove darkMode prop
                   className="sr-only"
                 />
                 <div className="flex flex-col items-center text-center space-y-3">
-                  <div className={`p-3 rounded-full transition-colors ${
-                    systemConfig.theme === 'dark' 
-                      ? 'bg-primary-900 text-primary-300' 
+                  <div className={`p-3 rounded-full transition-colors ${systemConfig.theme === 'dark'
+                      ? 'bg-primary-900 text-primary-300'
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
-                  }`}>
+                    }`}>
                     <FiMoon size={28} />
                   </div>
                   <div>
@@ -432,8 +430,8 @@ const SystemSettings = ({ userRole }) => { // Remove darkMode prop
               {/* System Default Option */}
               <label className={`
                 relative cursor-pointer rounded-xl p-4 border-2 transition-all duration-300
-                ${systemConfig.theme === 'system' 
-                  ? 'border-primary-500 bg-gradient-to-br from-white to-gray-100 dark:from-gray-800 dark:to-gray-900 shadow-lg scale-105' 
+                ${systemConfig.theme === 'system'
+                  ? 'border-primary-500 bg-gradient-to-br from-white to-gray-100 dark:from-gray-800 dark:to-gray-900 shadow-lg scale-105'
                   : 'border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 hover:border-primary-300 dark:hover:border-primary-700'
                 }
               `}>
@@ -446,11 +444,10 @@ const SystemSettings = ({ userRole }) => { // Remove darkMode prop
                   className="sr-only"
                 />
                 <div className="flex flex-col items-center text-center space-y-3">
-                  <div className={`p-3 rounded-full transition-colors ${
-                    systemConfig.theme === 'system' 
-                      ? 'bg-purple-100 text-purple-600 dark:bg-purple-900 dark:text-purple-300' 
+                  <div className={`p-3 rounded-full transition-colors ${systemConfig.theme === 'system'
+                      ? 'bg-purple-100 text-purple-600 dark:bg-purple-900 dark:text-purple-300'
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
-                  }`}>
+                    }`}>
                     <FiMonitor size={28} />
                   </div>
                   <div>
@@ -474,11 +471,10 @@ const SystemSettings = ({ userRole }) => { // Remove darkMode prop
                   <div className={`h-3 w-1/2 rounded ${previewTheme === 'light' ? 'bg-gray-300' : 'bg-gray-600'}`} />
                   <div className={`h-3 w-2/3 rounded ${previewTheme === 'light' ? 'bg-gray-300' : 'bg-gray-600'}`} />
                 </div>
-                <div className={`px-3 py-1 rounded-full text-xs ${
-                  previewTheme === 'light' 
-                    ? 'bg-primary-100 text-primary-700' 
+                <div className={`px-3 py-1 rounded-full text-xs ${previewTheme === 'light'
+                    ? 'bg-primary-100 text-primary-700'
                     : 'bg-primary-900 text-primary-300'
-                }`}>
+                  }`}>
                   {previewTheme === 'light' ? 'Light' : 'Dark'} Preview
                 </div>
               </div>
