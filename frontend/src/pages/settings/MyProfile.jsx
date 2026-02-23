@@ -43,7 +43,6 @@ const MyProfile = ({ onLogout, darkMode }) => {
         const fetchUserData = async () => {
             try {
                 const userId = getId();
-                console.log('User ID from getId():', userId);
                 if (!userId) {
                     navigate(PATHROUTES.login);
                     return;
@@ -360,11 +359,10 @@ const MyProfile = ({ onLogout, darkMode }) => {
                                                 value={formData[field]}
                                                 onChange={handleInputChange}
                                                 maxLength={field === 'mobile' ? 10 : 20}
-                                                className={`mt-1 block w-full rounded-md border ${
-                                                    errors[field] 
-                                                        ? 'border-red-500 bg-red-50 dark:bg-red-900/20' 
+                                                className={`mt-1 block w-full rounded-md border ${errors[field]
+                                                        ? 'border-red-500 bg-red-50 dark:bg-red-900/20'
                                                         : 'border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white'
-                                                } shadow-sm px-4 py-2 sm:text-sm
+                                                    } shadow-sm px-4 py-2 sm:text-sm
                                                 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500`}
                                                 placeholder={`Enter your ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`}
                                             />

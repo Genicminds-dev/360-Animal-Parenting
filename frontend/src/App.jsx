@@ -64,6 +64,7 @@ const AppContent = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [sessionExpired, setSessionExpired] = useState(false);
+  
 
   // Define handleLogout first before it's used
   const handleLogout = useCallback(async (isSessionExpired = false) => {
@@ -379,7 +380,7 @@ const AppContent = () => {
             }
           />
 
-          
+
 
 
 
