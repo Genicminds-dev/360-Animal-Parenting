@@ -14,22 +14,32 @@ export const PATHROUTES = {
   editUsers: "/edit-user",
   viewUsers: "/view-user",
 
+    // scheme Management
+  schemeList: "/manage-schemes",
+  // addUsers: "/add-user",
+  // editUsers: "/edit-user",
+  // viewUsers: "/view-user",
+ 
+  // Handover Routes
+  handoverList: "/management/handover",
+
   // Procurement Routes
-  agentRegistration: "/procurement/agent-registration",
   sellerRegistration: "/procurement/seller-registration",
   animalRegistration: "/procurement/animal-registration",
   healthCheckupList: "/procurement/health-checkup-List",
   healthCheckupForm: "/health-checkup/form/:id",
   // healthCheckUpList: "/procurement/health-check",
-
+  
   // Management Routes
   sellersList: "/management/sellers",
   sellerDetails: "/management/seller-details/:uid",
   editSeller: "/management/edit-seller/:uid",
+  
+  brokerRegistration: "/broker-registration",
+  brokerList: "/brokers",
+  brokerDetails: "/broker-details/:uid",
+  editBroker: "/edit-broker/:uid",
 
-  agentsList: "/management/commission-agents",
-  agentDetails: "/management/agent-details/:uid",
-  editAgent: "/management/edit-agent/:uid",
   animalsList: "/management/animals",
   animalDetails: "/management/animal-details/:uid",
   editAnimal: "/management/edit-animal/:uid",

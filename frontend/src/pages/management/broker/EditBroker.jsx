@@ -1,4 +1,3 @@
-// pages/management/agents/EditAgent.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { toast, Toaster } from "react-hot-toast";
@@ -7,12 +6,12 @@ import api, { baseURLFile } from "../../../services/api/api";
 import { Endpoints } from "../../../services/api/EndPoint";
 import { PATHROUTES } from "../../../routes/pathRoutes";
 
-const EditAgent = () => {
+const EditBroker = () => {
     const navigate = useNavigate();
     const { uid } = useParams();
     const location = useLocation();
     
-    const [agent, setAgent] = useState(null);
+    const [broker, setBroker] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [imageError, setImageError] = useState({});
@@ -40,54 +39,54 @@ const EditAgent = () => {
         return `${baseURLFile}${path}`;
     };
 
-    // Load agent data from API
+    // Load broker data from API
     useEffect(() => {
-        const loadAgentData = async () => {
+        const loadBrokerData = async () => {
             setLoading(true);
             
             try {
-                // Check if agent data was passed in state (from list page)
+                // Check if broker data was passed in state (from list page)
                 if (location.state) {
-                    const agentData = location.state;
-                    setAgent(agentData);
+                    const brokerData = location.state;
+                    setBroker(brokerData);
                     
                     setFormData({
-                        fullName: agentData.fullName || '',
-                        mobile: agentData.mobile || '',
-                        aadharNumber: agentData.aadharNumber || '',
+                        fullName: brokerData.fullName || '',
+                        mobile: brokerData.mobile || '',
+                        aadharNumber: brokerData.aadharNumber || '',
                         profilePhoto: null,
                         aadharDocument: null
                     });
                     
                     // Store existing file URLs separately
                     setExistingFiles({
-                        profileImg: agentData.profileImg || null,
-                        aadhaarFile: agentData.aadhaarFile || null
+                        profileImg: brokerData.profileImg || null,
+                        aadhaarFile: brokerData.aadhaarFile || null
                     });
                     
                     // Set preview URLs from existing files with full URL
-                    if (agentData.profileImg) {
-                        setProfilePreview(getFullFileUrl(agentData.profileImg));
+                    if (brokerData.profileImg) {
+                        setProfilePreview(getFullFileUrl(brokerData.profileImg));
                     }
                     
-                    if (agentData.aadhaarFile) {
-                        setDocumentPreview(getFullFileUrl(agentData.aadhaarFile));
+                    if (brokerData.aadhaarFile) {
+                        setDocumentPreview(getFullFileUrl(brokerData.aadhaarFile));
                     }
                 } else if (uid) {
-                    await fetchAgentData(uid);
+                    await fetchBrokerData(uid);
                 } else {
-                    toast.error("No agent ID provided");
-                    navigate(PATHROUTES.agentsList);
+                    toast.error("No broker ID provided");
+                    navigate(PATHROUTES.brokerList);
                 }
             } catch (error) {
-                console.error("Error loading agent data:", error);
-                toast.error("Failed to load agent details");
+                console.error("Error loading broker data:", error);
+                toast.error("Failed to load broker details");
             } finally {
                 setLoading(false);
             }
         };
 
-        loadAgentData();
+        loadBrokerData();
 
         // Cleanup function for preview URLs
         return () => {
@@ -100,44 +99,44 @@ const EditAgent = () => {
         };
     }, [uid, location.state, navigate]);
 
-    // Fetch agent data from API
-    const fetchAgentData = async (agentUid) => {
+    // Fetch broker data from API
+    const fetchBrokerData = async (brokerUid) => {
         try {
-            const response = await api.get(Endpoints.GET_AGENT_BY_ID(agentUid));
+            const response = await api.get(Endpoints.GET_BROKER_BY_ID(brokerUid));
             
             if (response.data.success) {
-                const agentData = response.data.data;
-                setAgent(agentData);
+                const brokerData = response.data.data;
+                setBroker(brokerData);
                 
                 setFormData({
-                    fullName: agentData.name || '',
-                    mobile: agentData.phone || '',
-                    aadharNumber: agentData.aadhaarNumber || '',
+                    fullName: brokerData.name || '',
+                    mobile: brokerData.phone || '',
+                    aadharNumber: brokerData.aadhaarNumber || '',
                     profilePhoto: null,
                     aadharDocument: null
                 });
                 
                 setExistingFiles({
-                    profileImg: agentData.profileImg || null,
-                    aadhaarFile: agentData.aadhaarFile || null
+                    profileImg: brokerData.profileImg || null,
+                    aadhaarFile: brokerData.aadhaarFile || null
                 });
                 
                 // Set preview URLs from existing files with full URL
-                if (agentData.profileImg) {
-                    setProfilePreview(getFullFileUrl(agentData.profileImg));
+                if (brokerData.profileImg) {
+                    setProfilePreview(getFullFileUrl(brokerData.profileImg));
                 }
                 
-                if (agentData.aadhaarFile) {
-                    setDocumentPreview(getFullFileUrl(agentData.aadhaarFile));
+                if (brokerData.aadhaarFile) {
+                    setDocumentPreview(getFullFileUrl(brokerData.aadhaarFile));
                 }
             } else {
-                toast.error(response.data.message || "Agent not found");
-                navigate(PATHROUTES.agentsList);
+                toast.error(response.data.message || "Broker not found");
+                navigate(PATHROUTES.brokerList);
             }
         } catch (error) {
-            console.error("Error fetching agent data:", error);
-            toast.error(error?.response?.data?.message || "Failed to load agent details");
-            navigate(PATHROUTES.agentsList);
+            console.error("Error fetching broker data:", error);
+            toast.error(error?.response?.data?.message || "Failed to load broker details");
+            navigate(PATHROUTES.brokerList);
         }
     };
 
@@ -340,9 +339,9 @@ const EditAgent = () => {
                 formDataToSend.append('aadhaarFile', '');
             }
             
-            // Send PUT request to update agent
+            // Send PUT request to update broker
             const response = await api.put(
-                Endpoints.UPDATE_AGENT(uid),
+                Endpoints.UPDATE_BROKER(uid),
                 formDataToSend,
                 {
                     headers: {
@@ -352,7 +351,7 @@ const EditAgent = () => {
             );
             
             if (response.data.success) {
-                toast.success(response.data.message || 'Agent updated successfully!');
+                toast.success(response.data.message || 'Broker updated successfully!');
                 
                 // Clean up preview URLs
                 if (profilePreview && profilePreview.startsWith('blob:')) {
@@ -362,15 +361,15 @@ const EditAgent = () => {
                     URL.revokeObjectURL(documentPreview);
                 }
                 
-                // Navigate back to agent list
-                navigate(PATHROUTES.agentsList);
+                // Navigate back to broker list
+                navigate(PATHROUTES.brokerList);
             } else {
-                toast.error(response.data.message || "Failed to update agent");
+                toast.error(response.data.message || "Failed to update broker");
             }
             
         } catch (error) {
-            console.error("Error updating agent:", error);
-            toast.error(error?.response?.data?.message || "Failed to update agent");
+            console.error("Error updating broker:", error);
+            toast.error(error?.response?.data?.message || "Failed to update broker");
         } finally {
             setIsSubmitting(false);
         }
@@ -385,7 +384,7 @@ const EditAgent = () => {
             URL.revokeObjectURL(documentPreview);
         }
         
-        navigate(PATHROUTES.agentsList);
+        navigate(PATHROUTES.brokerList);
     };
 
     // Loading state
@@ -393,9 +392,9 @@ const EditAgent = () => {
         return (
             <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-50 via-white to-gray-50">
                 <div className="text-center p-8 bg-white rounded-xl shadow-md">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    <h3 className="text-xl font-bold text-gray-700 mb-2">Loading Agent Details...</h3>
-                    <p className="text-gray-500">Please wait while we fetch the agent information.</p>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+                    <h3 className="text-xl font-bold text-gray-700 mb-2">Loading Broker Details...</h3>
+                    <p className="text-gray-500">Please wait while we fetch the broker information.</p>
                 </div>
             </div>
         );
@@ -403,34 +402,31 @@ const EditAgent = () => {
 
     return (
         <div className="space-y-6">
-            <Toaster position="top-center" />
             
             {/* Header Section */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <button
                         onClick={handleCancel}
-                        className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="p-2 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
                         disabled={isSubmitting}
                     >
                         <ArrowLeft size={20} />
                     </button>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Edit Agent</h1>
-                        <p className="text-gray-600">Update agent information for {formData.fullName}</p>
+                        <h1 className="text-2xl font-bold text-gray-900">Edit Broker Details</h1>
+                        <p className="text-gray-600">Update broker details like name, contact information, and other basic details.</p>
                     </div>
                 </div>
-                <div className="text-sm text-gray-500">
-                    Agent ID: <span className="font-medium">{uid}</span>
-                </div>
+
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-8">
                 {/* Personal Details Card */}
                 <div className="bg-white rounded-xl shadow-md p-6">
                     <div className="flex items-center space-x-3 mb-6">
-                        <div className="p-2 bg-blue-50 rounded-lg">
-                            <User className="text-blue-600" size={20} />
+                        <div className="p-2 bg-primary-50 rounded-lg">
+                            <User className="text-primary-600" size={20} />
                         </div>
                         <h2 className="text-lg font-semibold text-gray-900">Personal Details</h2>
                     </div>
@@ -457,7 +453,7 @@ const EditAgent = () => {
                             </div>
                             <label 
                                 htmlFor="profilePhoto"
-                                className={`absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full cursor-pointer hover:bg-blue-700 transition-colors shadow-lg ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                className={`absolute bottom-0 right-0 bg-primary-600 text-white p-2 rounded-full cursor-pointer hover:bg-primary-700 transition-colors shadow-lg ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
                                 <Camera size={18} />
                             </label>
@@ -510,7 +506,7 @@ const EditAgent = () => {
                                 name="fullName"
                                 value={formData.fullName}
                                 onChange={handleChange}
-                                className={`w-full px-4 py-2 border ${errors.fullName ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                                className={`w-full px-4 py-2 border ${errors.fullName ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500`}
                                 placeholder="Enter full name"
                                 disabled={isSubmitting}
                             />
@@ -530,7 +526,7 @@ const EditAgent = () => {
                                     name="mobile"
                                     value={formData.mobile}
                                     onChange={handleChange}
-                                    className={`w-full pl-10 px-4 py-2 border ${errors.mobile ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                                    className={`w-full pl-10 px-4 py-2 border ${errors.mobile ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500`}
                                     placeholder="Enter 10-digit mobile number"
                                     disabled={isSubmitting}
                                 />
@@ -549,16 +545,13 @@ const EditAgent = () => {
                                 name="aadharNumber"
                                 value={formData.aadharNumber}
                                 onChange={handleChange}
-                                className={`w-full px-4 py-2 border ${errors.aadharNumber ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                                className={`w-full px-4 py-2 border ${errors.aadharNumber ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500`}
                                 placeholder="Enter 12-digit Aadhar number"
                                 disabled={isSubmitting}
                             />
                             {errors.aadharNumber && (
                                 <p className="text-red-500 text-xs mt-1">{errors.aadharNumber}</p>
                             )}
-                            {/* <p className="text-xs text-gray-500 mt-1">
-                                Leave empty to remove Aadhar number
-                            </p> */}
                         </div>
                     </div>
                 </div>
@@ -581,7 +574,7 @@ const EditAgent = () => {
                                             <div className={`p-3 rounded-lg ${
                                                 isPDF(formData.aadharDocument || existingFiles.aadhaarFile) 
                                                     ? 'bg-red-100 text-red-600' 
-                                                    : 'bg-blue-100 text-blue-600'
+                                                    : 'bg-primary-100 text-primary-600'
                                             }`}>
                                                 {isPDF(formData.aadharDocument || existingFiles.aadhaarFile) ? (
                                                     <FileIcon size={24} />
@@ -607,7 +600,7 @@ const EditAgent = () => {
                                                 className={`p-2 rounded-lg hover:opacity-90 transition-opacity ${
                                                     isPDF(formData.aadharDocument || existingFiles.aadhaarFile)
                                                         ? 'bg-red-100 text-red-600 hover:bg-red-200'
-                                                        : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
+                                                        : 'bg-primary-100 text-primary-600 hover:bg-primary-200'
                                                 }`}
                                                 title={isPDF(formData.aadharDocument || existingFiles.aadhaarFile) ? "Open PDF" : "Preview Image"}
                                                 disabled={isSubmitting}
@@ -677,7 +670,7 @@ const EditAgent = () => {
                                     </p>
                                 </div>
                             ) : (
-                                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors">
+                                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary-500 transition-colors">
                                     <div className="flex flex-col items-center justify-center">
                                         <Upload className="text-gray-400 mb-3" size={40} />
                                         <p className="text-sm text-gray-700 mb-2 font-medium">
@@ -689,7 +682,7 @@ const EditAgent = () => {
                                         
                                         <label 
                                             htmlFor="aadharDocument"
-                                            className={`px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition-colors text-sm ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            className={`px-4 py-2 bg-primary-600 text-white rounded-lg cursor-pointer hover:bg-primary-700 transition-colors text-sm ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         >
                                             Browse File
                                         </label>
@@ -723,7 +716,7 @@ const EditAgent = () => {
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-6 py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {isSubmitting ? (
                             <>
@@ -733,7 +726,7 @@ const EditAgent = () => {
                         ) : (
                             <>
                                 <Save size={16} />
-                                Update Agent
+                                Update Broker
                             </>
                         )}
                     </button>
@@ -743,4 +736,4 @@ const EditAgent = () => {
     );
 };
 
-export default EditAgent;
+export default EditBroker;

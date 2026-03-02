@@ -22,11 +22,11 @@ export const Endpoints = {
   GET_ROLES: "/admin/roles",
 
   // Agent MANAGEMENT
-  GET_AGENT: "/admin/commission-agent",
-  CREATE_AGENT: "/admin/commission-agent",
-  UPDATE_AGENT: (uid) => `/admin/commission-agent/${uid}`,
-  DELETE_AGENT: (uid) => `/admin/commission-agent/${uid}?status=false`,
-  GET_AGENT_BY_ID: (uid) => `/admin/commission-agent/${uid}`,
+  GET_BROKER: "/admin/commission-agent",
+  CREATE_BROKER: "/admin/commission-agent",
+  UPDATE_BROKER: (uid) => `/admin/commission-agent/${uid}`,
+  DELETE_BROKER: (uid) => `/admin/commission-agent/${uid}?status=false`,
+  GET_BROKER_BY_ID: (uid) => `/admin/commission-agent/${uid}`,
 
   GET_ROLES: "/admin/roles",
 

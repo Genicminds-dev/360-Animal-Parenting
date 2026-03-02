@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Phone, Camera, Upload, FileText, X, Eye, File } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
-import api from '../../services/api/api';
-import { Endpoints } from '../../services/api/EndPoint';
-import { PATHROUTES } from '../../routes/pathRoutes';
+import api from '../../../services/api/api';
+import { PATHROUTES } from '../../../routes/pathRoutes';
+import { Endpoints } from '../../../services/api/EndPoint';
 
-const AgentRegistration = () => {
+const AddBroker = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         fullName: '',
@@ -29,6 +29,15 @@ const AgentRegistration = () => {
 
     const handleChange = (e) => {
         const { name, value, files } = e.target;
+        
+        // Add length restrictions for specific fields
+        if (name === 'mobile' && value.length > 10) {
+            return; // Don't update if exceeds 10 digits
+        }
+        if (name === 'aadharNumber' && value.length > 12) {
+            return; // Don't update if exceeds 12 digits
+        }
+        
         if (files && files[0]) {
             const file = files[0];
             setFormData(prev => ({ ...prev, [name]: file }));
@@ -111,7 +120,7 @@ const AgentRegistration = () => {
             }
             
             // Make API call
-            const response = await api.post(Endpoints.CREATE_AGENT, formDataToSend, {
+            const response = await api.post(Endpoints.CREATE_BROKER, formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -119,7 +128,7 @@ const AgentRegistration = () => {
             
             if (response.data.success) {
                 // Show success toast
-                toast.success(response.data.message || 'Agent registered successfully!');
+                toast.success(response.data.message || 'Broker registered successfully!');
                 
                 // Clean up preview URLs
                 if (previewUrl) {
@@ -137,14 +146,14 @@ const AgentRegistration = () => {
                 setErrors({});
                 setPreviewUrl(null);
                 
-                // Navigate to commission agents page after a short delay
+                // Navigate to brokers list page after a short delay
                 setTimeout(() => {
-                    navigate(PATHROUTES.agentsList);
+                    navigate(PATHROUTES.brokerList);
                 }, 1500);
                 
             } else {
                 // Handle API error messages
-                const errorMessage = response.data.message || 'Failed to register agent';
+                const errorMessage = response.data.message || 'Failed to register broker';
                 toast.error(errorMessage);
                 
                 // Set specific field errors based on error message
@@ -155,7 +164,7 @@ const AgentRegistration = () => {
                 }
             }
         } catch (error) {
-            console.error('Error registering agent:', error);
+            console.error('Error registering broker:', error);
             
             // Handle different error types
             let errorMessage = 'An unexpected error occurred. Please try again.';
@@ -206,27 +215,16 @@ const AgentRegistration = () => {
 
     return (
         <div className="space-y-6">
-            {/* Toaster Component */}
-            <Toaster
-                position="top-center"
-                toastOptions={{
-                    style: { background: "#363636", color: "#fff" },
-                    success: { style: { background: "#10b981" } },
-                    error: { style: { background: "#ef4444" } },
-                    duration: 3000,
-                }}
-            />
-            
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">Agent Registration</h1>
-                <p className="text-gray-600">Register new agent for animal procurement</p>
+                <h1 className="text-2xl font-bold text-gray-900">Broker Registration</h1>
+                <p className="text-gray-600">Register new broker for animal procurement</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="card">
                     <div className="flex items-center space-x-3 mb-6">
-                        <div className="p-2 bg-blue-50 rounded-lg">
-                            <User className="text-blue-600" size={20} />
+                        <div className="p-2 bg-primary-50 rounded-lg">
+                            <User className="text-primary-600" size={20} />
                         </div>
                         <h2 className="text-lg font-semibold text-gray-900">Personal Details</h2>
                     </div>
@@ -307,6 +305,7 @@ const AgentRegistration = () => {
                                     name="mobile"
                                     value={formData.mobile}
                                     onChange={handleChange}
+                                    maxLength={10}
                                     className={`input-field pl-10 ${errors.mobile ? 'border-red-500' : ''}`}
                                     placeholder="Enter 10-digit mobile number"
                                     disabled={isSubmitting}
@@ -315,6 +314,9 @@ const AgentRegistration = () => {
                             {errors.mobile && (
                                 <p className="text-red-500 text-xs mt-1">{errors.mobile}</p>
                             )}
+                            <p className="text-xs text-gray-500 mt-1">
+                                {formData.mobile.length}/10 digits
+                            </p>
                         </div>
 
                         <div>
@@ -326,6 +328,7 @@ const AgentRegistration = () => {
                                 name="aadharNumber"
                                 value={formData.aadharNumber}
                                 onChange={handleChange}
+                                maxLength={12}
                                 className={`input-field ${errors.aadharNumber ? 'border-red-500' : ''}`}
                                 placeholder="Enter 12-digit Aadhar number"
                                 disabled={isSubmitting}
@@ -333,6 +336,9 @@ const AgentRegistration = () => {
                             {errors.aadharNumber && (
                                 <p className="text-red-500 text-xs mt-1">{errors.aadharNumber}</p>
                             )}
+                            <p className="text-xs text-gray-500 mt-1">
+                                {formData.aadharNumber.length}/12 digits
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -354,7 +360,7 @@ const AgentRegistration = () => {
                                             <div className={`p-3 rounded-lg ${
                                                 isPDF(formData.aadharDocument) 
                                                     ? 'bg-red-100 text-red-600' 
-                                                    : 'bg-blue-100 text-blue-600'
+                                                    : 'bg-primary-100 text-primary-600'
                                             }`}>
                                                 {isPDF(formData.aadharDocument) ? (
                                                     <File size={24} />
@@ -380,7 +386,7 @@ const AgentRegistration = () => {
                                                 className={`p-2 rounded-lg hover:opacity-90 transition-opacity ${
                                                     isPDF(formData.aadharDocument)
                                                         ? 'bg-red-100 text-red-600 hover:bg-red-200'
-                                                        : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
+                                                        : 'bg-primary-100 text-primary-600 hover:bg-primary-200'
                                                 }`}
                                                 title={isPDF(formData.aadharDocument) ? "Open PDF" : "Preview Image"}
                                                 disabled={isSubmitting}
@@ -491,7 +497,7 @@ const AgentRegistration = () => {
                                 Registering...
                             </>
                         ) : (
-                            'Register Agent'
+                            'Register Broker'
                         )}
                     </button>
                 </div>
@@ -500,4 +506,4 @@ const AgentRegistration = () => {
     );
 };
 
-export default AgentRegistration;
+export default AddBroker;
