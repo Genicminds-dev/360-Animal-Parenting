@@ -10,7 +10,9 @@ import {
   UserCircle,
   ChevronDown,
   ChevronRight,
-  X
+  X,
+  FileCheck,
+  Handshake
 } from 'lucide-react';
 import { GiCow } from 'react-icons/gi';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -129,16 +131,22 @@ const Sidebar = ({ toggleSidebar, onLogout, isMobile, onLogoutClick }) => {
     //   ]
     // },
     // { path: PATHROUTES.sellersList, label: 'Sellers', icon: <Users size={20} />, roles: [1, 2, 3] },
-    // { path: PATHROUTES.agentsList, label: 'Commission Agents', icon: <Users size={20} />, roles: [1, 2, 3] },
+    // { path: PATHROUTES.brokerList, label: 'Commission Agents', icon: <Users size={20} />, roles: [1, 2, 3] },
     // { path: PATHROUTES.animalsList, label: 'Animals', icon: <GiCow size={20} />, roles: [1, 2, 3] },
     // { path: '/transporters', label: 'Transporters', icon: <Truck size={20} />, roles: [1, 2, 3] },
     // { path: '/suppliers', label: 'Suppliers', icon: <UserCircle size={20} />, roles: [1, 2, 3] },
     // { path: '/beneficiaries', label: 'Beneficiaries', icon: <Users size={20} />, roles: [1, 2, 3] },
     // { path: '/team', label: 'Team Members', icon: <Users size={20} />, roles: [1, 2, 3] },
     // { path: '/reports', label: 'Reports', icon: <FileText size={20} />, roles: [1, 2, 3] },
-    
+
+        // { path: PATHROUTES.sellersList, label: 'Sellers', icon: <Users size={20} />, roles: [1, 2, 3] },
+    { path: PATHROUTES.brokerList, label: 'Broker', icon: <Users size={20} />, roles: [1, 2, 3] },
+    { path: PATHROUTES.animalsList, label: 'Procured Animals', icon: <GiCow size={20} />, roles: [1, 2, 3] },
     { path: PATHROUTES.animalProcurement, label: 'Animal Registration', icon: <GiCow size={20} />, roles: [1, 2, 3] },
-    { path: PATHROUTES.animalProcuredList, label: 'Animal List', icon: <FileText size={20} />, roles: [1, 2, 3] },
+    // { path: PATHROUTES.animalProcuredList, label: 'Animal List', icon: <FileText size={20} />, roles: [1, 2, 3] },
+        { path: PATHROUTES.handoverList, label: 'Handover', icon: <Handshake size={20} />, roles: [1, 2, 3] },
+    { path: PATHROUTES.schemeList, label: 'Manage Schemes', icon: <FileCheck size={20} />, roles: [1, 2, 3] },
+ 
 
 
     { path: PATHROUTES.userList, label: 'Manage Users', icon: <Users size={20} />, roles: [1, 2, 3] },
@@ -344,7 +352,7 @@ export default Sidebar;
 //     //   ]
 //     // },
 //     // { path: PATHROUTES.sellersList, label: 'Sellers', icon: <Users size={20} />, roles: [1, 2, 3] },
-//     // { path: PATHROUTES.agentsList, label: 'Commission Agents', icon: <Users size={20} />, roles: [1, 2, 3] },
+//     // { path: PATHROUTES.brokerList, label: 'Commission Agents', icon: <Users size={20} />, roles: [1, 2, 3] },
 //     // { path: PATHROUTES.animalsList, label: 'Animals', icon: <GiCow size={20} />, roles: [1, 2, 3] },
 //     // { path: '/transporters', label: 'Transporters', icon: <Truck size={20} />, roles: [1, 2, 3] },
 //     // { path: '/suppliers', label: 'Suppliers', icon: <UserCircle size={20} />, roles: [1, 2, 3] },

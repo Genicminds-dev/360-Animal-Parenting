@@ -17,11 +17,9 @@ import Login from './pages/Auth/Login';
 import Dashboard from './pages/Dashboard/Dashboard';
 import SellerRegistration from './pages/procurement/SellerRegistration';
 import AnimalRegistration from './pages/procurement/AnimalRegistration';
-import AgentRegistration from './pages/procurement/AgentRegistration';
 import ForgotPassword from './pages/Auth/ForgotPassword';
 import ResetPassword from './pages/Auth/ResetPassword';
 import SellersList from './pages/management/sellers/SellersList';
-import AgentsList from './pages/management/agents/AgentsList';
 import AnimalsList from './pages/management/animals/AnimalsList';
 import AnimalDetails from './pages/management/animals/AnimalDetails';
 
@@ -33,8 +31,6 @@ import api from "./services/api/api";
 import { Endpoints } from "./services/api/EndPoint";
 import SessionTimeoutModal from './components/Layout/Session/SessionTimeoutModal';
 import HealthCheckupList from './pages/procurement/HealthCheckupList';
-import AgentDetails from './pages/management/agents/AgentDetails';
-import EditAgent from './pages/management/agents/EditAgent';
 import SellerDetails from './pages/management/sellers/SellerDetails';
 import EditSeller from './pages/management/sellers/EditSeller';
 import HealthCheckupForm from './pages/procurement/HealthCheckupForm';
@@ -46,6 +42,16 @@ import SettingsPage from './pages/settings/SettingPage';
 import AnimalProcurement from './pages/AnimalProcurement/AnimalProcurement';
 import ProcurementView from './pages/AnimalProcuredList/ProcurementView';
 import ProcurementList from './pages/AnimalProcuredList/ProcurementList';
+
+
+
+import BrokersList from './pages/management/broker/BrokersList';
+import AddBroker from './pages/management/broker/AddBroker';
+import EditBroker from './pages/management/broker/EditBroker';
+import BrokerDetails from './pages/management/broker/BrokerDetails';
+import ManageSchemesTable from './pages/manageSchemes/ManageSchemesTable';
+import HandoverList from './pages/management/Handover/HandoverList';
+
 
 // Placeholder component for incomplete pages
 const Placeholder = ({ title }) => (
@@ -64,7 +70,7 @@ const AppContent = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [sessionExpired, setSessionExpired] = useState(false);
-  
+
 
   // Define handleLogout first before it's used
   const handleLogout = useCallback(async (isSessionExpired = false) => {
@@ -166,14 +172,6 @@ const AppContent = () => {
 
           {/* Procurement Routes with Role-based Access */}
           <Route
-            path={PATHROUTES.agentRegistration.replace('/', '')}
-            element={
-              <PrivateRoute allowedRoles={[1, 2]}>
-                <AgentRegistration />
-              </PrivateRoute>
-            }
-          />
-          <Route
             path={PATHROUTES.sellerRegistration.replace('/', '')}
             element={
               <PrivateRoute allowedRoles={[1, 2]}>
@@ -233,26 +231,34 @@ const AppContent = () => {
             }
           />
           <Route
-            path={PATHROUTES.agentsList.replace('/', '')}
+            path={PATHROUTES.brokerList.replace('/', '')}
             element={
               <PrivateRoute allowedRoles={[1, 2]}>
-                <AgentsList />
+                <BrokersList />
               </PrivateRoute>
             }
           />
           <Route
-            path={PATHROUTES.agentDetails.replace('/', '')}
+            path={PATHROUTES.brokerDetails.replace('/', '')}
             element={
               <PrivateRoute allowedRoles={[1, 2]}>
-                <AgentDetails />
+                <BrokerDetails />
               </PrivateRoute>
             }
           />
           <Route
-            path={PATHROUTES.editAgent.replace('/', '')}
+            path={PATHROUTES.brokerRegistration.replace('/', '')}
             element={
               <PrivateRoute allowedRoles={[1, 2]}>
-                <EditAgent />
+                <AddBroker />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path={PATHROUTES.editBroker.replace('/', '')}
+            element={
+              <PrivateRoute allowedRoles={[1, 2]}>
+                <EditBroker />
               </PrivateRoute>
             }
           />
@@ -280,6 +286,27 @@ const AppContent = () => {
               </PrivateRoute>
             }
           />
+
+          <Route
+            path={PATHROUTES.schemeList.replace('/', '')}
+            element={
+              <PrivateRoute allowedRoles={[1, 2]}>
+                <ManageSchemesTable />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path={PATHROUTES.handoverList.replace('/', '')}
+            element={
+              <PrivateRoute allowedRoles={[1, 2, 3]}>
+                <HandoverList />
+              </PrivateRoute>
+            }
+          />
+
+
+
 
           {/* Transporters */}
           <Route
