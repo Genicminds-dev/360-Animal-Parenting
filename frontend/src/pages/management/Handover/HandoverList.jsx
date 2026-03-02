@@ -2,9 +2,6 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     FaUserPlus,
-    FaUserCheck,
-    FaUser,
-    FaUserTimes,
     FaDownload,
     FaPrint
 } from 'react-icons/fa';
@@ -17,24 +14,25 @@ import {
     Filter,
     X,
     Calendar,
+    CheckCircle,
+    XCircle,
+    Layers,
     ArrowRight,
     ChevronDown,
     ChevronUp,
     Minus
 } from "lucide-react";
 
-import DataTable from '../../components/common/Table/DataTable';
-import { Endpoints } from '../../services/api/EndPoint';
-import api from '../../services/api/api';
-import { PATHROUTES } from '../../routes/pathRoutes';
+import DataTable from '../../../components/common/Table/DataTable';
+import { PATHROUTES } from '../../../routes/pathRoutes';
 
-const ManageUsersTable = () => {
-    const [users, setUsers] = useState([]);
-    const [filteredUsers, setFilteredUsers] = useState([]);
-    
+const HandoverList = () => {
+    const [schemes, setSchemes] = useState([]);
+    const [filteredSchemes, setFilteredSchemes] = useState([]);
     const [searchInput, setSearchInput] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const searchTimeoutRef = useRef(null);
+    const toastShownRef = useRef(false); // Toast ko sirf ek baar dikhane ke liye
 
     const [currentPage, setCurrentPage] = useState(1);
     const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
@@ -46,7 +44,7 @@ const ManageUsersTable = () => {
     const [filters, setFilters] = useState({});
     const [loading, setLoading] = useState(true);
     const [isDeleting, setIsDeleting] = useState(false);
-    
+
     // Filter UI state
     const [showFilters, setShowFilters] = useState(false);
     const [tempFilters, setTempFilters] = useState({});
@@ -57,10 +55,9 @@ const ManageUsersTable = () => {
     const [selectedIds, setSelectedIds] = useState(new Set());
 
     const [stats, setStats] = useState({
-        totalUsers: 0,
-        activeUsers: 0,
-        inactiveUsers: 0,
-        adminUsers: 0,
+        totalHandovers: 0,
+        completedHandovers: 0,
+        pendingHandovers: 0,
     });
 
     const [pagination, setPagination] = useState({
@@ -72,81 +69,99 @@ const ManageUsersTable = () => {
 
     const navigate = useNavigate();
 
-    // Get unique roles for dropdown
-    const getRoleOptions = useMemo(() => {
-        const roles = new Set();
-        users.forEach(user => {
-            if (user.Role?.name) {
-                roles.add(user.Role.name);
-            }
-        });
-        return Array.from(roles).sort();
-    }, [users]);
+    const LOCAL_SCHEMES_DATA = [
+        { id: 1, schemeName: "Pradhan Mantri Jan Dhan Yojana", status: "active", createdAt: "2024-01-15" },
+        { id: 2, schemeName: "Sukanya Samriddhi Yojana", status: "active", createdAt: "2024-01-20" },
+        { id: 3, schemeName: "Atal Pension Yojana", status: "active", createdAt: "2024-02-01" },
+        { id: 4, schemeName: "Pradhan Mantri Jeevan Jyoti Yojana", status: "inactive", createdAt: "2024-02-10" },
+        { id: 5, schemeName: "Pradhan Mantri Suraksha Bima Yojana", status: "active", createdAt: "2024-02-15" },
+        { id: 6, schemeName: "National Pension System", status: "active", createdAt: "2024-03-01" },
+        { id: 7, schemeName: "Ayushman Bharat Yojana", status: "active", createdAt: "2024-03-10" },
+        { id: 8, schemeName: "PM Kisan Samman Nidhi", status: "inactive", createdAt: "2024-03-15" },
+        { id: 9, schemeName: "Ujjwala Yojana", status: "active", createdAt: "2024-04-01" },
+        { id: 10, schemeName: "Swachh Bharat Mission", status: "active", createdAt: "2024-04-10" },
+        { id: 11, schemeName: "Digital India Mission", status: "active", createdAt: "2024-04-15" },
+        { id: 12, schemeName: "Make in India", status: "inactive", createdAt: "2024-05-01" },
+        { id: 13, schemeName: "Startup India", status: "active", createdAt: "2024-05-10" },
+        { id: 14, schemeName: "Standup India", status: "active", createdAt: "2024-05-15" },
+        { id: 15, schemeName: "PM Awas Yojana", status: "active", createdAt: "2024-06-01" },
+        { id: 16, schemeName: "PM Gram Sadak Yojana", status: "inactive", createdAt: "2024-06-10" },
+        { id: 17, schemeName: "Jal Jeevan Mission", status: "active", createdAt: "2024-06-15" },
+        { id: 18, schemeName: "PM Poshan Shakti Nirman", status: "active", createdAt: "2024-07-01" },
+        { id: 19, schemeName: "National Health Mission", status: "active", createdAt: "2024-07-10" },
+        { id: 20, schemeName: "Beti Bachao Beti Padhao", status: "inactive", createdAt: "2024-07-15" },
+        { id: 21, schemeName: "POSHAN Abhiyaan", status: "active", createdAt: "2024-08-01" },
+        { id: 22, schemeName: "Rashtriya Swasthya Bima Yojana", status: "active", createdAt: "2024-08-10" },
+        { id: 23, schemeName: "PM Garib Kalyan Yojana", status: "active", createdAt: "2024-08-15" },
+        { id: 24, schemeName: "One Nation One Ration Card", status: "inactive", createdAt: "2024-09-01" },
+        { id: 25, schemeName: "PM Street Vendor's AtmaNirbhar Nidhi", status: "active", createdAt: "2024-09-10" }
+    ];
 
-    // Get unique status for dropdown
     const getStatusOptions = useMemo(() => {
         const statuses = new Set();
-        users.forEach(user => {
-            if (user.status && user.status !== 'NA') {
-                statuses.add(user.status);
+        schemes.forEach(scheme => {
+            if (scheme.status) {
+                statuses.add(scheme.status);
             }
         });
         return Array.from(statuses).sort();
-    }, [users]);
+    }, [schemes]);
 
-    // API functions directly in component
-    const fetchUsers = async () => {
+    const fetchSchemes = async () => {
         try {
             setLoading(true);
-            const response = await api.get(Endpoints.GET_USERS);
 
-            const apiUsers = Array.isArray(response.data.data)
-                ? response.data.data
-                : [response.data.data];
+            // Simulating API delay
+            await new Promise(resolve => setTimeout(resolve, 500));
 
-            const normalizedUsers = apiUsers.map(user => ({
-                ...user,
-                id: user.id || user.uid,
-                status: user.status ?? "NA",
-                createdAt: user.createdAt ? new Date(user.createdAt).toISOString().split('T')[0] : 'N/A'
+            const normalizedSchemes = LOCAL_SCHEMES_DATA.map(scheme => ({
+                ...scheme,
+                createdAt: scheme.createdAt || new Date().toISOString().split('T')[0]
             }));
 
-            setUsers(normalizedUsers);
-            setFilteredUsers(normalizedUsers);
-            calculateStats(normalizedUsers);
-            
+            setSchemes(normalizedSchemes);
+            setFilteredSchemes(normalizedSchemes);
+            calculateStats(normalizedSchemes);
+
             setPagination(prev => ({
                 ...prev,
-                totalRecords: normalizedUsers.length,
-                totalPages: Math.ceil(normalizedUsers.length / prev.limit)
+                totalRecords: normalizedSchemes.length,
+                totalPages: Math.ceil(normalizedSchemes.length / prev.limit)
             }));
         } catch (error) {
-            console.error('Error fetching users:', error);
-            toast.error(error.response?.data?.message || "Failed to fetch users");
-            setUsers([]);
-            setFilteredUsers([]);
+            console.error('Error fetching schemes:', error);
+            toast.error("Failed to fetch schemes");
+            setSchemes([]);
+            setFilteredSchemes([]);
         } finally {
             setLoading(false);
         }
     };
 
-    const deleteUser = async (userId) => {
+    const deleteScheme = async (schemeId) => {
         try {
-            const response = await api.delete(Endpoints.DELETE_USER(userId));
-            return response.data;
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            const updatedSchemes = schemes.filter(scheme => scheme.id !== schemeId);
+            setSchemes(updatedSchemes);
+
+            return { success: true };
         } catch (error) {
-            console.error('Error deleting user:', error);
+            console.error('Error deleting scheme:', error);
             throw error;
         }
     };
 
-    const deleteMultipleUsers = async (userIds) => {
+    // Bulk delete function
+    const deleteMultipleSchemes = async (schemeIds) => {
         try {
-            const deletePromises = userIds.map(id => deleteUser(id));
-            const results = await Promise.allSettled(deletePromises);
+            await new Promise(resolve => setTimeout(resolve, 800));
 
-            const successful = results.filter(r => r.status === 'fulfilled').length;
-            const failed = results.filter(r => r.status === 'rejected').length;
+            const successful = schemeIds.length;
+            const failed = 0;
+
+            const updatedSchemes = schemes.filter(scheme => !schemeIds.includes(scheme.id));
+            setSchemes(updatedSchemes);
 
             return { successful, failed };
         } catch (error) {
@@ -155,31 +170,30 @@ const ManageUsersTable = () => {
         }
     };
 
-    // Fetch users on component mount
     useEffect(() => {
-        fetchUsers();
+        fetchSchemes();
+
+        // Cleanup function
+        return () => {
+            toastShownRef.current = false;
+        };
     }, []);
 
     // Calculate statistics
-    const calculateStats = (usersData) => {
-        const totalUsers = usersData.length;
-        const activeUsers = usersData.filter(user => user.status === 'active').length;
-        const inactiveUsers = usersData.filter(user => user.status === 'inactive').length;
-        const adminUsers = usersData.filter(user => user.Role?.name === 'Admin').length;
+    const calculateStats = (handoversData) => {
+        const totalHandovers = handoversData.length;
+        const completedHandovers = handoversData.filter(scheme => scheme.status === 'completed').length;
+        const pendingHandovers = handoversData.filter(scheme => scheme.status === 'pending').length;
 
         setStats({
-            totalUsers,
-            activeUsers,
-            inactiveUsers,
-            adminUsers,
+            totalHandovers,
+            completedHandovers,
+            pendingHandovers,
         });
     };
 
-    // Initialize tempFilters when component mounts
     useEffect(() => {
         setTempFilters(filters);
-
-        // Check if any filters are applied
         const hasAppliedFilters = Object.keys(filters).some(key => filters[key] !== "");
         setIsFilterApplied(hasAppliedFilters);
         setAppliedFilters(filters);
@@ -203,78 +217,47 @@ const ManageUsersTable = () => {
         };
     }, [searchInput]);
 
-    // Apply filters function
+    // Apply filters function - FIXED: Ab search mein index ki jagah id use kar rahe hain
     const applyFilters = useCallback((filterValues) => {
-        let filtered = [...users];
+        let filtered = [...schemes];
 
-        // Apply search filter
+        // Apply search filter - FIXED: Ab id ko string mein convert karke search kar rahe hain
         if (searchTerm) {
             const searchLower = searchTerm.toLowerCase();
-            filtered = filtered.filter((user) => {
-                const fullName = `${user.firstName || ''} ${user.lastName || ''}`.toLowerCase();
-                const roleName = user.Role?.name?.toLowerCase() || "";
-                return user.id?.toString().includes(searchTerm) ||
-                    fullName.includes(searchLower) ||
-                    user.email?.toLowerCase().includes(searchLower) ||
-                    roleName.includes(searchLower);
+            filtered = filtered.filter((scheme) => {
+                // Search in scheme name
+                const schemeNameMatch = scheme.schemeName?.toLowerCase().includes(searchLower);
+
+                // Search in ID (jo ki unique hai)
+                const idMatch = scheme.id.toString().includes(searchTerm);
+
+                return schemeNameMatch || idMatch;
             });
         }
 
-        // Apply role filter
-        if (filterValues.role) {
-            filtered = filtered.filter(user => user.Role?.name === filterValues.role);
-        }
-
-        // Apply status filter
         if (filterValues.status) {
-            filtered = filtered.filter(user => user.status === filterValues.status);
+            filtered = filtered.filter(scheme => scheme.status === filterValues.status);
         }
 
-        // Apply date range filter
-        if (filterValues.fromDate || filterValues.toDate) {
-            filtered = filtered.filter(user => {
-                if (!user.createdAt || user.createdAt === 'N/A') return false;
-                
-                const userDate = new Date(user.createdAt);
+        setFilteredSchemes(filtered);
 
-                if (filterValues.fromDate) {
-                    const fromDate = new Date(filterValues.fromDate);
-                    fromDate.setHours(0, 0, 0, 0);
-                    if (userDate < fromDate) return false;
-                }
-
-                if (filterValues.toDate) {
-                    const toDate = new Date(filterValues.toDate);
-                    toDate.setHours(23, 59, 59, 999);
-                    if (userDate > toDate) return false;
-                }
-
-                return true;
-            });
-        }
-
-        setFilteredUsers(filtered);
-        
         setPagination(prev => ({
             ...prev,
             currentPage: 1,
             totalRecords: filtered.length,
             totalPages: Math.ceil(filtered.length / prev.limit)
         }));
-    }, [users, searchTerm]);
+    }, [schemes, searchTerm]);
 
-    // Fetch when search term changes
     useEffect(() => {
         applyFilters(filters);
     }, [searchTerm, filters, applyFilters]);
 
-    // Handle filter changes
     const handleFilterChange = (key, value) => {
         setTempFilters(prev => ({ ...prev, [key]: value }));
     };
 
     const handleApplyFilters = () => {
-        // Remove empty filters
         const filtersToApply = { ...tempFilters };
         Object.keys(filtersToApply).forEach(key => {
             if (filtersToApply[key] === "" || filtersToApply[key] === null || filtersToApply[key] === undefined) {
@@ -286,7 +269,6 @@ const ManageUsersTable = () => {
         applyFilters(tempFilters);
         setAppliedFilters(tempFilters);
 
-        // Check if any filters are applied
         const hasAppliedFilters = Object.keys(tempFilters).some(key => tempFilters[key] !== "");
         setIsFilterApplied(hasAppliedFilters);
 
@@ -295,10 +277,7 @@ const ManageUsersTable = () => {
 
     const handleClearFilters = () => {
         const emptyFilters = {
-            role: "",
             status: "",
-            fromDate: "",
-            toDate: ""
         };
         setTempFilters(emptyFilters);
         setFilters(emptyFilters);
@@ -313,12 +292,10 @@ const ManageUsersTable = () => {
         setShowFilters(false);
     };
 
-    // Handle search input change
     const handleSearchChange = (e) => {
         setSearchInput(e.target.value);
     };
 
-    // Clear search
     const handleClearSearch = () => {
         setSearchInput("");
         setSearchTerm("");
@@ -334,17 +311,16 @@ const ManageUsersTable = () => {
         setSortConfig({ key, direction });
     };
 
-    const sortedUsers = useMemo(() => {
-        if (!sortConfig.key) return filteredUsers;
+    const sortedSchemes = useMemo(() => {
+        if (!sortConfig.key) return filteredSchemes;
 
-        return [...filteredUsers].sort((a, b) => {
-            const getValue = (user, key) => {
-                if (key === "name") return `${user.firstName || ''} ${user.lastName || ''}`;
-                if (key === "role") return user.Role?.name || "";
+        return [...filteredSchemes].sort((a, b) => {
+            const getValue = (scheme, key) => {
+                if (key === "schemeName") return scheme.schemeName || "";
                 if (key === "createdAt") {
-                    return user.createdAt && user.createdAt !== 'N/A' ? new Date(user.createdAt).getTime() : 0;
+                    return scheme.createdAt ? new Date(scheme.createdAt).getTime() : 0;
                 }
-                return user[key];
+                return scheme[key];
             };
 
             const aValue = getValue(a, sortConfig.key);
@@ -354,9 +330,8 @@ const ManageUsersTable = () => {
             if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
             return 0;
         });
-    }, [filteredUsers, sortConfig]);
+    }, [filteredSchemes, sortConfig]);
 
-    // Get sort icon
     const getSortIcon = useCallback(
         (key) => {
             if (sortConfig.key !== key) {
@@ -375,7 +350,7 @@ const ManageUsersTable = () => {
     );
 
     // Selection handlers
-    const toggleSelectUser = (id) => {
+    const toggleSelectScheme = (id) => {
         if (!id) return;
         setSelectedIds((prev) => {
             const newSet = new Set(prev);
@@ -389,7 +364,7 @@ const ManageUsersTable = () => {
     };
 
     const toggleSelectAll = () => {
-        const allIds = filteredUsers.map(user => user.id).filter(Boolean);
+        const allIds = filteredSchemes.map(scheme => scheme.id).filter(Boolean);
         if (selectedIds.size === allIds.length && allIds.length > 0) {
             setSelectedIds(new Set());
         } else {
@@ -397,24 +372,19 @@ const ManageUsersTable = () => {
         }
     };
 
-    // Navigation handlers
-    const handleEditUser = (user) => {
-        navigate(`${PATHROUTES.editUsers}/${user.id}`, { state: { user } });
+    const handleEditScheme = (scheme) => {
+        navigate(`${PATHROUTES.editScheme}/${scheme.id}`, { state: { scheme } });
     };
 
-    const handleViewUser = (user) => {
-        navigate(`${PATHROUTES.viewUsers}/${user.id}`);
-    };
-
-    const handleAddUser = () => {
-        navigate(PATHROUTES.addUsers);
+    const handleAddScheme = () => {
+        navigate(PATHROUTES.addScheme);
     };
 
     // Delete handlers
     const handleDeleteClick = (id) => {
-        const user = users.find(u => u.id === id);
-        if (!user) {
-            toast.error("Cannot delete user: Invalid user ID");
+        const scheme = schemes.find(s => s.id === id);
+        if (!scheme) {
+            toast.error("Cannot delete scheme: Invalid scheme ID");
             return;
         }
         setDeleteTarget("single");
@@ -424,7 +394,7 @@ const ManageUsersTable = () => {
 
     const handleBulkDelete = (ids) => {
         if (!ids || ids.size === 0) {
-            toast.error("Please select users to delete");
+            toast.error("Please select schemes to delete");
             return;
         }
         setDeleteTarget("selected");
@@ -440,70 +410,60 @@ const ManageUsersTable = () => {
             setLoading(true);
 
             if (deleteTarget === 'selected') {
-                const result = await deleteMultipleUsers(deleteId);
+                const result = await deleteMultipleSchemes(deleteId);
                 if (result.successful > 0) {
-                    const updatedUsers = users.filter(user => !deleteId.includes(user.id));
-                    setUsers(updatedUsers);
-                    setFilteredUsers(updatedUsers.filter(user => {
-                        // Re-apply current filters to filtered list
+                    const updatedSchemes = schemes.filter(scheme => !deleteId.includes(scheme.id));
+                    setSchemes(updatedSchemes);
+
+                    setFilteredSchemes(updatedSchemes.filter(scheme => {
                         let include = true;
-                        
-                        if (filters.role && user.Role?.name !== filters.role) include = false;
-                        if (filters.status && user.status !== filters.status) include = false;
-                        
-                        // Date range check would go here if needed
-                        
+                        if (filters.status && scheme.status !== filters.status) include = false;
+
                         return include;
                     }));
-                    
-                    calculateStats(updatedUsers);
-                    
+
+                    calculateStats(updatedSchemes);
+
                     setPagination(prev => ({
                         ...prev,
-                        totalRecords: updatedUsers.length,
-                        totalPages: Math.ceil(updatedUsers.length / prev.limit)
+                        totalRecords: updatedSchemes.length,
+                        totalPages: Math.ceil(updatedSchemes.length / prev.limit)
                     }));
-                    
-                    toast.success(`${result.successful} user(s) deleted successfully`);
-                    if (result.failed > 0) {
-                        toast.error(`${result.failed} user(s) failed to delete`);
-                    }
+
+                    toast.success(`${result.successful} scheme(s) deleted successfully`);
                 }
                 setSelectedIds(new Set());
             } else {
-                await deleteUser(deleteId);
-                const updatedUsers = users.filter(user => user.id !== deleteId);
-                setUsers(updatedUsers);
-                setFilteredUsers(updatedUsers.filter(user => {
-                    // Re-apply current filters
+                await deleteScheme(deleteId);
+                const updatedSchemes = schemes.filter(scheme => scheme.id !== deleteId);
+                setSchemes(updatedSchemes);
+
+                setFilteredSchemes(updatedSchemes.filter(scheme => {
                     let include = true;
-                    
-                    if (filters.role && user.Role?.name !== filters.role) include = false;
-                    if (filters.status && user.status !== filters.status) include = false;
-                    
+                    if (filters.status && scheme.status !== filters.status) include = false;
+
                     return include;
                 }));
-                
-                calculateStats(updatedUsers);
-                
+
+                calculateStats(updatedSchemes);
+
                 setPagination(prev => ({
                     ...prev,
-                    totalRecords: updatedUsers.length,
-                    totalPages: Math.ceil(updatedUsers.length / prev.limit)
+                    totalRecords: updatedSchemes.length,
+                    totalPages: Math.ceil(updatedSchemes.length / prev.limit)
                 }));
-                
-                // Remove from selection if present
+
                 setSelectedIds((prev) => {
                     const newSet = new Set(prev);
                     newSet.delete(deleteId);
                     return newSet;
                 });
-                
-                toast.success('User deleted successfully');
+
+                toast.success('Scheme deleted successfully');
             }
         } catch (error) {
-            console.error('Error deleting user:', error);
-            toast.error(error.response?.data?.message || "Failed to delete user");
+            console.error('Error deleting scheme:', error);
+            toast.error(error.response?.data?.message || "Failed to delete scheme");
         } finally {
             setLoading(false);
             setIsDeleting(false);
@@ -514,8 +474,9 @@ const ManageUsersTable = () => {
     };
 
     const handleRefresh = () => {
+        toastShownRef.current = false;
         toast.success("Refreshing data...");
-        fetchUsers();
+        fetchSchemes();
     };
 
     const handlePageChange = (page) => {
@@ -532,59 +493,23 @@ const ManageUsersTable = () => {
         }));
     };
 
-    const getCurrentDate = () => {
-        return new Date().toISOString().split("T")[0];
-    };
-
-    // Table columns
     const columns = useMemo(() => [
         {
-            key: "id",
-            label: "User ID",
-            sortable: true,
-            onSort: () => requestSort('id'),
-            sortIcon: getSortIcon('id'),
-            render: (item) => (
-                <div className="flex items-center gap-1">
-                    <span className="font-medium text-gray-800">{item.id}</span>
-                </div>
-            )
+            key: "srNo",
+            label: "Sr. No.",
+            sortable: false,
+            headerCenter: true,
+            render: (item) => item.id
         },
         {
-            key: "name",
-            label: "Full Name",
+            key: "schemeName",
+            label: "Scheme Name",
             sortable: true,
-            onSort: () => requestSort('name'),
-            sortIcon: getSortIcon('name'),
+            onSort: () => requestSort('schemeName'),
+            sortIcon: getSortIcon('schemeName'),
             render: (item) => (
-                <div className="flex items-center gap-2">
-                    <span className="font-medium text-gray-800">
-                        {item.firstName || ''} {item.lastName || ''}
-                    </span>
-                </div>
-            )
-        },
-        {
-            key: "email",
-            label: "Email",
-            sortable: true,
-            onSort: () => requestSort('email'),
-            sortIcon: getSortIcon('email'),
-            render: (item) => (
-                <div className="flex items-center gap-1">
-                    <span className="font-medium">{item.email || ''}</span>
-                </div>
-            )
-        },
-        {
-            key: "role",
-            label: "Role",
-            sortable: true,
-            onSort: () => requestSort('role'),
-            sortIcon: getSortIcon('role'),
-            render: (item) => (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
-                    {item.Role?.name || "N/A"}
+                <span className="font-medium text-gray-800">
+                    {item.schemeName || ''}
                 </span>
             )
         },
@@ -592,55 +517,39 @@ const ManageUsersTable = () => {
             key: "status",
             label: "Status",
             sortable: true,
+            headerCenter: true,
             onSort: () => requestSort('status'),
             sortIcon: getSortIcon('status'),
-            render: (item) => {
-                const getStatusStyle = (status) => {
-                    switch (status?.toLowerCase()) {
-                        case 'active': return { bg: 'bg-green-100', text: 'text-green-800' };
-                        case 'inactive': return { bg: 'bg-pink-100', text: 'text-pink-800' };
-                        default: return { bg: 'bg-gray-100', text: 'text-gray-600' };
-                    }
-                };
-
-                const style = getStatusStyle(item.status);
-
-                return (
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${style.bg} ${style.text}`}>
-                        {item.status === "active" ? "Active" : item.status === "inactive" ? "Inactive" : "NA"}
-                    </span>
-                );
-            }
+            render: (item) => (
+                <span className={`px-2 py-1 text-xs font-medium rounded-full ${item.status === 'active'
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
+                    }`}>
+                    {item.status?.charAt(0).toUpperCase() + item.status?.slice(1) || 'N/A'}
+                </span>
+            )
         },
         {
             key: "createdAt",
             label: "Created Date",
             sortable: true,
+            headerCenter: true,   // 👈 center enabled
             onSort: () => requestSort('createdAt'),
             sortIcon: getSortIcon('createdAt'),
-            render: (item) => {
-                const date = item.createdAt && item.createdAt !== 'N/A' ? new Date(item.createdAt) : null;
-                const formattedDate = date ? date.toLocaleDateString('en-GB') : 'N/A';
-
-                return (
-                    <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-900">{formattedDate}</span>
-                    </div>
-                );
-            }
+            render: (item) => item.createdAt || 'N/A'
         }
     ], [getSortIcon, requestSort]);
 
-    const totalDisplayedRecords = filteredUsers.length;
+    const totalDisplayedRecords = filteredSchemes.length;
 
     return (
         <>
             <div className="space-y-6 bg-gray-50 dark:bg-gray-900">
-                {/* Header Section - SellersList style */}
+                {/* Header Section */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
-                        <p className="text-gray-600">Manage all users and their access permissions</p>
+                        <h1 className="text-2xl font-bold text-gray-900">Handover</h1>
+                        <p className="text-gray-600">Manage all handover details</p>
                     </div>
                     <div className="flex items-center space-x-4">
                         <button
@@ -652,62 +561,65 @@ const ManageUsersTable = () => {
                             <ArrowRight size={16} />
                         </button>
                         <button
-                            onClick={handleAddUser}
+                            onClick={handleAddScheme}
                             className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium flex items-center space-x-2"
                         >
                             <FaUserPlus className="w-4 h-4" />
-                            <span>Add User</span>
+                            <span>Add Handover</span>
                         </button>
                     </div>
                 </div>
 
-                {/* Stats Cards - SellersList style */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
-                        <div className="flex items-start justify-between">
-                            <FaUser className="text-primary-500 opacity-60" size={40} />
-                            <div className="text-right">
-                                <h3 className="text-2xl font-bold text-gray-900">{stats.totalUsers}</h3>
-                                <p className="text-gray-600">Total Users</p>
+                {/* Stats Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm text-gray-600">Total Handovers</p>
+                                <p className="text-2xl font-bold text-gray-900">
+                                    {stats.totalHandovers}
+                                </p>
+                            </div>
+                            <div className="p-3 bg-blue-100 rounded-full">
+                                <Layers className="w-6 h-6 text-blue-600" />
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
-                        <div className="flex items-start justify-between">
-                            <FaUserCheck className="text-green-500 opacity-60" size={40} />
-                            <div className="text-right">
-                                <h3 className="text-2xl font-bold text-gray-900">{stats.activeUsers}</h3>
-                                <p className="text-gray-600">Active Users</p>
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm text-gray-600">Completed Handovers</p>
+                                <p className="text-2xl font-bold text-green-600">
+                                    {stats.completedHandovers}
+                                </p>
+                            </div>
+                            <div className="p-3 bg-green-100 rounded-full">
+                                <CheckCircle className="w-6 h-6 text-green-600" />
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
-                        <div className="flex items-start justify-between">
-                            <FaUserTimes className="text-pink-500 opacity-60" size={40} />
-                            <div className="text-right">
-                                <h3 className="text-2xl font-bold text-gray-900">{stats.inactiveUsers}</h3>
-                                <p className="text-gray-600">Inactive Users</p>
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm text-gray-600">Pending Handovers</p>
+                                <p className="text-2xl font-bold text-red-600">
+                                    {stats.pendingHandovers}
+                                </p>
+                            </div>
+                            <div className="p-3 bg-red-100 rounded-full">
+                                <XCircle className="w-6 h-6 text-red-600" />
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
-                        <div className="flex items-start justify-between">
-                            <Shield className="text-purple-500 opacity-60" size={40} />
-                            <div className="text-right">
-                                <h3 className="text-2xl font-bold text-gray-900">{stats.adminUsers}</h3>
-                                <p className="text-gray-600">Admin Users</p>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
-                {/* Search and Action Menu - SellersList style */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                        {/* Left Side: Search and Filter Toggle */}
+                        {/* Left Side: Search */}
                         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                             {/* Search Input */}
                             <div className="relative w-full sm:w-80">
@@ -716,7 +628,7 @@ const ManageUsersTable = () => {
                                 </div>
                                 <input
                                     type="text"
-                                    placeholder="Search by User ID, Name, Email or Role..."
+                                    placeholder="Search by Scheme Name..."
                                     className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-transparent text-sm bg-gray-50/50"
                                     value={searchInput}
                                     onChange={handleSearchChange}
@@ -724,7 +636,7 @@ const ManageUsersTable = () => {
                                 {searchTerm && (
                                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                                         <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                                            {sortedUsers.length} found
+                                            {sortedSchemes.length} found
                                         </span>
                                     </div>
                                 )}
@@ -733,11 +645,10 @@ const ManageUsersTable = () => {
                             {/* Filter Toggle Button */}
                             <button
                                 onClick={() => setShowFilters(!showFilters)}
-                                className={`px-4 py-2.5 border rounded-lg flex items-center gap-2 text-sm transition-all justify-center md:justify-start ${
-                                    showFilters
-                                        ? "bg-gradient-to-br from-primary-500 to-primary-600 text-white border-transparent"
-                                        : "border-gray-300 hover:bg-gray-50 text-gray-700"
-                                }`}
+                                className={`px-4 py-2.5 border rounded-lg flex items-center gap-2 text-sm transition-all justify-center md:justify-start ${showFilters
+                                    ? "bg-gradient-to-br from-primary-500 to-primary-600 text-white border-transparent"
+                                    : "border-gray-300 hover:bg-gray-50 text-gray-700"
+                                    }`}
                             >
                                 <Filter className="w-4 h-4" />
                                 Filters
@@ -751,7 +662,6 @@ const ManageUsersTable = () => {
 
                         {/* Right Side: Action Buttons */}
                         <div className="flex flex-wrap gap-2 w-full md:w-auto justify-center md:justify-start">
-                            {/* Bulk Delete Button */}
                             {selectedIds.size > 0 && (
                                 <button
                                     onClick={() => handleBulkDelete(selectedIds)}
@@ -764,28 +674,10 @@ const ManageUsersTable = () => {
                         </div>
                     </div>
 
-                    {/* Filters Panel - SellersList style */}
+                    {/* Filters Panel */}
                     {showFilters && (
                         <div className="mt-4 p-5 bg-primary-50/50 rounded-xl border border-primary-100">
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                {/* Role Filter */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Select Role
-                                    </label>
-                                    <select
-                                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
-                                        value={tempFilters.role || ""}
-                                        onChange={(e) => handleFilterChange("role", e.target.value)}
-                                    >
-                                        <option value="">All Roles</option>
-                                        {getRoleOptions.map(role => (
-                                            <option key={role} value={role}>{role}</option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                {/* Status Filter */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Select Status
@@ -803,40 +695,6 @@ const ManageUsersTable = () => {
                                         ))}
                                     </select>
                                 </div>
-
-                                {/* Date Range Filters */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        From Date
-                                    </label>
-                                    <div className="relative">
-                                        <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                        <input
-                                            type="date"
-                                            className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
-                                            value={tempFilters.fromDate || ""}
-                                            max={getCurrentDate()}
-                                            onChange={(e) => handleFilterChange("fromDate", e.target.value)}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        To Date
-                                    </label>
-                                    <div className="relative">
-                                        <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                        <input
-                                            type="date"
-                                            className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
-                                            value={tempFilters.toDate || ""}
-                                            max={getCurrentDate()}
-                                            min={tempFilters.fromDate || undefined}
-                                            onChange={(e) => handleFilterChange("toDate", e.target.value)}
-                                        />
-                                    </div>
-                                </div>
                             </div>
 
                             <div className="mt-6 flex flex-col xs:flex-row justify-between items-start xs:items-center gap-4">
@@ -850,9 +708,6 @@ const ManageUsersTable = () => {
                                             <span className="text-primary-700 text-xs">
                                                 {Object.keys(appliedFilters).length > 0 &&
                                                     Object.keys(appliedFilters).filter(k => appliedFilters[k]).map(key => {
-                                                        if (key === 'fromDate' || key === 'toDate') {
-                                                            return key === 'fromDate' ? `From: ${appliedFilters[key]}` : `To: ${appliedFilters[key]}`;
-                                                        }
                                                         return `${key}: ${appliedFilters[key]}`;
                                                     }).join(', ')}
                                             </span>
@@ -886,22 +741,20 @@ const ManageUsersTable = () => {
                     )}
                 </div>
 
-                {/* Data Table - Using DataTable component */}
                 <DataTable
                     columns={columns}
-                    data={sortedUsers}
+                    data={sortedSchemes}
                     loading={loading}
-                    onEdit={handleEditUser}
-                    onView={handleViewUser}
+                    onEdit={handleEditScheme}
                     onDelete={handleDeleteClick}
                     onBulkDelete={handleBulkDelete}
-                    addButtonLabel="Add New User"
-                    emptyStateMessage="No users found. Try adjusting your search or filters."
-                    loadingMessage="Loading users data..."
+                    addButtonLabel="Add New Scheme"
+                    emptyStateMessage="No schemes found. Try adjusting your search or filters."
+                    loadingMessage="Loading schemes data..."
                     enableSelection={true}
                     enablePagination={true}
                     selectedRows={selectedIds}
-                    onSelectRow={toggleSelectUser}
+                    onSelectRow={toggleSelectScheme}
                     onSelectAll={toggleSelectAll}
                     pagination={{
                         currentPage: pagination.currentPage,
@@ -917,7 +770,6 @@ const ManageUsersTable = () => {
                 />
             </div>
 
-            {/* Delete Confirmation Modal - SellersList style */}
             {showDeleteModal && (
                 <div
                     className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 overflow-y-auto"
@@ -936,8 +788,8 @@ const ManageUsersTable = () => {
                             </h3>
                             <p className="text-gray-500 text-sm sm:text-base leading-relaxed p-3">
                                 {deleteTarget === "selected"
-                                    ? `You're about to delete ${deleteId?.length || 0} selected user(s). This action cannot be undone.`
-                                    : "You're about to delete this user. This action cannot be undone."}
+                                    ? `You're about to delete ${deleteId?.length || 0} selected scheme(s). This action cannot be undone.`
+                                    : "You're about to delete this scheme. This action cannot be undone."}
                             </p>
                         </div>
 
@@ -976,4 +828,4 @@ const ManageUsersTable = () => {
     );
 };
 
-export default ManageUsersTable;
+export default HandoverList;

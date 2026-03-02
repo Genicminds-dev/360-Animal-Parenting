@@ -51,7 +51,7 @@ const DataTable = ({
   // Health Check specific props
   enableHealthCheck = false,
   healthCheckLabel,
-  
+
   // Props for external selection management
   selectedRows,
   onSelectRow,
@@ -250,18 +250,23 @@ const DataTable = ({
                     />
                   </th>
                 )}
-                {columns.map((col) => (
-                  <th
-                    key={col.key}
-                    className="px-4 py-3 border-r border-gray-100 text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors text-left"
-                    onClick={() => handleSort(col.key)}
-                  >
-                    <div className="flex items-center">
-                      {col.label}
-                      {getSortIcon(col.key)}
-                    </div>
-                  </th>
-                ))}
+                {columns.map((col) => {
+                  const isCenter = col.headerCenter;
+
+                  return (
+                    <th
+                      key={col.key}
+                      className={`px-4 py-3 border-r border-gray-100 text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors ${isCenter ? "text-center" : "text-left"
+                        }`}
+                      onClick={() => handleSort(col.key)}
+                    >
+                      <div className={`flex items-center ${isCenter ? "justify-center" : ""}`}>
+                        {col.label}
+                        {getSortIcon(col.key)}
+                      </div>
+                    </th>
+                  );
+                })}
                 {showActionsColumn && (
                   <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
@@ -299,14 +304,21 @@ const DataTable = ({
                         />
                       </td>
                     )}
-                    {columns.map((col) => (
-                      <td
-                        key={col.key}
-                        className="px-4 py-3 whitespace-nowrap text-sm text-gray-700 border-r border-gray-100"
-                      >
-                        {(renderCell || defaultRenderCell)(item, col)}
-                      </td>
-                    ))}
+                    {columns.map((col) => {
+                      const isCenter = col.headerCenter;
+
+                      return (
+                        <td
+                          key={col.key}
+                          className={`px-4 py-3 whitespace-nowrap text-sm text-gray-700 border-r border-gray-100 ${isCenter ? "text-center" : ""
+                            }`}
+                        >
+                          <div className={isCenter ? "flex justify-center" : ""}>
+                            {(renderCell || defaultRenderCell)(item, col)}
+                          </div>
+                        </td>
+                      );
+                    })}
                     {showActionsColumn && (
                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-700">
                         <div className="flex items-center justify-center">

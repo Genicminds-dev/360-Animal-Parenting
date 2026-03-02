@@ -166,7 +166,7 @@ const Layout = ({ onLogout }) => {
           {/* Optional Footer */}
           <footer className="mt-auto py-4 px-6 border-t border-gray-200">
             <div className="text-center text-sm text-gray-500">
-              <p>© {new Date().getFullYear()} 360 Animal Parenting System. All rights reserved.</p>
+              <p>© {new Date().getFullYear()} 360° Animal Parenting System. All rights reserved.</p>
             </div>
           </footer>
         </main>
