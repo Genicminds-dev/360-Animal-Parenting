@@ -140,11 +140,13 @@ const Sidebar = ({ toggleSidebar, onLogout, isMobile, onLogoutClick }) => {
     // { path: '/reports', label: 'Reports', icon: <FileText size={20} />, roles: [1, 2, 3] },
 
         // { path: PATHROUTES.sellersList, label: 'Sellers', icon: <Users size={20} />, roles: [1, 2, 3] },
+        // { path: PATHROUTES.animalProcurement, label: 'Animal Registration', icon: <GiCow size={20} />, roles: [1, 2, 3] },
+        // { path: PATHROUTES.animalProcuredList, label: 'Animal List', icon: <FileText size={20} />, roles: [1, 2, 3] },
+
     { path: PATHROUTES.brokerList, label: 'Broker', icon: <Users size={20} />, roles: [1, 2, 3] },
-    { path: PATHROUTES.animalsList, label: 'Procured Animals', icon: <GiCow size={20} />, roles: [1, 2, 3] },
-    { path: PATHROUTES.animalProcurement, label: 'Animal Registration', icon: <GiCow size={20} />, roles: [1, 2, 3] },
-    // { path: PATHROUTES.animalProcuredList, label: 'Animal List', icon: <FileText size={20} />, roles: [1, 2, 3] },
-        { path: PATHROUTES.handoverList, label: 'Handover', icon: <Handshake size={20} />, roles: [1, 2, 3] },
+    { path: PATHROUTES.animalProcurement, label: 'Animal Procurement', icon: <GiCow size={20} />, roles: [1, 2, 3] },
+    { path: PATHROUTES.procuredAnimals, label: 'Procured Animals', icon: <GiCow size={20} />, roles: [1, 2, 3] },
+    { path: PATHROUTES.handoverList, label: 'Handover', icon: <Handshake size={20} />, roles: [1, 2, 3] },
     { path: PATHROUTES.schemeList, label: 'Manage Schemes', icon: <FileCheck size={20} />, roles: [1, 2, 3] },
  
 

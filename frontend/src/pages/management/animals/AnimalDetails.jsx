@@ -9,7 +9,6 @@ import {
   ArrowLeft,
   User,
   Building,
-  Beef,
   Tag,
   Calendar,
   Eye,
@@ -41,7 +40,7 @@ import { GiCow } from "react-icons/gi";
 
 const AnimalDetails = () => {
   const navigate = useNavigate();
-  const { uid } = useParams();
+  const { earTagId } = useParams(); // Using earTagId as the unique identifier
   const location = useLocation();
 
   const [animal, setAnimal] = useState(null);
@@ -74,469 +73,384 @@ const AnimalDetails = () => {
     ownerName: "",
     animalName: "",
     species: "",
-    animalId: "",
+    animalEarTagId: "", // Changed from animalId to animalEarTagId
     medicalInsuranceCertificate: null,
     certificateFile: null,
     fileName: "",
   });
 
-  // Mock animal data - Using consistent earTagId format (TAG-XXX) to match HealthCheckupList
-  const MOCK_ANIMAL_DATA = {
-    id: 1,
-    uid: "ANM001",
-    // Vendor Details
-    vendorName: "Rajesh Kumar",
-    vendorId: "V001",
-    vendorMobile: "9876543210",
-    
-    // Animal Details
-    earTagId: "TAG-001",
-    animalType: "Cow",
-    breed: "Holstein Friesian",
-    pricing: "₹85,000",
-    pregnancyStatus: "milking",
-    calfTagId: "CALF001",
-    numberOfPregnancies: 3,
-    ageYears: 5,
-    ageMonths: 2,
-    weight: "450 kg",
-    milkPerDay: "12 liters",
-    calfAgeYears: 1,
-    calfAgeMonths: 6,
-    commissionAgentName: "Amit Singh",
-    commissionAgentId: "CA001",
-    
-    // Media fields
-    frontPhoto: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400",
-    sidePhoto: "https://images.unsplash.com/photo-1547722700-57de53c5c0e7?w=400",
-    backPhoto: "https://images.unsplash.com/photo-1596733430284-f7437764b1a9?w=400",
-    animalVideo: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    calfPhoto: "https://images.unsplash.com/photo-1597848212624-e6f1f5d6f7d0?w=400",
-    calfVideo: null,
-    
-    // Additional view-only fields
-    createdAt: "2024-01-15T10:30:00Z",
-    status: "Registered",
-    healthStatus: "Healthy",
-    lastHealthCheck: "2024-02-15"
-  };
-
-  // Mock animals array
+  // ============= UPDATED MOCK ANIMAL DATA WITH BENEFICIARY FIELDS =============
   const MOCK_ANIMALS = [
-    MOCK_ANIMAL_DATA,
     {
-      id: 2,
-      uid: "ANM002",
+      // Animal 1 - Milking Cow with Calf
+      earTagId: "TAG-001",
+      
+      // Animal Details from EditAnimal.jsx
+      breed: "Gir",
+      gender: "Female",
+      lactation: "3",
+      ageYears: 5,
+      ageMonths: 2,
+      calvingStatus: "milking",
+      calfTagId: "CALF-001",
+      calfGender: "Female",
+      calvingDate: "2024-02-15",
+      examDate: "2024-03-10",
+      examineBy: "Dr. Rajesh Kumar",
+      receivingDate: "2024-01-15",
+      remark: "Healthy animal, good milk production. Regular deworming done. Animal is responding well to feed and shows no signs of stress.",
+      
+      // Media fields
+      frontImage: {
+        preview: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400",
+        name: "front_image.jpg",
+        type: "image/jpeg",
+        size: "2.3 MB"
+      },
+      sideImage: {
+        preview: "https://images.unsplash.com/photo-1547722700-57de53c5c0e7?w=400",
+        name: "side_image.jpg",
+        type: "image/jpeg",
+        size: "1.8 MB"
+      },
+      rearImage: {
+        preview: "https://images.unsplash.com/photo-1596733430284-f7437764b1a9?w=400",
+        name: "rear_image.jpg",
+        type: "image/jpeg",
+        size: "2.1 MB"
+      },
+      video: {
+        preview: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        name: "animal_360_video.mp4",
+        type: "video/mp4",
+        size: "15.6 MB",
+        instructions: "Front → Left → Back → Right → Front"
+      },
+      
+      // Beneficiary Details (replacing vendor details)
+      beneficiaryId: "BEN001",
+      beneficiaryName: "Rajesh Kumar",
+      beneficiaryMobile: "9876543210",
+      doNumber: "DO-2024-001",
+      
+      // Additional view-only fields
+      createdAt: "2024-01-15T10:30:00Z",
+      status: "Registered",
+      healthStatus: "Healthy",
+      lastHealthCheck: "2024-03-15"
+    },
+    {
+      // Animal 2 - Pregnant Buffalo
       earTagId: "TAG-002",
-      vendorName: "Suresh Patel",
-      vendorId: "V002",
-      vendorMobile: "9876543211",
-      animalType: "Buffalo",
+      
+      // Animal Details from EditAnimal.jsx
       breed: "Murrah",
-      pricing: "₹95,000",
-      pregnancyStatus: "pregnant",
-      calfTagId: "",
-      numberOfPregnancies: 2,
+      gender: "Female",
+      lactation: "2",
       ageYears: 4,
       ageMonths: 0,
-      weight: "550 kg",
-      milkPerDay: "10 liters",
-      calfAgeYears: "",
-      calfAgeMonths: "",
-      commissionAgentName: "Ravi Kumar",
-      commissionAgentId: "CA002",
+      calvingStatus: "pregnant",
+      calfTagId: "",
+      calfGender: "",
+      calvingDate: "2024-06-15", // Expected calving date
+      examDate: "2024-03-05",
+      examineBy: "Dr. Priya Sharma",
+      receivingDate: "2024-01-20",
+      remark: "Pregnant - expected delivery in June 2024. Regular checkup required. Animal is in good health with normal vital signs.",
+      
+      // Media fields - Some animals may have missing media
+      frontImage: {
+        preview: "https://images.unsplash.com/photo-1596733430284-f7437764b1a9?w=400",
+        name: "buffalo_front.jpg",
+        type: "image/jpeg",
+        size: "1.9 MB"
+      },
+      sideImage: null,
+      rearImage: null,
+      video: null,
+      
+      // Beneficiary Details
+      beneficiaryId: "BEN002",
+      beneficiaryName: "Suresh Patel",
+      beneficiaryMobile: "9876543211",
+      doNumber: "DO-2024-002",
+      
+      // Additional view-only fields
       createdAt: "2024-01-20T14:45:00Z",
       status: "Verified",
       healthStatus: "Healthy",
-      lastHealthCheck: "2024-02-10"
+      lastHealthCheck: "2024-03-05"
     },
     {
-      id: 3,
-      uid: "ANM003",
+      // Animal 3 - Non-Pregnant Young Cow
       earTagId: "TAG-003",
-      vendorName: "Mohan Singh",
-      vendorId: "V003",
-      vendorMobile: "9876543212",
-      animalType: "Cow",
-      breed: "Gir",
-      pricing: "₹75,000",
-      pregnancyStatus: "non-pregnant",
-      calfTagId: "",
-      numberOfPregnancies: 1,
+      
+      // Animal Details from EditAnimal.jsx
+      breed: "Holstein Friesian",
+      gender: "Female",
+      lactation: "1",
       ageYears: 3,
       ageMonths: 6,
-      weight: "400 kg",
-      milkPerDay: "8 liters",
-      calfAgeYears: "",
-      calfAgeMonths: "",
-      commissionAgentName: "Priya Singh",
-      commissionAgentId: "CA003",
+      calvingStatus: "non-pregnant",
+      calfTagId: "",
+      calfGender: "",
+      calvingDate: "",
+      examDate: "2024-03-01",
+      examineBy: "Dr. Amit Patel",
+      receivingDate: "2024-02-10",
+      remark: "Young animal, first lactation expected soon. Healthy condition. Vaccination schedule up to date.",
+      
+      // Media fields - Minimal media
+      frontImage: {
+        preview: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400",
+        name: "cow_front.jpg",
+        type: "image/jpeg",
+        size: "2.0 MB"
+      },
+      sideImage: null,
+      rearImage: null,
+      video: null,
+      
+      // Beneficiary Details
+      beneficiaryId: "BEN003",
+      beneficiaryName: "Mohan Singh",
+      beneficiaryMobile: "9876543212",
+      doNumber: "DO-2024-003",
+      
+      // Additional view-only fields
       createdAt: "2024-02-10T09:15:00Z",
       status: "Registered",
       healthStatus: "Healthy",
       lastHealthCheck: "2024-03-01"
+    },
+    {
+      // Animal 4 - Milking Cow with Male Calf
+      earTagId: "TAG-004",
+      
+      // Animal Details from EditAnimal.jsx
+      breed: "Jersey Cross",
+      gender: "Female",
+      lactation: "4",
+      ageYears: 7,
+      ageMonths: 3,
+      calvingStatus: "milking",
+      calfTagId: "CALF-004",
+      calfGender: "Male",
+      calvingDate: "2024-01-10",
+      examDate: "2024-02-20",
+      examineBy: "Dr. Sunita Reddy",
+      receivingDate: "2023-12-05",
+      remark: "High milk yield animal. Producing 15 liters/day. Calf is healthy and active.",
+      
+      // Media fields
+      frontImage: {
+        preview: "https://images.unsplash.com/photo-1547722700-57de53c5c0e7?w=400",
+        name: "jersey_front.jpg",
+        type: "image/jpeg",
+        size: "2.2 MB"
+      },
+      sideImage: {
+        preview: "https://images.unsplash.com/photo-1596733430284-f7437764b1a9?w=400",
+        name: "jersey_side.jpg",
+        type: "image/jpeg",
+        size: "1.7 MB"
+      },
+      rearImage: null,
+      video: null,
+      
+      // Beneficiary Details
+      beneficiaryId: "BEN004",
+      beneficiaryName: "Harpreet Singh",
+      beneficiaryMobile: "9876543213",
+      doNumber: "DO-2024-004",
+      
+      // Additional view-only fields
+      createdAt: "2023-12-05T11:20:00Z",
+      status: "Active",
+      healthStatus: "Excellent",
+      lastHealthCheck: "2024-02-20"
+    },
+    {
+      // Animal 5 - Pregnant Cow - No Media
+      earTagId: "TAG-005",
+      
+      // Animal Details from EditAnimal.jsx
+      breed: "Sahiwal",
+      gender: "Female",
+      lactation: "0",
+      ageYears: 2,
+      ageMonths: 8,
+      calvingStatus: "pregnant",
+      calfTagId: "",
+      calfGender: "",
+      calvingDate: "2024-08-20",
+      examDate: "2024-03-15",
+      examineBy: "Dr. Vikram Singh",
+      receivingDate: "2024-02-28",
+      remark: "First pregnancy. Young animal, needs extra care and nutrition. Regular monitoring required.",
+      
+      // Media fields - No media uploaded
+      frontImage: null,
+      sideImage: null,
+      rearImage: null,
+      video: null,
+      
+      // Beneficiary Details
+      beneficiaryId: "BEN005",
+      beneficiaryName: "Amit Kumar",
+      beneficiaryMobile: "9876543214",
+      doNumber: "DO-2024-005",
+      
+      // Additional view-only fields
+      createdAt: "2024-02-28T16:30:00Z",
+      status: "Under Observation",
+      healthStatus: "Good",
+      lastHealthCheck: "2024-03-15"
     }
   ];
 
-  // EXPANDED MOCK HEALTH CHECKUPS DATA - To test the design
-// ============= COMPREHENSIVE MOCK HEALTH CHECKUPS DATA =============
-// Add this to your ViewAnimal.jsx component, replace the existing MOCK_HEALTH_CHECKUPS
-
-const MOCK_HEALTH_CHECKUPS = {
-  "TAG-001": [
-    // 1. COMPLETE CHECKUP - All fields filled, approved, multiple vaccinations
-    {
-      id: 101,
-      vetOfficer: "1", // Dr. Rajesh Kumar
-      checkDate: "2024-03-15",
-      temperature: "38.5",
-      heartRate: "72",
-      generalCondition: "Excellent",
-      appetite: "Good",
-      hydration: "Good",
-      mobility: "Normal",
-      vaccinated: "yes",
-      vaccinations: [
-        {
-          id: 1001,
-          vaccinationType: "FMD",
-          vaccinationName: "Foot and Mouth Disease Vaccine",
-          vaccinationDate: "2024-03-15",
-          batchNo: "FMD12345"
-        },
-        {
-          id: 1002,
-          vaccinationType: "LSD",
-          vaccinationName: "Lumpy Skin Disease Vaccine",
-          vaccinationDate: "2024-03-15",
-          batchNo: "LSD67890"
-        }
-      ],
-      vetApproval: "approved",
-      remark: "Animal is in excellent health condition. Both vaccinations administered successfully. No signs of illness or distress. Recommended next checkup in 3 months.",
-      healthCertificateName: "health_certificate_mar15_2024.pdf",
-      healthCertificate: null,
-      submittedAt: "2024-03-15T10:30:00Z"
-    },
-    
-    // 2. PENDING APPROVAL - Recent checkup waiting for approval
-    {
-      id: 102,
-      vetOfficer: "2", // Dr. Priya Sharma
-      checkDate: "2024-03-10",
-      temperature: "38.8",
-      heartRate: "75",
-      generalCondition: "Good",
-      appetite: "Good",
-      hydration: "Adequate",
-      mobility: "Normal",
-      vaccinated: "yes",
-      vaccinations: [
-        {
-          id: 1003,
-          vaccinationType: "FMD",
-          vaccinationName: "Foot and Mouth Disease Vaccine",
-          vaccinationDate: "2024-03-10",
-          batchNo: "FMD98765"
-        }
-      ],
-      vetApproval: "pending",
-      remark: "Routine checkup completed. Vaccination administered. Awaiting approval from senior veterinarian.",
-      healthCertificateName: "pending_certificate_mar10.pdf",
-      healthCertificate: null,
-      submittedAt: "2024-03-10T14:20:00Z"
-    },
-    
-    // 3. REJECTED - With health issues detected
-    {
-      id: 103,
-      vetOfficer: "3", // Dr. Amit Patel
-      checkDate: "2024-02-28",
-      temperature: "39.5", // High fever
-      heartRate: "85", // Elevated heart rate
-      generalCondition: "Poor",
-      appetite: "Poor",
-      hydration: "Dehydrated",
-      mobility: "Severely Lame",
-      vaccinated: "no",
-      vaccinations: [],
-      vetApproval: "rejected",
-      remark: "Animal showing severe signs of infection. High temperature, lameness in right hind leg, reduced appetite. Treatment prescribed: Antibiotics (Amoxicillin 10ml daily for 7 days), Anti-inflammatory medication. Immediate recheck required in 3 days.",
-      healthCertificateName: "",
-      healthCertificate: null,
-      submittedAt: "2024-02-28T09:15:00Z"
-    },
-    
-    // 4. BASIC CHECKUP - Only mandatory fields, no vaccinations
-    {
-      id: 104,
-      vetOfficer: "4", // Dr. Sunita Reddy
-      checkDate: "2024-02-15",
-      temperature: "", // Not recorded
-      heartRate: "", // Not recorded
-      generalCondition: "Fair",
-      appetite: "Moderate",
-      hydration: "Adequate",
-      mobility: "Normal",
-      vaccinated: "no",
-      vaccinations: [],
-      vetApproval: "approved",
-      remark: "Quick health assessment. Animal appears generally healthy but showing mild signs of stress. No vaccinations administered today.",
-      healthCertificateName: "",
-      healthCertificate: null,
-      submittedAt: "2024-02-15T11:45:00Z"
-    },
-    
-    // 5. PREGNANCY CHECKUP - Special case with pregnancy remarks
-    {
-      id: 105,
-      vetOfficer: "1", // Dr. Rajesh Kumar
-      checkDate: "2024-02-01",
-      temperature: "38.6",
-      heartRate: "74",
-      generalCondition: "Good",
-      appetite: "Good",
-      hydration: "Good",
-      mobility: "Normal",
-      vaccinated: "yes",
-      vaccinations: [
-        {
-          id: 1004,
-          vaccinationType: "Other",
-          vaccinationName: "Pregnancy Vitamin Supplement",
-          vaccinationDate: "2024-02-01",
-          batchNo: "VIT78901"
-        }
-      ],
-      vetApproval: "approved",
-      remark: "Pregnancy confirmed - approximately 4 months. Animal in good health. Prescribed prenatal vitamins. Next checkup recommended in 30 days for pregnancy monitoring.",
-      healthCertificateName: "pregnancy_certificate_feb1.pdf",
-      healthCertificate: null,
-      submittedAt: "2024-02-01T13:20:00Z"
-    },
-    
-    // 6. CALF CHECKUP - For milking animals with calf
-    {
-      id: 106,
-      vetOfficer: "5", // Dr. Vikram Singh
-      checkDate: "2024-01-20",
-      temperature: "38.7",
-      heartRate: "76",
-      generalCondition: "Good",
-      appetite: "Good",
-      hydration: "Good",
-      mobility: "Normal",
-      vaccinated: "yes",
-      vaccinations: [
-        {
-          id: 1005,
-          vaccinationType: "FMD",
-          vaccinationName: "Foot and Mouth Disease Vaccine",
-          vaccinationDate: "2024-01-20",
-          batchNo: "FMD45678"
-        }
-      ],
-      vetApproval: "approved",
-      remark: "Mother and calf both healthy. Milk production stable at 12 liters/day. Calf weighing 45kg, active and feeding well.",
-      healthCertificateName: "calf_health_jan20.pdf",
-      healthCertificate: null,
-      submittedAt: "2024-01-20T10:00:00Z"
-    },
-    
-    // 7. EMERGENCY CHECKUP - After hours, urgent care
-    {
-      id: 107,
-      vetOfficer: "2", // Dr. Priya Sharma
-      checkDate: "2024-01-05",
-      temperature: "40.2", // Very high fever
-      heartRate: "92", // Very high heart rate
-      generalCondition: "Critical",
-      appetite: "None",
-      hydration: "Severely Dehydrated",
-      mobility: "Unable to Move",
-      vaccinated: "no",
-      vaccinations: [],
-      vetApproval: "approved",
-      remark: "EMERGENCY: Animal found unable to stand, high fever, labored breathing. Administered IV fluids, antibiotics, and antipyretics. Hospitalized for 24 hours observation. Condition stabilized. Follow-up required in 48 hours.",
-      healthCertificateName: "emergency_treatment_jan5.pdf",
-      healthCertificate: null,
-      submittedAt: "2024-01-05T22:30:00Z"
-    },
-    
-    // 8. ROUTINE CHECKUP - Minimal data, no remark
-    {
-      id: 108,
-      vetOfficer: "3", // Dr. Amit Patel
-      checkDate: "2023-12-10",
-      temperature: "38.4",
-      heartRate: "71",
-      generalCondition: "Good",
-      appetite: "",
-      hydration: "",
-      mobility: "",
-      vaccinated: "yes",
-      vaccinations: [
-        {
-          id: 1006,
-          vaccinationType: "LSD",
-          vaccinationName: "Lumpy Skin Disease Vaccine",
-          vaccinationDate: "2023-12-10",
-          batchNo: "LSD13579"
-        }
-      ],
-      vetApproval: "approved",
-      remark: "",
-      healthCertificateName: "",
-      healthCertificate: null,
-      submittedAt: "2023-12-10T15:50:00Z"
-    },
-    
-    // 9. FOLLOW-UP CHECKUP - After previous rejection
-    {
-      id: 109,
-      vetOfficer: "3", // Dr. Amit Patel
-      checkDate: "2024-03-05",
-      temperature: "38.3",
-      heartRate: "70",
-      generalCondition: "Good",
-      appetite: "Good",
-      hydration: "Good",
-      mobility: "Slightly Lame", // Improving but not fully recovered
-      vaccinated: "yes",
-      vaccinations: [
-        {
-          id: 1007,
-          vaccinationType: "FMD",
-          vaccinationName: "Foot and Mouth Disease Vaccine",
-          vaccinationDate: "2024-03-05",
-          batchNo: "FMD24680"
-        }
-      ],
-      vetApproval: "approved",
-      remark: "FOLLOW-UP: Animal has recovered well from previous infection. Temperature normal, appetite returned, still slight lameness but improving. Cleared for normal activities. Continue prescribed supplements for 2 more weeks.",
-      healthCertificateName: "followup_certificate_mar5.pdf",
-      healthCertificate: null,
-      submittedAt: "2024-03-05T16:10:00Z"
-    },
-    
-    // 10. VACCINATION ONLY - Quick visit just for vaccine
-    {
-      id: 110,
-      vetOfficer: "4", // Dr. Sunita Reddy
-      checkDate: "2024-03-18",
-      temperature: "38.6",
-      heartRate: "73",
-      generalCondition: "",
-      appetite: "",
-      hydration: "",
-      mobility: "",
-      vaccinated: "yes",
-      vaccinations: [
-        {
-          id: 1008,
-          vaccinationType: "FMD",
-          vaccinationName: "Foot and Mouth Disease Vaccine - Booster",
-          vaccinationDate: "2024-03-18",
-          batchNo: "FMD36912"
-        }
-      ],
-      vetApproval: "approved",
-      remark: "Booster vaccination only. Animal healthy, no examination needed.",
-      healthCertificateName: "booster_vaccination_mar18.pdf",
-      healthCertificate: null,
-      submittedAt: "2024-03-18T09:30:00Z"
-    }
-  ],
-  
-  "TAG-002": [
-    // Buffalo with pregnancy
-    {
-      id: 201,
-      vetOfficer: "1",
-      checkDate: "2024-03-10",
-      temperature: "38.8",
-      heartRate: "73",
-      generalCondition: "Good",
-      appetite: "Good",
-      hydration: "Good",
-      mobility: "Normal",
-      vaccinated: "yes",
-      vaccinations: [
-        {
-          id: 2001,
-          vaccinationType: "FMD",
-          vaccinationName: "Foot and Mouth Disease Vaccine",
-          vaccinationDate: "2024-03-10",
-          batchNo: "FMD12345"
-        }
-      ],
-      vetApproval: "approved",
-      remark: "Pregnant buffalo (6 months), regular checkup required. All vitals normal. Fetal heartbeat strong. Recommended calcium supplements.",
-      healthCertificateName: "pregnant_buffalo_mar10.pdf",
-      healthCertificate: null,
-      submittedAt: "2024-03-10T14:20:00Z"
-    },
-    {
-      id: 202,
-      vetOfficer: "2",
-      checkDate: "2024-01-15",
-      temperature: "38.6",
-      heartRate: "71",
-      generalCondition: "Good",
-      appetite: "Good",
-      hydration: "Good",
-      mobility: "Normal",
-      vaccinated: "yes",
-      vaccinations: [
-        {
-          id: 2002,
-          vaccinationType: "LSD",
-          vaccinationName: "Lumpy Skin Disease Vaccine",
-          vaccinationDate: "2024-01-15",
-          batchNo: "LSD24680"
-        }
-      ],
-      vetApproval: "approved",
-      remark: "Pregnancy confirmed. Estimated delivery in 3 months (April 2024).",
-      healthCertificateName: "",
-      healthCertificate: null,
-      submittedAt: "2024-01-15T10:45:00Z"
-    }
-  ],
-  
-  "TAG-003": [
-    // Young cow, first checkup
-    {
-      id: 301,
-      vetOfficer: "3",
-      checkDate: "2024-02-28",
-      temperature: "38.4",
-      heartRate: "69",
-      generalCondition: "Excellent",
-      appetite: "Good",
-      hydration: "Good",
-      mobility: "Normal",
-      vaccinated: "yes",
-      vaccinations: [
-        {
-          id: 3001,
-          vaccinationType: "FMD",
-          vaccinationName: "Foot and Mouth Disease Vaccine",
-          vaccinationDate: "2024-02-28",
-          batchNo: "FMD13579"
-        }
-      ],
-      vetApproval: "approved",
-      remark: "First health checkup. Young healthy cow, 3 years old. No issues detected. Vaccination administered.",
-      healthCertificateName: "first_checkup_feb28.pdf",
-      healthCertificate: null,
-      submittedAt: "2024-02-28T13:50:00Z"
-    }
-  ],
-  
-  "TAG-004": [], // Empty array - no checkups
-  "TAG-005": [] // Empty array - no checkups
-};
+  // ============= COMPREHENSIVE MOCK HEALTH CHECKUPS DATA =============
+  const MOCK_HEALTH_CHECKUPS = {
+    "TAG-001": [
+      {
+        id: 101,
+        vetOfficer: "1",
+        checkDate: "2024-03-15",
+        temperature: "38.5",
+        heartRate: "72",
+        generalCondition: "Excellent",
+        appetite: "Good",
+        hydration: "Good",
+        mobility: "Normal",
+        vaccinated: "yes",
+        vaccinations: [
+          {
+            id: 1001,
+            vaccinationType: "FMD",
+            vaccinationName: "Foot and Mouth Disease Vaccine",
+            vaccinationDate: "2024-03-15",
+            batchNo: "FMD12345"
+          }
+        ],
+        vetApproval: "approved",
+        remark: "Animal is in excellent health condition. All vitals normal.",
+        healthCertificateName: "health_certificate_mar15.pdf",
+        healthCertificate: null,
+        submittedAt: "2024-03-15T10:30:00Z"
+      },
+      {
+        id: 102,
+        vetOfficer: "2",
+        checkDate: "2024-02-28",
+        temperature: "38.8",
+        heartRate: "75",
+        generalCondition: "Good",
+        appetite: "Good",
+        hydration: "Adequate",
+        mobility: "Normal",
+        vaccinated: "yes",
+        vaccinations: [
+          {
+            id: 1002,
+            vaccinationType: "LSD",
+            vaccinationName: "Lumpy Skin Disease Vaccine",
+            vaccinationDate: "2024-02-28",
+            batchNo: "LSD67890"
+          }
+        ],
+        vetApproval: "approved",
+        remark: "Routine checkup completed. Vaccination administered.",
+        healthCertificateName: "",
+        healthCertificate: null,
+        submittedAt: "2024-02-28T14:20:00Z"
+      }
+    ],
+    "TAG-002": [
+      {
+        id: 201,
+        vetOfficer: "1",
+        checkDate: "2024-03-05",
+        temperature: "38.6",
+        heartRate: "73",
+        generalCondition: "Good",
+        appetite: "Good",
+        hydration: "Good",
+        mobility: "Normal",
+        vaccinated: "yes",
+        vaccinations: [
+          {
+            id: 2001,
+            vaccinationType: "FMD",
+            vaccinationName: "Foot and Mouth Disease Vaccine",
+            vaccinationDate: "2024-03-05",
+            batchNo: "FMD12345"
+          }
+        ],
+        vetApproval: "approved",
+        remark: "Pregnant buffalo (6 months), regular checkup required. All vitals normal.",
+        healthCertificateName: "pregnant_buffalo_mar05.pdf",
+        healthCertificate: null,
+        submittedAt: "2024-03-05T14:20:00Z"
+      }
+    ],
+    "TAG-003": [
+      {
+        id: 301,
+        vetOfficer: "3",
+        checkDate: "2024-03-01",
+        temperature: "38.4",
+        heartRate: "69",
+        generalCondition: "Excellent",
+        appetite: "Good",
+        hydration: "Good",
+        mobility: "Normal",
+        vaccinated: "yes",
+        vaccinations: [
+          {
+            id: 3001,
+            vaccinationType: "FMD",
+            vaccinationName: "Foot and Mouth Disease Vaccine",
+            vaccinationDate: "2024-03-01",
+            batchNo: "FMD13579"
+          }
+        ],
+        vetApproval: "approved",
+        remark: "Young healthy cow, 3 years old. No issues detected.",
+        healthCertificateName: "first_checkup_mar01.pdf",
+        healthCertificate: null,
+        submittedAt: "2024-03-01T13:50:00Z"
+      }
+    ],
+    "TAG-004": [
+      {
+        id: 401,
+        vetOfficer: "4",
+        checkDate: "2024-02-20",
+        temperature: "38.7",
+        heartRate: "74",
+        generalCondition: "Excellent",
+        appetite: "Good",
+        hydration: "Good",
+        mobility: "Normal",
+        vaccinated: "yes",
+        vaccinations: [
+          {
+            id: 4001,
+            vaccinationType: "FMD",
+            vaccinationName: "Foot and Mouth Disease Vaccine",
+            vaccinationDate: "2024-02-20",
+            batchNo: "FMD24680"
+          }
+        ],
+        vetApproval: "approved",
+        remark: "High milk producer. All parameters normal.",
+        healthCertificateName: "",
+        healthCertificate: null,
+        submittedAt: "2024-02-20T11:15:00Z"
+      }
+    ],
+    "TAG-005": [] // No health checkups yet
+  };
 
   // Mock Insurance data
   const MOCK_INSURANCES = {
@@ -549,14 +463,30 @@ const MOCK_HEALTH_CHECKUPS = {
         ownerName: "Rajesh Kumar",
         animalName: "Ganga",
         species: "Cow",
-        animalId: "ANM001",
+        animalEarTagId: "TAG-001",
         fileName: "insurance_certificate_jan15.pdf",
         medicalInsuranceCertificate: null,
         createdAt: "2024-01-15T11:30:00Z"
       }
     ],
     "TAG-002": [],
-    "TAG-003": []
+    "TAG-003": [],
+    "TAG-004": [
+      {
+        id: 1002,
+        certificateNo: "INS002",
+        issueDate: "2024-02-10",
+        policyNumber: "POL789012",
+        ownerName: "Harpreet Singh",
+        animalName: "Laxmi",
+        species: "Cow",
+        animalEarTagId: "TAG-004",
+        fileName: "insurance_certificate_feb10.pdf",
+        medicalInsuranceCertificate: null,
+        createdAt: "2024-02-10T09:45:00Z"
+      }
+    ],
+    "TAG-005": []
   };
 
   // Load animal data
@@ -565,14 +495,18 @@ const MOCK_HEALTH_CHECKUPS = {
       setLoading(true);
       
       try {
+        // Check if animal data was passed via location state
         if (location.state?.animal) {
           setAnimal(location.state.animal);
           loadInsurances(location.state.animal.earTagId);
           loadHealthCheckups(location.state.animal.earTagId);
-        } else if (uid) {
-          await fetchAnimalData(uid);
-        } else {
-          toast.error("No animal ID provided");
+        } 
+        // Otherwise fetch by earTagId from URL
+        else if (earTagId) {
+          await fetchAnimalData(earTagId);
+        } 
+        else {
+          toast.error("No Ear Tag ID provided");
           navigate("/animals");
         }
       } catch (error) {
@@ -584,21 +518,25 @@ const MOCK_HEALTH_CHECKUPS = {
     };
 
     loadAnimalData();
-  }, [uid, location.state, navigate]);
+  }, [earTagId, location.state, navigate]);
 
-  // Fetch animal data function
-  const fetchAnimalData = async (uid) => {
+  // Fetch animal data function using earTagId
+  const fetchAnimalData = async (earTagId) => {
     try {
+      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      const foundAnimal = MOCK_ANIMALS.find(a => a.uid === uid);
+      // Find animal by earTagId (case insensitive)
+      const foundAnimal = MOCK_ANIMALS.find(a => 
+        a.earTagId.toLowerCase() === earTagId.toLowerCase()
+      );
       
       if (foundAnimal) {
         setAnimal(foundAnimal);
         loadInsurances(foundAnimal.earTagId);
         loadHealthCheckups(foundAnimal.earTagId);
       } else {
-        toast.error("Animal not found");
+        toast.error(`Animal with Ear Tag ID ${earTagId} not found`);
         navigate("/management/animals");
       }
     } catch (error) {
@@ -662,11 +600,9 @@ const MOCK_HEALTH_CHECKUPS = {
   const navigateToHealthCheckForm = () => {
     if (animal) {
       const animalData = {
-        id: animal.id,
-        animalId: animal.uid,
         animalTagId: animal.earTagId,
-        sellerName: animal.vendorName,
-        sellerMobile: animal.vendorMobile,
+        sellerName: animal.beneficiaryName,
+        sellerMobile: animal.beneficiaryMobile,
         checkupDate: new Date().toISOString(),
         status: "Scheduled"
       };
@@ -685,11 +621,9 @@ const MOCK_HEALTH_CHECKUPS = {
   const navigateToEditHealthCheckup = (checkup) => {
     if (animal) {
       const animalData = {
-        id: animal.id,
-        animalId: animal.uid,
         animalTagId: animal.earTagId,
-        sellerName: animal.vendorName,
-        sellerMobile: animal.vendorMobile,
+        sellerName: animal.beneficiaryName,
+        sellerMobile: animal.beneficiaryMobile,
         checkupDate: checkup.checkDate,
         status: checkup.vetApproval
       };
@@ -706,99 +640,95 @@ const MOCK_HEALTH_CHECKUPS = {
   };
 
   // ============= INLINE EDIT HANDLERS =============
-const startInlineEdit = (checkup) => {
-  setEditingCheckupId(checkup.id);
-  setEditFormData({
-    id: checkup.id,
-    vetOfficer: checkup.vetOfficer || '',
-    checkDate: checkup.checkDate || '',
-    temperature: checkup.temperature || '',
-    heartRate: checkup.heartRate || '',
-    generalCondition: checkup.generalCondition || '',
-    appetite: checkup.appetite || '',
-    hydration: checkup.hydration || '',
-    mobility: checkup.mobility || '',
-    vaccinated: checkup.vaccinated || 'no',
-    vaccinations: checkup.vaccinations || [],
-    vetApproval: checkup.vetApproval || 'pending',
-    remark: checkup.remark || '',
-    healthCertificateName: checkup.healthCertificateName || ''
-  });
-};
+  const startInlineEdit = (checkup) => {
+    setEditingCheckupId(checkup.id);
+    setEditFormData({
+      id: checkup.id,
+      vetOfficer: checkup.vetOfficer || '',
+      checkDate: checkup.checkDate || '',
+      temperature: checkup.temperature || '',
+      heartRate: checkup.heartRate || '',
+      generalCondition: checkup.generalCondition || '',
+      appetite: checkup.appetite || '',
+      hydration: checkup.hydration || '',
+      mobility: checkup.mobility || '',
+      vaccinated: checkup.vaccinated || 'no',
+      vaccinations: checkup.vaccinations || [],
+      vetApproval: checkup.vetApproval || 'pending',
+      remark: checkup.remark || '',
+      healthCertificateName: checkup.healthCertificateName || ''
+    });
+  };
 
-const handleEditInputChange = (e) => {
-  const { name, value } = e.target;
-  setEditFormData(prev => ({
-    ...prev,
-    [name]: value
-  }));
-};
-
-const handleEditVaccinationChange = (index, field, value) => {
-  setEditFormData(prev => {
-    const updatedVaccinations = [...prev.vaccinations];
-    updatedVaccinations[index] = {
-      ...updatedVaccinations[index],
-      [field]: value
-    };
-    return {
+  const handleEditInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData(prev => ({
       ...prev,
-      vaccinations: updatedVaccinations
-    };
-  });
-};
+      [name]: value
+    }));
+  };
 
-const addEditVaccination = () => {
-  setEditFormData(prev => ({
-    ...prev,
-    vaccinations: [
-      ...prev.vaccinations,
-      {
-        id: Date.now(),
-        vaccinationType: '',
-        vaccinationName: '',
-        vaccinationDate: '',
-        batchNo: ''
-      }
-    ]
-  }));
-};
+  const handleEditVaccinationChange = (index, field, value) => {
+    setEditFormData(prev => {
+      const updatedVaccinations = [...prev.vaccinations];
+      updatedVaccinations[index] = {
+        ...updatedVaccinations[index],
+        [field]: value
+      };
+      return {
+        ...prev,
+        vaccinations: updatedVaccinations
+      };
+    });
+  };
 
-const removeEditVaccination = (index) => {
-  setEditFormData(prev => ({
-    ...prev,
-    vaccinations: prev.vaccinations.filter((_, i) => i !== index)
-  }));
-};
+  const addEditVaccination = () => {
+    setEditFormData(prev => ({
+      ...prev,
+      vaccinations: [
+        ...prev.vaccinations,
+        {
+          id: Date.now(),
+          vaccinationType: '',
+          vaccinationName: '',
+          vaccinationDate: '',
+          batchNo: ''
+        }
+      ]
+    }));
+  };
 
-const saveInlineEdit = () => {
-  // Update the health checkups array
-  const updatedCheckups = healthCheckups.map(checkup => 
-    checkup.id === editingCheckupId ? { ...checkup, ...editFormData } : checkup
-  );
-  
-  setHealthCheckups(updatedCheckups);
-  
-  // Save to localStorage
-  if (animal?.earTagId) {
-    localStorage.setItem(
-      `healthCheckups_${animal.earTagId}`,
-      JSON.stringify(updatedCheckups)
+  const removeEditVaccination = (index) => {
+    setEditFormData(prev => ({
+      ...prev,
+      vaccinations: prev.vaccinations.filter((_, i) => i !== index)
+    }));
+  };
+
+  const saveInlineEdit = () => {
+    const updatedCheckups = healthCheckups.map(checkup => 
+      checkup.id === editingCheckupId ? { ...checkup, ...editFormData } : checkup
     );
-  }
-  
-  // Exit edit mode
-  setEditingCheckupId(null);
-  setEditFormData({});
-  
-  toast.success("Health checkup updated successfully!");
-};
+    
+    setHealthCheckups(updatedCheckups);
+    
+    if (animal?.earTagId) {
+      localStorage.setItem(
+        `healthCheckups_${animal.earTagId}`,
+        JSON.stringify(updatedCheckups)
+      );
+    }
+    
+    setEditingCheckupId(null);
+    setEditFormData({});
+    
+    toast.success("Health checkup updated successfully!");
+  };
 
-const cancelInlineEdit = () => {
-  setEditingCheckupId(null);
-  setEditFormData({});
-};
-  // ============================================================
+  const cancelInlineEdit = () => {
+    setEditingCheckupId(null);
+    setEditFormData({});
+  };
 
   // INSURANCE FORM HANDLERS
   const handleInsuranceInputChange = (e) => {
@@ -845,7 +775,7 @@ const cancelInlineEdit = () => {
       ownerName: insuranceForm.ownerName || "",
       animalName: insuranceForm.animalName || "",
       species: insuranceForm.species || "",
-      animalId: insuranceForm.animalId || animal?.uid || "",
+      animalEarTagId: insuranceForm.animalEarTagId || animal?.earTagId || "",
       fileName: insuranceForm.fileName,
       medicalInsuranceCertificate: insuranceForm.medicalInsuranceCertificate,
       createdAt: new Date().toISOString(),
@@ -875,7 +805,7 @@ const cancelInlineEdit = () => {
       ownerName: "",
       animalName: "",
       species: "",
-      animalId: "",
+      animalEarTagId: "",
       medicalInsuranceCertificate: null,
       certificateFile: null,
       fileName: "",
@@ -890,7 +820,7 @@ const cancelInlineEdit = () => {
       ownerName: insurance.ownerName,
       animalName: insurance.animalName,
       species: insurance.species,
-      animalId: insurance.animalId,
+      animalEarTagId: insurance.animalEarTagId,
       medicalInsuranceCertificate: insurance.medicalInsuranceCertificate,
       certificateFile: null,
       fileName: insurance.fileName,
@@ -944,9 +874,11 @@ const cancelInlineEdit = () => {
     }
   };
 
-  // View health checkup details (placeholder for future implementation)
-  const viewHealthCheckupDetails = (checkup) => {
-    toast.info("View details - Coming soon");
+  // Navigate to beneficiary details
+  const navigateToBeneficiaryDetails = () => {
+    if (animal?.beneficiaryId) {
+      navigate(`/beneficiaries/${animal.beneficiaryId}`);
+    }
   };
 
   // Utility Functions
@@ -954,6 +886,7 @@ const cancelInlineEdit = () => {
     if (!dateString) return "Not provided";
     try {
       const date = new Date(dateString);
+      if (isNaN(date.getTime())) return dateString;
       return date.toLocaleDateString("en-GB", {
         day: "2-digit",
         month: "short",
@@ -985,7 +918,7 @@ const cancelInlineEdit = () => {
   };
 
   const getPregnancyStatusLabel = (status) => {
-    switch(status) {
+    switch(status?.toLowerCase()) {
       case 'milking': return 'Milking';
       case 'pregnant': return 'Pregnant';
       case 'non-pregnant': return 'Non-Pregnant';
@@ -1011,18 +944,12 @@ const cancelInlineEdit = () => {
     return vet ? vet.name : 'Unknown';
   };
 
-  const getVetMobileById = (vetId) => {
-    if (!vetId) return '';
-    const vet = veterinaryOfficers.find(v => v.id.toString() === vetId.toString());
-    return vet ? vet.mobile : '';
-  };
-
   // Loading state
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-50 via-white to-gray-50">
         <div className="text-center p-8 bg-white rounded-xl shadow-md">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
           <h3 className="text-xl font-bold text-gray-700 mb-2">Loading Animal Details...</h3>
           <p className="text-gray-500">Please wait while we fetch the animal information.</p>
         </div>
@@ -1034,14 +961,14 @@ const cancelInlineEdit = () => {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-50 via-white to-gray-50">
         <div className="text-center p-8 bg-white rounded-xl shadow-md">
-          <div className="p-4 bg-blue-100 rounded-full mb-4 inline-block">
-            <GiCow className="w-12 h-12 text-blue-600" />
+          <div className="p-4 bg-primary-100 rounded-full mb-4 inline-block">
+            <GiCow className="w-12 h-12 text-primary-600" />
           </div>
           <h3 className="text-lg font-bold text-gray-700 mb-2">Animal Not Found</h3>
           <p className="text-gray-500 mb-6">No animal data found in the system.</p>
           <button
             onClick={() => navigate("/management/animals")}
-            className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 mx-auto"
+            className="px-5 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 mx-auto"
           >
             <ArrowLeft size={16} />
             Back to Animals
@@ -1052,33 +979,13 @@ const cancelInlineEdit = () => {
   }
 
   return (
-    <div className="space-y-6 p-4 md:p-6 bg-gradient-to-r from-gray-50 via-white to-gray-50">
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          style: {
-            background: "#363636",
-            color: "#fff",
-          },
-          success: {
-            style: {
-              background: "#10b981",
-            },
-          },
-          error: {
-            style: {
-              background: "#ef4444",
-            },
-          },
-        }}
-      />
-
+    <div className="space-y-6 bg-gradient-to-r from-gray-50 via-white to-gray-50">
       {/* Header Section */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate("/management/animals")}
-            className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            className="p-2 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
           >
             <ArrowLeft size={20} />
           </button>
@@ -1089,77 +996,49 @@ const cancelInlineEdit = () => {
         </div>
       </div>
 
-      {/* Profile Header */}
-      <div className="bg-white rounded-xl shadow-md p-6">
+      {/* Profile Header - Using Ear Tag ID as primary identifier */}
+      <div className="bg-white rounded-xl shadow-md p-3">
         <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
           <div className="flex-shrink-0">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 border-4 border-white shadow-lg flex items-center justify-center overflow-hidden">
-              {animal.frontPhoto ? (
-                <img
-                  src={animal.frontPhoto}
-                  alt="Animal"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src =
-                      "https://via.placeholder.com/150?text=Animal";
-                  }}
-                />
-              ) : (
-                <GiCow className="text-gray-400" size={40} />
-              )}
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary-100 to-primary-200 border-4 border-white shadow-lg flex items-center justify-center">
+              <GiCow className="text-primary-600" size={40} />
             </div>
           </div>
 
           <div className="flex-1">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
               <div>
-                <h3 className="text-2xl font-bold text-gray-900">
-                  {animal.uid}
+                <h3 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                  <Tag className="text-primary-500" size={20} />
+                  {animal.earTagId}
                 </h3>
-                <p className="text-gray-600 mt-1">
-                  {animal.breed} • {animal.animalType} • {animal.ageYears} years {animal.ageMonths} months
+                <p className="text-gray-600 text-sm font-medium mt-1 flex items-center gap-3 flex-wrap">
+                  <span className="flex items-center gap-1">
+                    <GiCow size={16} className="text-gray-400" />
+                    {animal.breed}
+                  </span>
+                  <span className="text-gray-300">•</span>
+                  <span className="flex items-center gap-1 capitalize">
+                    <User size={16} className="text-gray-400" />
+                    {animal.gender}
+                  </span>
+                  <span className="text-gray-300">•</span>
+                  <span className="flex items-center gap-1">
+                    <Calendar size={16} className="text-gray-400" />
+                    Age: {animal.ageYears}Y {animal.ageMonths}M
+                  </span>
                 </p>
               </div>
               
-              <div className="flex flex-col items-start md:items-end gap-2 mt-4 md:mt-0">
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  animal.status === "Registered" ? "bg-blue-100 text-blue-800" :
-                  animal.status === "Verified" ? "bg-green-100 text-green-800" :
-                  animal.status === "Sold" ? "bg-purple-100 text-purple-800" :
+              <div className="mt-4 md:mt-0">
+                <span className={`px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 ${
+                  animal.calvingStatus === 'milking' ? "bg-primary-100 text-primary-800" :
+                  animal.calvingStatus === 'pregnant' ? "bg-pink-100 text-pink-800" :
                   "bg-gray-100 text-gray-800"
                 }`}>
-                  {animal.status || "Registered"}
-                </span>
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  animal.pregnancyStatus === 'milking' ? "bg-blue-100 text-blue-800" :
-                  animal.pregnancyStatus === 'pregnant' ? "bg-pink-100 text-pink-800" :
-                  "bg-gray-100 text-gray-800"
-                }`}>
-                  {getPregnancyStatusLabel(animal.pregnancyStatus)}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-4 mt-4">
-              <div className="flex items-center gap-2">
-                <Tag className="text-gray-400" size={16} />
-                <span className="text-sm text-gray-600">
-                  Ear Tag: <span className="font-medium">{animal.earTagId}</span>
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <IndianRupee className="text-gray-400" size={16} />
-                <span className="text-sm text-gray-600">
-                  Price: <span className="font-medium">{animal.pricing}</span>
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Milk className="text-gray-400" size={16} />
-                <span className="text-sm text-gray-600">
-                  Milk: <span className="font-medium">{animal.milkPerDay} liters/day</span>
+                  {animal.calvingStatus === 'milking' && <Milk size={16} />}
+                  {animal.calvingStatus === 'pregnant' && <HeartPulse size={16} />}
+                  {getPregnancyStatusLabel(animal.calvingStatus)}
                 </span>
               </div>
             </div>
@@ -1174,7 +1053,7 @@ const cancelInlineEdit = () => {
             onClick={() => setActiveTab("details")}
             className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
               activeTab === "details"
-                ? "border-blue-600 text-blue-700"
+                ? "border-primary-600 text-primary-700"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             }`}
           >
@@ -1184,36 +1063,23 @@ const cancelInlineEdit = () => {
             </div>
           </button>
           <button
-            onClick={() => setActiveTab("vendor")}
+            onClick={() => setActiveTab("beneficiary")}
             className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-              activeTab === "vendor"
-                ? "border-blue-600 text-blue-700"
+              activeTab === "beneficiary"
+                ? "border-primary-600 text-primary-700"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             }`}
           >
             <div className="flex items-center gap-2">
               <Building size={18} />
-              Vendor
-            </div>
-          </button>
-          <button
-            onClick={() => setActiveTab("media")}
-            className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-              activeTab === "media"
-                ? "border-blue-600 text-blue-700"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <Camera size={18} />
-              Media
+              Beneficiary
             </div>
           </button>
           <button
             onClick={() => setActiveTab("healthCheckups")}
             className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
               activeTab === "healthCheckups"
-                ? "border-blue-600 text-blue-700"
+                ? "border-primary-600 text-primary-700"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             }`}
           >
@@ -1221,7 +1087,7 @@ const cancelInlineEdit = () => {
               <HeartPulse size={18} />
               Health Checkups
               {healthCheckups.length > 0 && (
-                <span className="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded-full">
+                <span className="bg-primary-100 text-primary-800 text-xs px-2 py-0.5 rounded-full">
                   {healthCheckups.length}
                 </span>
               )}
@@ -1231,7 +1097,7 @@ const cancelInlineEdit = () => {
             onClick={() => setActiveTab("insurance")}
             className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
               activeTab === "insurance"
-                ? "border-blue-600 text-blue-700"
+                ? "border-primary-600 text-primary-700"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             }`}
           >
@@ -1239,7 +1105,7 @@ const cancelInlineEdit = () => {
               <Shield size={18} />
               Insurance
               {insurances.length > 0 && (
-                <span className="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded-full">
+                <span className="bg-primary-100 text-primary-800 text-xs px-2 py-0.5 rounded-full">
                   {insurances.length}
                 </span>
               )}
@@ -1248,61 +1114,112 @@ const cancelInlineEdit = () => {
         </nav>
       </div>
 
-      {/* Details Tab Content */}
+      {/* ============= UPDATED DETAILS TAB CONTENT ============= */}
+      {/* Details Tab Content - With fields matching EditAnimal.jsx */}
       {activeTab === "details" && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="space-y-6">
-              <DetailSection title="Basic Information" icon={<GiCow size={20} />}>
+              <DetailSection title="Animal Information" icon={<GiCow size={20} />}>
                 <div className="space-y-4">
-                  <DetailRow label="Animal ID" value={animal.uid || "Not provided"} />
-                  <DetailRow label="Animal Type" value={animal.animalType || "Not provided"} />
+                  <DetailRow label="Ear Tag ID" value={animal.earTagId || "Not provided"} />
                   <DetailRow label="Breed" value={animal.breed || "Not provided"} />
+                  <DetailRow label="Gender" value={animal.gender || "Not provided"} />
+                  <DetailRow label="Calving Status" value={getPregnancyStatusLabel(animal.calvingStatus)} />
+                  <DetailRow label="Lactation" value={animal.lactation || "Not provided"} />
                   <DetailRow label="Age" value={animal.ageYears !== undefined && animal.ageMonths !== undefined 
                     ? `${animal.ageYears} years ${animal.ageMonths} months`
                     : "Not provided"} />
-                  <DetailRow label="Weight" value={animal.weight ? `${animal.weight} kg` : "Not provided"} />
-                  <DetailRow label="Milk Production" value={animal.milkPerDay ? `${animal.milkPerDay} liters/day` : "Not provided"} />
-                  <DetailRow label="Price" value={animal.pricing || "Not provided"} />
-                  <DetailRow label="Pregnancy Status" value={getPregnancyStatusLabel(animal.pregnancyStatus)} />
-                  <DetailRow label="Number of Pregnancies" value={animal.numberOfPregnancies || "Not provided"} />
+                  <DetailRow label="Calving Date" value={formatDate(animal.calvingDate)} />
+                  <DetailRow label="Exam Date" value={formatDate(animal.examDate)} />
+                  <DetailRow label="Examine By" value={animal.examineBy || "Not provided"} />
+                  <DetailRow label="Receiving Date" value={formatDate(animal.receivingDate)} />
                 </div>
               </DetailSection>
-
-              {animal.commissionAgentName && (
-                <DetailSection title="Commission Agent" icon={<User size={20} />}>
-                  <div className="space-y-4">
-                    <DetailRow label="Agent Name" value={animal.commissionAgentName || "Not provided"} />
-                    <DetailRow label="Agent ID" value={animal.commissionAgentId || "Not provided"} />
-                  </div>
-                </DetailSection>
-              )}
             </div>
 
             <div className="space-y-6">
-              {animal.pregnancyStatus === 'milking' && (
+              {/* Calf Details - Only show if calving status is 'milking' */}
+              {animal.calvingStatus === 'milking' && (
                 <DetailSection title="Calf Details" icon={<Baby size={20} />}>
                   <div className="space-y-4">
                     <DetailRow label="Calf Tag ID" value={animal.calfTagId || "Not provided"} />
-                    <DetailRow label="Calf Age" value={animal.calfAgeYears !== undefined && animal.calfAgeMonths !== undefined
-                      ? `${animal.calfAgeYears} years ${animal.calfAgeMonths} months`
-                      : "Not provided"} />
+                    <DetailRow label="Calf Gender" value={animal.calfGender || "Not provided"} />
                   </div>
                 </DetailSection>
               )}
 
-              <DetailSection title="Health Information" icon={<HeartPulse size={20} />}>
-                <div className="space-y-4">
-                  <DetailRow label="Health Status" value={animal.healthStatus || "Healthy"} />
-                  <DetailRow label="Last Health Check" value={formatDate(animal.lastHealthCheck)} />
-                  <DetailRow label="Total Health Checkups" value={healthCheckups.length.toString()} />
-                </div>
-              </DetailSection>
+                <DetailSection title="Remark" icon={<Baby size={20} />}>
+                  <div className="space-y-4">
+                  <DetailRow label="" value={animal.remark || "Not provided"} fullWidth />
+                  </div>
+                </DetailSection>
 
-              <DetailSection title="Registration Details" icon={<Calendar size={20} />}>
-                <div className="space-y-4">
-                  <DetailRow label="Registration Date" value={formatDate(animal.createdAt)} />
-                  <DetailRow label="Status" value={animal.status || "Registered"} />
+              {/* Media Section */}
+              <DetailSection title="Media Gallery" icon={<Camera size={20} />}>
+                <div className="space-y-6">
+                  {/* Animal Photos */}
+                  <div>
+                    <h4 className="text-md font-medium text-gray-700 mb-3">Animal Photos</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      {[
+                        { label: "Front Image", field: "frontImage", data: animal.frontImage },
+                        { label: "Side Image", field: "sideImage", data: animal.sideImage },
+                        { label: "Rear Image", field: "rearImage", data: animal.rearImage },
+                      ].map((img, i) => (
+                        <div key={i} className="text-center">
+                          <p className="text-xs text-gray-500 mb-1">{img.label}</p>
+                          {img.data?.preview ? (
+                            <div className="relative group">
+                              <img
+                                src={img.data.preview}
+                                alt={img.label}
+                                className="h-32 w-full object-cover rounded-lg border border-gray-200 hover:scale-105 transition-transform cursor-pointer"
+                                onClick={() => window.open(img.data.preview, '_blank')}
+                                onError={(e) => {
+                                  e.target.onerror = null;
+                                  e.target.src = "https://via.placeholder.com/150?text=No+Image";
+                                }}
+                              />
+                              {img.data.name && (
+                                <p className="text-xs text-gray-500 mt-1 truncate">{img.data.name}</p>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="h-32 flex items-center justify-center text-gray-400 border-2 border-dashed border-gray-200 rounded-lg bg-gray-50">
+                              <Camera className="text-gray-300" size={20} />
+                              <span className="ml-1 text-xs">No image</span>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Animal Video */}
+                  <div>
+                    <h4 className="text-md font-medium text-gray-700 mb-2">Animal 360° Video</h4>
+                    {animal.video?.preview ? (
+                      <div>
+                        <video 
+                          controls 
+                          src={animal.video.preview} 
+                          className="rounded-lg w-full border border-gray-200 max-h-48"
+                        />
+                        {animal.video.instructions && (
+                          <p className="text-xs text-gray-500 mt-2 italic">📋 {animal.video.instructions}</p>
+                        )}
+                        {animal.video.name && (
+                          <p className="text-xs text-gray-500 mt-1">{animal.video.name} ({animal.video.size})</p>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="h-32 flex items-center justify-center text-gray-400 border-2 border-dashed border-gray-200 rounded-lg bg-gray-50">
+                        <Video className="text-gray-300" size={24} />
+                        <span className="ml-2 text-sm">No video available</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </DetailSection>
             </div>
@@ -1310,14 +1227,14 @@ const cancelInlineEdit = () => {
         </div>
       )}
 
-      {/* VENDOR TAB */}
-      {activeTab === "vendor" && (
+      {/* BENEFICIARY TAB - UPDATED with Beneficiary ID, DO Number, Name, Mobile, and Action */}
+      {activeTab === "beneficiary" && (
         <div className="space-y-6">
           <div className="bg-white rounded-xl shadow-md overflow-hidden">
             <div className="p-5 border-b border-gray-200">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Vendor Details</h3>
-                <p className="text-gray-600 mt-1">Vendor who supplied this animal</p>
+                <h3 className="text-lg font-semibold text-gray-900">Beneficiary Details</h3>
+                <p className="text-gray-600 mt-1">Beneficiary information for this animal</p>
               </div>
             </div>
 
@@ -1325,46 +1242,46 @@ const cancelInlineEdit = () => {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor ID</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone Number</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Beneficiary ID</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DO Number</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mobile Number</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {animal.vendorName ? (
+                  {animal.beneficiaryName ? (
                     <tr className="hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="text-sm font-medium text-gray-900">{animal.vendorId || "V001"}</span>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm font-medium text-gray-900">{animal.beneficiaryId || "Not provided"}</span>
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="text-sm font-medium text-gray-900">{animal.vendorName}</span>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm font-medium text-gray-900">{animal.doNumber || "Not provided"}</span>
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="text-sm text-gray-900">{animal.vendorMobile || "9876543210"}</span>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm font-medium text-gray-900">{animal.beneficiaryName}</span>
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm text-gray-900">{animal.beneficiaryMobile || "Not provided"}</span>
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <button
-                          onClick={() => navigate(`/vendors/${animal.vendorId || 'V001'}`)}
-                          className="px-3 py-1.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 text-sm"
+                          onClick={navigateToBeneficiaryDetails}
+                          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 text-sm"
                         >
-                          <Eye size={14} /> View Details
+                          <Eye size={16} /> View Details
                         </button>
                       </td>
                     </tr>
                   ) : (
                     <tr>
-                      <td colSpan="5" className="px-4 py-12 text-center">
+                      <td colSpan="5" className="px-6 py-12 text-center">
                         <div className="flex flex-col items-center justify-center">
-                          <div className="p-4 bg-blue-100 rounded-full mb-4">
-                            <Building className="w-12 h-12 text-blue-600" />
+                          <div className="p-4 bg-primary-100 rounded-full mb-4">
+                            <Building className="w-12 h-12 text-primary-600" />
                           </div>
-                          <h3 className="text-lg font-medium text-gray-500 mb-2">No vendor information</h3>
-                          <p className="text-gray-400 text-sm mb-6">Vendor information is not available for this animal.</p>
+                          <h3 className="text-lg font-medium text-gray-500 mb-2">No beneficiary information</h3>
+                          <p className="text-gray-400 text-sm mb-6">Beneficiary information is not available for this animal.</p>
                         </div>
                       </td>
                     </tr>
@@ -1376,87 +1293,10 @@ const cancelInlineEdit = () => {
         </div>
       )}
 
-      {/* MEDIA TAB */}
-      {activeTab === "media" && (
-        <div className="space-y-6">
-          <DetailSection title="Animal Media" icon={<Camera size={20} />}>
-            <div className="space-y-6">
-              <div>
-                <h4 className="text-md font-medium text-gray-700 mb-4">Animal Photos</h4>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {[
-                    { label: "Front View", field: "frontPhoto", src: animal.frontPhoto },
-                    { label: "Side View", field: "sidePhoto", src: animal.sidePhoto },
-                    { label: "Back View", field: "backPhoto", src: animal.backPhoto },
-                  ].map((img, i) => (
-                    <div key={i} className="text-center">
-                      <p className="text-sm text-gray-600 mb-2">{img.label}</p>
-                      {img.src ? (
-                        <img
-                          src={img.src}
-                          alt={img.label}
-                          className="h-48 w-full object-cover rounded-lg border border-gray-200"
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = "https://via.placeholder.com/150?text=No+Image";
-                          }}
-                        />
-                      ) : (
-                        <div className="h-48 flex items-center justify-center text-gray-400 border-2 border-dashed border-gray-300 rounded-lg">
-                          <Camera className="text-gray-300" size={24} />
-                          <span className="ml-2">No photo</span>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <h4 className="text-md font-medium text-gray-700 mb-2">Animal 360° Video</h4>
-                {animal.animalVideo ? (
-                  <video controls src={animal.animalVideo} className="rounded-lg w-full border border-gray-200" />
-                ) : (
-                  <div className="h-48 flex items-center justify-center text-gray-400 border-2 border-dashed border-gray-300 rounded-lg">
-                    <Video className="text-gray-300" size={24} />
-                    <span className="ml-2">No video available</span>
-                  </div>
-                )}
-              </div>
-
-              {animal.pregnancyStatus === 'milking' && (
-                <>
-                  <h4 className="text-md font-medium text-gray-700 mt-4">Calf Media</h4>
-                  {animal.calfPhoto && (
-                    <div>
-                      <p className="text-sm text-gray-600 mb-2">Calf Photo</p>
-                      <img
-                        src={animal.calfPhoto}
-                        alt="Calf"
-                        className="h-48 w-full object-cover rounded-lg border border-gray-200"
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = "https://via.placeholder.com/150?text=No+Image";
-                        }}
-                      />
-                    </div>
-                  )}
-                  {animal.calfVideo && (
-                    <div>
-                      <p className="text-sm text-gray-600 mb-2">Calf 360° Video</p>
-                      <video controls src={animal.calfVideo} className="rounded-lg w-full border border-gray-200" />
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          </DetailSection>
-        </div>
-      )}
-
-      {/* HEALTH CHECKUPS TAB */}
+      {/* HEALTH CHECKUPS TAB - Keep existing health checkups code */}
       {activeTab === "healthCheckups" && (
         <div className="space-y-6">
+          {/* ... existing health checkups code ... */}
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-lg font-semibold text-gray-900">Routine Health Checkups</h2>
@@ -1466,7 +1306,7 @@ const cancelInlineEdit = () => {
             </div>
             <button
               onClick={navigateToHealthCheckForm}
-              className="px-4 py-2.5 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:opacity-90 transition-opacity font-medium flex items-center gap-2 shadow-md"
+              className="px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:opacity-90 transition-opacity font-medium flex items-center gap-2 shadow-md"
             >
               <Plus size={16} />
               Add Health Checkup
@@ -1500,230 +1340,7 @@ const cancelInlineEdit = () => {
                 .map((checkup) => {
                   const approvalBadge = getVetApprovalBadge(checkup.vetApproval);
                   const ApprovalIcon = approvalBadge.icon;
-                  const isEditing = editingCheckupId === checkup.id;
                   
-                  if (isEditing) {
-                    return (
-                      <div key={checkup.id} className="border border-blue-300 rounded-lg p-4 bg-blue-50 shadow-sm">
-                        {/* Edit Mode Header */}
-                        <div className="flex items-center justify-between mb-4">
-                          <h4 className="text-base font-semibold text-blue-800">Edit Health Checkup</h4>
-                          <div className="flex gap-2">
-                            <button
-                              onClick={saveInlineEdit}
-                              className="px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-xs font-medium flex items-center gap-1"
-                            >
-                              <Check size={14} />
-                              Save
-                            </button>
-                            <button
-                              onClick={cancelInlineEdit}
-                              className="px-3 py-1.5 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-xs font-medium flex items-center gap-1"
-                            >
-                              <X size={14} />
-                              Cancel
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Edit Form - Compact Version */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
-                          <div>
-                            <label className="text-xs font-medium text-gray-700 mb-1 block">Vet Officer</label>
-                            <select
-                              name="vetOfficer"
-                              value={editFormData.vetOfficer}
-                              onChange={handleEditInputChange}
-                              className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            >
-                              <option value="">Select</option>
-                              {veterinaryOfficers.map(vet => (
-                                <option key={vet.id} value={vet.id}>{vet.name}</option>
-                              ))}
-                            </select>
-                          </div>
-                          <div>
-                            <label className="text-xs font-medium text-gray-700 mb-1 block">Check Date</label>
-                            <input
-                              type="date"
-                              name="checkDate"
-                              value={editFormData.checkDate}
-                              onChange={handleEditInputChange}
-                              className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                          </div>
-                          <div>
-                            <label className="text-xs font-medium text-gray-700 mb-1 block">Temperature</label>
-                            <input
-                              type="text"
-                              name="temperature"
-                              value={editFormData.temperature}
-                              onChange={handleEditInputChange}
-                              placeholder="°C"
-                              className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                          </div>
-                          <div>
-                            <label className="text-xs font-medium text-gray-700 mb-1 block">Heart Rate</label>
-                            <input
-                              type="text"
-                              name="heartRate"
-                              value={editFormData.heartRate}
-                              onChange={handleEditInputChange}
-                              placeholder="BPM"
-                              className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                          </div>
-                          <div>
-                            <label className="text-xs font-medium text-gray-700 mb-1 block">Condition</label>
-                            <select
-                              name="generalCondition"
-                              value={editFormData.generalCondition}
-                              onChange={handleEditInputChange}
-                              className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            >
-                              <option value="">Select</option>
-                              <option value="Excellent">Excellent</option>
-                              <option value="Good">Good</option>
-                              <option value="Fair">Fair</option>
-                              <option value="Poor">Poor</option>
-                              <option value="Critical">Critical</option>
-                            </select>
-                          </div>
-                          <div>
-                            <label className="text-xs font-medium text-gray-700 mb-1 block">Mobility</label>
-                            <select
-                              name="mobility"
-                              value={editFormData.mobility}
-                              onChange={handleEditInputChange}
-                              className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            >
-                              <option value="">Select</option>
-                              <option value="Normal">Normal</option>
-                              <option value="Slightly Lame">Slightly Lame</option>
-                              <option value="Severely Lame">Severely Lame</option>
-                              <option value="Unable to Move">Unable to Move</option>
-                            </select>
-                          </div>
-                          <div>
-                            <label className="text-xs font-medium text-gray-700 mb-1 block">Appetite</label>
-                            <select
-                              name="appetite"
-                              value={editFormData.appetite}
-                              onChange={handleEditInputChange}
-                              className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            >
-                              <option value="">Select</option>
-                              <option value="Good">Good</option>
-                              <option value="Moderate">Moderate</option>
-                              <option value="Poor">Poor</option>
-                              <option value="None">None</option>
-                            </select>
-                          </div>
-                          <div>
-                            <label className="text-xs font-medium text-gray-700 mb-1 block">Hydration</label>
-                            <select
-                              name="hydration"
-                              value={editFormData.hydration}
-                              onChange={handleEditInputChange}
-                              className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            >
-                              <option value="">Select</option>
-                              <option value="Good">Good</option>
-                              <option value="Adequate">Adequate</option>
-                              <option value="Dehydrated">Dehydrated</option>
-                              <option value="Severely Dehydrated">Severely Dehydrated</option>
-                            </select>
-                          </div>
-                        </div>
-
-                        {/* Vaccination Section in Edit Mode */}
-                        <div className="mb-3">
-                          <div className="flex items-center justify-between mb-2">
-                            <label className="text-xs font-medium text-gray-700">Vaccinations</label>
-                            <button
-                              onClick={addEditVaccination}
-                              className="px-2 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-xs flex items-center gap-1"
-                            >
-                              <Plus size={12} /> Add
-                            </button>
-                          </div>
-                          {editFormData.vaccinations?.map((vaccination, index) => (
-                            <div key={vaccination.id || index} className="flex items-center gap-2 mb-2 bg-white p-2 rounded-lg border border-gray-200">
-                              <input
-                                type="text"
-                                placeholder="Type"
-                                value={vaccination.vaccinationType}
-                                onChange={(e) => handleEditVaccinationChange(index, 'vaccinationType', e.target.value)}
-                                className="flex-1 px-2 py-1 text-xs border border-gray-300 rounded"
-                              />
-                              <input
-                                type="text"
-                                placeholder="Name"
-                                value={vaccination.vaccinationName}
-                                onChange={(e) => handleEditVaccinationChange(index, 'vaccinationName', e.target.value)}
-                                className="flex-1 px-2 py-1 text-xs border border-gray-300 rounded"
-                              />
-                              <input
-                                type="date"
-                                value={vaccination.vaccinationDate}
-                                onChange={(e) => handleEditVaccinationChange(index, 'vaccinationDate', e.target.value)}
-                                className="flex-1 px-2 py-1 text-xs border border-gray-300 rounded"
-                              />
-                              <input
-                                type="text"
-                                placeholder="Batch No"
-                                value={vaccination.batchNo}
-                                onChange={(e) => handleEditVaccinationChange(index, 'batchNo', e.target.value)}
-                                className="flex-1 px-2 py-1 text-xs border border-gray-300 rounded"
-                              />
-                              <button
-                                onClick={() => removeEditVaccination(index)}
-                                className="p-1 text-red-600 hover:bg-red-50 rounded"
-                              >
-                                <Trash2 size={14} />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* Remark in Edit Mode */}
-                        <div className="mb-2">
-                          <label className="text-xs font-medium text-gray-700 mb-1 block">Remark</label>
-                          <textarea
-                            name="remark"
-                            value={editFormData.remark}
-                            onChange={handleEditInputChange}
-                            rows="2"
-                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="Enter remarks..."
-                          />
-                        </div>
-
-                        {/* Approval Status in Edit Mode */}
-                        <div>
-                          <label className="text-xs font-medium text-gray-700 mb-1 block">Vet Approval</label>
-                          <div className="flex gap-3">
-                            {['approved', 'rejected', 'pending'].map(status => (
-                              <label key={status} className="flex items-center gap-1">
-                                <input
-                                  type="radio"
-                                  name="vetApproval"
-                                  value={status}
-                                  checked={editFormData.vetApproval === status}
-                                  onChange={handleEditInputChange}
-                                  className="text-blue-600 focus:ring-blue-500"
-                                />
-                                <span className="text-sm capitalize">{status}</span>
-                              </label>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  }
-                  
-                  // View Mode - Compact Card (your existing card design)
                   return (
                     <div
                       key={checkup.id}
@@ -1743,16 +1360,9 @@ const cancelInlineEdit = () => {
                             {getVetNameById(checkup.vetOfficer)}
                           </span>
                         </div>
-                        <button
-                          onClick={() => startInlineEdit(checkup)}
-                          className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors self-end sm:self-auto"
-                          title="Edit"
-                        >
-                          <Pencil size={14} />
-                        </button>
                       </div>
 
-                      {/* Vital Signs - Enhanced Design */}
+                      {/* Vital Signs */}
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
                         {checkup.temperature && (
                           <div className="flex items-center gap-2 p-2 bg-gradient-to-br from-orange-50 to-amber-50 rounded-lg border border-orange-100">
@@ -1781,13 +1391,13 @@ const cancelInlineEdit = () => {
                         {checkup.generalCondition && (
                           <div className={`flex items-center gap-2 p-2 rounded-lg border ${
                             checkup.generalCondition === 'Excellent' ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-200' :
-                            checkup.generalCondition === 'Good' ? 'bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200' :
+                            checkup.generalCondition === 'Good' ? 'bg-gradient-to-br from-primary-50 to-cyan-50 border-primary-200' :
                             checkup.generalCondition === 'Fair' ? 'bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200' :
                             'bg-gradient-to-br from-red-50 to-rose-50 border-red-200'
                           }`}>
                             <div className={`p-1.5 bg-white rounded-full shadow-sm ${
                               checkup.generalCondition === 'Excellent' ? 'text-green-600' :
-                              checkup.generalCondition === 'Good' ? 'text-blue-600' :
+                              checkup.generalCondition === 'Good' ? 'text-primary-600' :
                               checkup.generalCondition === 'Fair' ? 'text-yellow-600' :
                               'text-red-600'
                             }`}>
@@ -1797,7 +1407,7 @@ const cancelInlineEdit = () => {
                               <span className="text-[10px] font-medium text-gray-600 uppercase tracking-wider">Condition</span>
                               <p className={`text-sm font-bold leading-tight ${
                                 checkup.generalCondition === 'Excellent' ? 'text-green-700' :
-                                checkup.generalCondition === 'Good' ? 'text-blue-700' :
+                                checkup.generalCondition === 'Good' ? 'text-primary-700' :
                                 checkup.generalCondition === 'Fair' ? 'text-yellow-700' :
                                 'text-red-700'
                               }`}>
@@ -1839,7 +1449,7 @@ const cancelInlineEdit = () => {
                         )}
                       </div>
 
-                      {/* Vaccination Records - Scrollable */}
+                      {/* Vaccination Records */}
                       {checkup.vaccinations?.length > 0 && (
                         <div className="mb-3">
                           <p className="text-xs font-medium text-gray-700 mb-1 flex items-center gap-1">
@@ -1869,7 +1479,7 @@ const cancelInlineEdit = () => {
                         </div>
                       )}
 
-                      {/* Remark - Scrollable */}
+                      {/* Remark */}
                       {checkup.remark && (
                         <div className="mb-2">
                           <p className="text-xs font-medium text-gray-700 mb-1">Remark:</p>
@@ -1894,7 +1504,7 @@ const cancelInlineEdit = () => {
                             </span>
                           )}
                           {checkup.healthCertificateName && (
-                            <span className="flex items-center gap-1 text-blue-600">
+                            <span className="flex items-center gap-1 text-primary-600">
                               <FileText size={12} />
                               Certificate
                             </span>
@@ -1932,7 +1542,7 @@ const cancelInlineEdit = () => {
                         name="certificateNo"
                         value={insuranceForm.certificateNo}
                         onChange={handleInsuranceInputChange}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                         placeholder="Enter certificate number"
                         required
                       />
@@ -1947,7 +1557,7 @@ const cancelInlineEdit = () => {
                         name="issueDate"
                         value={insuranceForm.issueDate}
                         onChange={handleInsuranceInputChange}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                         required
                       />
                     </div>
@@ -1961,7 +1571,7 @@ const cancelInlineEdit = () => {
                         name="policyNumber"
                         value={insuranceForm.policyNumber}
                         onChange={handleInsuranceInputChange}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                         placeholder="Enter policy number"
                         required
                       />
@@ -1976,7 +1586,7 @@ const cancelInlineEdit = () => {
                         name="ownerName"
                         value={insuranceForm.ownerName}
                         onChange={handleInsuranceInputChange}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                         placeholder="Enter owner name"
                       />
                     </div>
@@ -1992,7 +1602,7 @@ const cancelInlineEdit = () => {
                         name="animalName"
                         value={insuranceForm.animalName}
                         onChange={handleInsuranceInputChange}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                         placeholder="Enter animal name"
                       />
                     </div>
@@ -2006,22 +1616,23 @@ const cancelInlineEdit = () => {
                         name="species"
                         value={insuranceForm.species}
                         onChange={handleInsuranceInputChange}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                         placeholder="Enter species"
                       />
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Animal ID
+                        Animal Ear Tag ID
                       </label>
                       <input
                         type="text"
-                        name="animalId"
-                        value={insuranceForm.animalId}
+                        name="animalEarTagId"
+                        value={insuranceForm.animalEarTagId || animal?.earTagId || ""}
                         onChange={handleInsuranceInputChange}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Enter animal ID"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-gray-50"
+                        placeholder="Animal Ear Tag ID"
+                        readOnly
                       />
                     </div>
 
@@ -2029,7 +1640,7 @@ const cancelInlineEdit = () => {
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Upload Medical Insurance Certificate
                       </label>
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-300 transition-colors">
+                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary-300 transition-colors">
                         <input
                           type="file"
                           accept=".pdf,.jpg,.jpeg,.png"
@@ -2041,7 +1652,7 @@ const cancelInlineEdit = () => {
                           htmlFor="insuranceFile"
                           className="cursor-pointer flex flex-col items-center gap-3"
                         >
-                          <FileCheck className="text-3xl text-blue-600" />
+                          <FileCheck className="text-3xl text-primary-600" />
                           <div>
                             <span className="block text-sm font-medium text-gray-700">
                               {insuranceForm.fileName || "Click to upload certificate"}
@@ -2066,7 +1677,7 @@ const cancelInlineEdit = () => {
                   </button>
                   <button
                     onClick={handleSaveInsurance}
-                    className="px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2"
+                    className="px-4 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2"
                   >
                     <Check size={16} />
                     {editingInsuranceId ? "Update Insurance" : "Save Insurance"}
@@ -2080,7 +1691,7 @@ const cancelInlineEdit = () => {
                 <h2 className="text-lg font-semibold text-gray-900">Medical Insurance</h2>
                 <button
                   onClick={() => setShowInsuranceForm(true)}
-                  className="px-4 py-2.5 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2"
+                  className="px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2"
                 >
                   <Plus size={16} />
                   Add Insurance
@@ -2091,16 +1702,10 @@ const cancelInlineEdit = () => {
                 <div className="bg-white rounded-xl shadow-md p-12 text-center">
                   <div className="flex flex-col items-center justify-center">
                     <div className="p-4 bg-primary-100 rounded-full mb-4">
-                      <FileCheck className="w-12 h-12 text-secondary-600" />
+                      <FileCheck className="w-12 h-12 text-primary-600" />
                     </div>
                     <h3 className="text-lg font-medium text-gray-500 mb-2">No Insurance Records Found</h3>
                     <p className="text-gray-400 text-sm mb-6">Add medical insurance information for this animal</p>
-                    <button
-                      onClick={() => setShowInsuranceForm(true)}
-                      className="px-4 py-2.5 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium"
-                    >
-                      Add Insurance
-                    </button>
                   </div>
                 </div>
               ) : (
@@ -2122,7 +1727,7 @@ const cancelInlineEdit = () => {
                         <div className="flex gap-2 flex-shrink-0">
                           <button
                             onClick={() => handleEditInsurance(insurance)}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
                             title="Edit"
                           >
                             <Pencil size={16} />
@@ -2141,7 +1746,7 @@ const cancelInlineEdit = () => {
                         <DetailRow label="Owner Name" value={insurance.ownerName || "N/A"} />
                         <DetailRow label="Animal Name" value={insurance.animalName || "N/A"} />
                         <DetailRow label="Species" value={insurance.species || "N/A"} />
-                        <DetailRow label="Animal ID" value={insurance.animalId || "N/A"} />
+                        <DetailRow label="Animal Ear Tag ID" value={insurance.animalEarTagId || "N/A"} />
                         <DetailRow label="Certificate No" value={insurance.certificateNo} />
                         <DetailRow label="Policy Number" value={insurance.policyNumber} />
                         <DetailRow label="Issue Date" value={formatDate(insurance.issueDate)} />
@@ -2166,7 +1771,7 @@ const cancelInlineEdit = () => {
                                     to={insurance.medicalInsuranceCertificate}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
                                   >
                                     <Eye size={16} /> View PDF
                                   </Link>
@@ -2191,7 +1796,7 @@ const cancelInlineEdit = () => {
                                     to={insurance.medicalInsuranceCertificate}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
                                   >
                                     <Eye size={16} /> View Full Size
                                   </Link>
@@ -2259,8 +1864,8 @@ const DetailSection = ({ title, icon, children }) => (
   <div className="bg-white rounded-xl shadow-md overflow-hidden">
     <div className="px-5 py-4 border-b border-gray-200">
       <div className="flex items-center gap-3">
-        <div className="p-2 bg-blue-50 rounded-lg">
-          <span className="text-blue-600">{icon}</span>
+        <div className="p-2 bg-primary-50 rounded-lg">
+          <span className="text-primary-600">{icon}</span>
         </div>
         <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
       </div>

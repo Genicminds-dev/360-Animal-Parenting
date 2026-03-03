@@ -465,7 +465,7 @@ const BrokersList = () => {
   };
 
   const handleEdit = (broker) => {
-    navigate(`${PATHROUTES.editBroker.replace(':uid', broker.uid)}`, {
+    navigate(`${PATHROUTES.editBroker}/${broker.id}`, {
       state: {
         uid: broker.uid,
         fullName: broker.fullName,
@@ -478,8 +478,8 @@ const BrokersList = () => {
   };
 
   const handleView = (broker) => {
-    navigate(`${PATHROUTES.brokerDetails.replace(':uid', broker.uid)}`, {
-      state: { uid: broker.uid }
+    navigate(`${PATHROUTES.brokerDetails}/${broker.uid}`, {
+      state: { broker }
     });
   };
 

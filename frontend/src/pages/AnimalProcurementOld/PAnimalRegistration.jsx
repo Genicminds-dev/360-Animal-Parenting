@@ -18,7 +18,7 @@ import { PATHROUTES } from '../../routes/pathRoutes';
 import { GiCow } from 'react-icons/gi';
 import api, { baseURLFile } from '../../services/api/api';
 
-const AnimalProcurement = () => {
+const PAnimalRegistration = () => {
   const navigate = useNavigate();
   const { uid } = useParams();
   const location = useLocation();
@@ -1888,4 +1888,4 @@ const handleSubmit = async () => {
   );
 };
 
-export default AnimalProcurement;
+export default PAnimalRegistration;
