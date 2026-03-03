@@ -196,7 +196,7 @@ const DataTable = ({
       )}
       {onDelete && (
         <button
-          onClick={() => onDelete(item.id)}
+          onClick={() => onDelete(item.id || item.uid)}
           className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
           title="Delete"
         >
@@ -298,8 +298,8 @@ const DataTable = ({
                       <td className="px-4 py-3 whitespace-nowrap border-r border-gray-100 text-center">
                         <input
                           type="checkbox"
-                          checked={effectiveSelectedItems.has(item.id)}
-                          onChange={() => effectiveOnSelectRow(item.id)}
+                          checked={effectiveSelectedItems.has(item.id || item.uid)}
+                          onChange={() => effectiveOnSelectRow(item.id || item.uid)}
                           className="rounded border-gray-300 text-primary-600 focus:ring-2 focus:ring-primary-500"
                         />
                       </td>
