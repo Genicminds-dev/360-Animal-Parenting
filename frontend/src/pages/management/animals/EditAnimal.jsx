@@ -5,6 +5,7 @@ import { toast } from "react-hot-toast";
 import { 
   Camera, X, ChevronDown, Save, ArrowLeft 
 } from 'lucide-react';
+import { PATHROUTES } from '../../../routes/pathRoutes';
 
 const EditAnimal = () => {
   const navigate = useNavigate();
@@ -32,6 +33,7 @@ const EditAnimal = () => {
     video: null
   });
 
+  const [errors, setErrors] = useState({});
   const [breedDropdownOpen, setBreedDropdownOpen] = useState(false);
   const [breedSearch, setBreedSearch] = useState('');
   const [genderDropdownOpen, setGenderDropdownOpen] = useState(false);
@@ -85,10 +87,10 @@ const EditAnimal = () => {
           });
         } else if (uid) {
           toast.error("No animal data provided");
-          navigate("/animals");
+          navigate(PATHROUTES.procuredAnimals);
         } else {
           toast.error("No animal ID provided");
-          navigate("/animals");
+          navigate(PATHROUTES.procuredAnimals);
         }
       } catch (error) {
         console.error("Error loading animal data:", error);
@@ -132,6 +134,11 @@ const EditAnimal = () => {
       ...prev,
       [field]: value
     }));
+    
+    // Clear error for this field when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
   };
 
   const handleMediaUpload = (field, file) => {
@@ -159,6 +166,11 @@ const EditAnimal = () => {
         [field]: fileData
       }));
     }
+    
+    // Clear any error for this field
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
   };
 
   const removeMedia = (field) => {
@@ -177,27 +189,57 @@ const EditAnimal = () => {
   };
 
   const validateForm = () => {
-    const errors = [];
-
-    if (!formData.earTagId) errors.push('Ear Tag ID is required');
-    if (!formData.breed) errors.push('Breed is required');
-    if (!formData.gender) errors.push('Gender is required');
-    if (!formData.calvingStatus) errors.push('Calving Status is required');
-
-    if (formData.calvingStatus === 'milking') {
-      if (!formData.calfTagId) errors.push('Calf Tag ID is required for milking animals');
-      if (!formData.calfGender) errors.push('Calf Gender is required for milking animals');
+    const newErrors = {};
+    
+    // Required field validations
+    if (!formData.earTagId.trim()) {
+      newErrors.earTagId = 'Ear Tag ID is required';
+    }
+    
+    if (!formData.breed.trim()) {
+      newErrors.breed = 'Breed is required';
+    }
+    
+    if (!formData.gender.trim()) {
+      newErrors.gender = 'Gender is required';
+    }
+    
+    if (!formData.calvingStatus.trim()) {
+      newErrors.calvingStatus = 'Calving Status is required';
     }
 
-    return errors;
+    // Conditional validations for milking
+    if (formData.calvingStatus === 'milking') {
+      if (!formData.calfTagId.trim()) {
+        newErrors.calfTagId = 'Calf Tag ID is required for milking animals';
+      }
+      if (!formData.calfGender.trim()) {
+        newErrors.calfGender = 'Calf Gender is required for milking animals';
+      }
+    }
+
+    // Additional validations (if needed)
+    if (formData.lactation && (parseInt(formData.lactation) < 0 || parseInt(formData.lactation) > 20)) {
+      newErrors.lactation = 'Lactation number must be between 0 and 20';
+    }
+
+    if (formData.ageYears && (parseInt(formData.ageYears) < 0 || parseInt(formData.ageYears) > 20)) {
+      newErrors.ageYears = 'Age years must be between 0 and 20';
+    }
+
+    if (formData.ageMonths && (parseInt(formData.ageMonths) < 0 || parseInt(formData.ageMonths) > 11)) {
+      newErrors.ageMonths = 'Age months must be between 0 and 11';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const errors = validateForm();
-    if (errors.length > 0) {
-      alert('Please fix the following errors:\n\n' + errors.join('\n'));
+    if (!validateForm()) {
+      toast.error('Please fix the form errors before submitting');
       return;
     }
 
@@ -230,10 +272,7 @@ const EditAnimal = () => {
       };
 
       toast.success('Animal updated successfully!');
-
-      navigate(`/management/animal-details/${uid}`, {
-        state: { animal: updatedAnimal }
-      });
+      navigate(PATHROUTES.procuredAnimals);
 
     } catch (error) {
       console.error("Error updating animal:", error);
@@ -244,7 +283,7 @@ const EditAnimal = () => {
   };
 
   const handleCancel = () => {
-    navigate(`/management/animal-details/${uid}`);
+    navigate(PATHROUTES.procuredAnimals);
   };
 
   const RequiredStar = () => <span className="text-red-500 ml-1">*</span>;
@@ -332,10 +371,12 @@ const EditAnimal = () => {
                 type="text"
                 value={formData.earTagId}
                 onChange={(e) => handleInputChange('earTagId', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className={`input-field ${errors.earTagId ? 'border-red-500' : ''}`}
                 placeholder="Enter Ear Tag ID"
-                required
               />
+              {errors.earTagId && (
+                <p className="text-red-500 text-xs mt-1">{errors.earTagId}</p>
+              )}
             </div>
 
             {/* 2. Breed */}
@@ -348,10 +389,9 @@ const EditAnimal = () => {
                   type="text"
                   value={formData.breed}
                   readOnly
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 cursor-pointer bg-white"
+                  className={`input-field ${errors.breed ? 'border-red-500' : ''}`}
                   placeholder="Select breed"
                   onClick={() => setBreedDropdownOpen(!breedDropdownOpen)}
-                  required
                 />
                 <ChevronDown
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer"
@@ -395,6 +435,9 @@ const EditAnimal = () => {
                   </div>
                 )}
               </div>
+              {errors.breed && (
+                <p className="text-red-500 text-xs mt-1">{errors.breed}</p>
+              )}
             </div>
 
             {/* 3. Gender */}
@@ -407,10 +450,9 @@ const EditAnimal = () => {
                   type="text"
                   value={formData.gender}
                   readOnly
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 cursor-pointer bg-white"
+                  className={`input-field ${errors.gender ? 'border-red-500' : ''}`}
                   placeholder="Select gender"
                   onClick={() => setGenderDropdownOpen(!genderDropdownOpen)}
-                  required
                 />
                 <ChevronDown
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer"
@@ -435,6 +477,9 @@ const EditAnimal = () => {
                   </div>
                 )}
               </div>
+              {errors.gender && (
+                <p className="text-red-500 text-xs mt-1">{errors.gender}</p>
+              )}
             </div>
 
             {/* 4. Lactation */}
@@ -446,11 +491,14 @@ const EditAnimal = () => {
                 type="number"
                 value={formData.lactation}
                 onChange={(e) => handleInputChange('lactation', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className={`input-field ${errors.lactation ? 'border-red-500' : ''}`}
                 placeholder="Enter lactation number"
                 min="0"
                 max="20"
               />
+              {errors.lactation && (
+                <p className="text-red-500 text-xs mt-1">{errors.lactation}</p>
+              )}
             </div>
 
             {/* 5. Age (Years & Months) */}
@@ -462,7 +510,7 @@ const EditAnimal = () => {
                 <select
                   value={formData.ageYears}
                   onChange={(e) => handleInputChange('ageYears', e.target.value)}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white"
+                  className={`flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white ${errors.ageYears ? 'border-red-500' : 'border-gray-300'}`}
                 >
                   <option value="">Years</option>
                   {ageYears.map(year => (
@@ -472,7 +520,7 @@ const EditAnimal = () => {
                 <select
                   value={formData.ageMonths}
                   onChange={(e) => handleInputChange('ageMonths', e.target.value)}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white"
+                  className={`flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white ${errors.ageMonths ? 'border-red-500' : 'border-gray-300'}`}
                 >
                   <option value="">Months</option>
                   {ageMonths.map(month => (
@@ -480,6 +528,12 @@ const EditAnimal = () => {
                   ))}
                 </select>
               </div>
+              {errors.ageYears && (
+                <p className="text-red-500 text-xs mt-1">{errors.ageYears}</p>
+              )}
+              {errors.ageMonths && (
+                <p className="text-red-500 text-xs mt-1">{errors.ageMonths}</p>
+              )}
             </div>
 
             {/* 6. Calving Status */}
@@ -492,10 +546,9 @@ const EditAnimal = () => {
                   type="text"
                   value={formData.calvingStatus}
                   readOnly
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 cursor-pointer bg-white"
+                  className={`input-field ${errors.calvingStatus ? 'border-red-500' : ''}`}
                   placeholder="Select calving status"
                   onClick={() => setCalvingStatusDropdownOpen(!calvingStatusDropdownOpen)}
-                  required
                 />
                 <ChevronDown
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer"
@@ -520,6 +573,9 @@ const EditAnimal = () => {
                   </div>
                 )}
               </div>
+              {errors.calvingStatus && (
+                <p className="text-red-500 text-xs mt-1">{errors.calvingStatus}</p>
+              )}
             </div>
           </div>
 
@@ -535,10 +591,12 @@ const EditAnimal = () => {
                   type="text"
                   value={formData.calfTagId}
                   onChange={(e) => handleInputChange('calfTagId', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className={`input-field ${errors.calfTagId ? 'border-red-500' : ''}`}
                   placeholder="Enter Calf Tag ID"
-                  required
                 />
+                {errors.calfTagId && (
+                  <p className="text-red-500 text-xs mt-1">{errors.calfTagId}</p>
+                )}
               </div>
 
               {/* Calf Gender */}
@@ -551,10 +609,9 @@ const EditAnimal = () => {
                     type="text"
                     value={formData.calfGender}
                     readOnly
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 cursor-pointer bg-white"
+                    className={`input-field ${errors.calfGender ? 'border-red-500' : ''}`}
                     placeholder="Select calf gender"
                     onClick={() => setCalfGenderDropdownOpen(!calfGenderDropdownOpen)}
-                    required
                   />
                   <ChevronDown
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer"
@@ -579,6 +636,9 @@ const EditAnimal = () => {
                     </div>
                   )}
                 </div>
+                {errors.calfGender && (
+                  <p className="text-red-500 text-xs mt-1">{errors.calfGender}</p>
+                )}
               </div>
             </div>
           )}
@@ -594,7 +654,7 @@ const EditAnimal = () => {
                 type="date"
                 value={formData.calvingDate}
                 onChange={(e) => handleInputChange('calvingDate', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="input-field"
               />
             </div>
 
@@ -607,7 +667,7 @@ const EditAnimal = () => {
                 type="date"
                 value={formData.examDate}
                 onChange={(e) => handleInputChange('examDate', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="input-field"
               />
             </div>
 
@@ -620,7 +680,7 @@ const EditAnimal = () => {
                 type="text"
                 value={formData.examineBy}
                 onChange={(e) => handleInputChange('examineBy', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="input-field"
                 placeholder="Enter examiner name"
               />
             </div>
@@ -634,7 +694,7 @@ const EditAnimal = () => {
                 type="date"
                 value={formData.receivingDate}
                 onChange={(e) => handleInputChange('receivingDate', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="input-field"
               />
             </div>
           </div>
@@ -648,7 +708,7 @@ const EditAnimal = () => {
               value={formData.remark}
               onChange={(e) => handleInputChange('remark', e.target.value)}
               rows="3"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="input-field"
               placeholder="Enter any remarks..."
             />
           </div>
@@ -711,13 +771,14 @@ const EditAnimal = () => {
               type="button"
               onClick={handleCancel}
               className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              disabled={isSubmitting}
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-6 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 disabled:opacity-50"
+              className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 disabled:opacity-50"
             >
               {isSubmitting ? (
                 <>

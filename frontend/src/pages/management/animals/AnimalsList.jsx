@@ -18,6 +18,7 @@ import { MdDelete } from 'react-icons/md';
 import { HiOutlineTrash } from 'react-icons/hi';
 import DataTable from "../../../components/common/Table/DataTable";
 import { GiCow } from "react-icons/gi";
+import { PATHROUTES } from "../../../routes/pathRoutes";
 
 // Mock data for animals - updated with gender field
 const MOCK_ANIMALS = [
@@ -104,7 +105,7 @@ const MOCK_ANIMALS = [
   }
 ];
 
-const AnimalsList = () => {
+const ProcuredAnimals = () => {
   const navigate = useNavigate();
   const [animals, setAnimals] = useState([]);
   const [filteredAnimals, setFilteredAnimals] = useState([]);
@@ -485,11 +486,11 @@ const AnimalsList = () => {
 
   // Event handlers
   const handleEdit = (animal) => {
-    navigate(`/management/edit-animal/${animal.earTagId}`, { state: { animal } });
+    navigate(`${PATHROUTES.editAnimal}/${animal.earTagId}`, { state: { animal } });
   };
 
   const handleView = (animal) => {
-    navigate(`/management/animal-details/${animal.earTagId}`, {
+    navigate(`${PATHROUTES.animalDetails}/${animal.earTagId}`, {
       state: { animal }
     });
   };
@@ -634,280 +635,281 @@ const AnimalsList = () => {
   const totalDisplayedRecords = filteredAnimals.length;
 
   return (
-    <div className="space-y-6">
-      {/* Header Section */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Procured Animal Lists</h1>
-          <p className="text-gray-600">View and manage all registered animals</p>
-        </div>
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={handleRefresh}
-            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium flex items-center space-x-2"
-            disabled={loading}
-          >
-            <span>Refresh</span>
-            <ArrowRight size={16} />
-          </button>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Total Animals */}
-        <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
-          <div className="flex items-start justify-between">
-            <GiCow className="text-primary-500 opacity-60" size={40} />
-            <div className="text-right">
-              <h3 className="text-2xl font-bold text-gray-900">{stats.totalAnimals}</h3>
-              <p className="text-gray-600">Total Animals</p>
-            </div>
+    <>
+      <div className="space-y-6">
+        {/* Header Section */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Procured Animal Lists</h1>
+            <p className="text-gray-600">View and manage all registered animals</p>
           </div>
-        </div>
-
-        {/* Number of Breeds */}
-        <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
-          <div className="flex items-start justify-between">
-            <GiCow className="text-green-500 opacity-60" size={40} />
-            <div className="text-right">
-              <h3 className="text-2xl font-bold text-gray-900">{stats.numberOfBreeds}</h3>
-              <p className="text-gray-600">Number of Breeds</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Milking Animals */}
-        <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
-          <div className="flex items-start justify-between">
-            <Milk className="text-purple-500 opacity-60" size={40} />
-            <div className="text-right">
-              <h3 className="text-2xl font-bold text-gray-900">{stats.milkingAnimals}</h3>
-              <p className="text-gray-600">Milking Animals</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Pregnant Animals */}
-        <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
-          <div className="flex items-start justify-between">
-            <HeartPulse className="text-pink-500 opacity-60" size={40} />
-            <div className="text-right">
-              <h3 className="text-2xl font-bold text-gray-900">{stats.pregnantAnimals}</h3>
-              <p className="text-gray-600">Pregnant Animals</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Search and Action Menu */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          {/* Left Side: Search and Filter Toggle */}
-          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-            {/* Search Input */}
-            <div className="relative w-full sm:w-80">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <BiSearch className="w-4 h-4 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                placeholder="Search by Ear Tag, Breed, Gender, Status..."
-                className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-transparent text-sm bg-gray-50/50"
-                value={searchInput}
-                onChange={handleSearchChange}
-              />
-              {searchTerm && (
-                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                    {filteredAnimals.length} found
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Filter Toggle Button */}
+          <div className="flex items-center space-x-4">
             <button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`px-4 py-2.5 border rounded-lg flex items-center gap-2 text-sm transition-all justify-center md:justify-start ${
-                showFilters
-                  ? "bg-gradient-to-br from-primary-500 to-primary-600 text-white border-transparent"
-                  : "border-gray-300 hover:bg-gray-50 text-gray-700"
-              }`}
+              onClick={handleRefresh}
+              className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium flex items-center space-x-2"
+              disabled={loading}
             >
-              <Filter className="w-4 h-4" />
-              Filters
-              {isFilterApplied && (
-                <span className="ml-1 px-1.5 py-0.5 bg-primary-200 text-primary-800 rounded-full text-xs">
-                  •
-                </span>
-              )}
+              <span>Refresh</span>
+              <ArrowRight size={16} />
             </button>
           </div>
+        </div>
 
-          {/* Right Side: Action Buttons */}
-          <div className="flex flex-wrap gap-2 w-full md:w-auto justify-center md:justify-start">
-            {/* Bulk Delete Button */}
-            {selectedAnimals.size > 0 && (
-              <button
-                onClick={() => handleBulkDelete(selectedAnimals)}
-                className="px-4 py-2.5 bg-gradient-to-br from-red-500 to-red-600 text-white rounded-lg hover:shadow-md hover:opacity-90 transition-colors flex items-center gap-2 text-sm"
-              >
-                <MdDelete className="w-4 h-4" />
-                Delete ({selectedAnimals.size})
-              </button>
-            )}
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Total Animals */}
+          <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
+            <div className="flex items-start justify-between">
+              <GiCow className="text-primary-500 opacity-60" size={40} />
+              <div className="text-right">
+                <h3 className="text-2xl font-bold text-gray-900">{stats.totalAnimals}</h3>
+                <p className="text-gray-600">Total Animals</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Number of Breeds */}
+          <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
+            <div className="flex items-start justify-between">
+              <GiCow className="text-green-500 opacity-60" size={40} />
+              <div className="text-right">
+                <h3 className="text-2xl font-bold text-gray-900">{stats.numberOfBreeds}</h3>
+                <p className="text-gray-600">Number of Breeds</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Milking Animals */}
+          <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
+            <div className="flex items-start justify-between">
+              <Milk className="text-purple-500 opacity-60" size={40} />
+              <div className="text-right">
+                <h3 className="text-2xl font-bold text-gray-900">{stats.milkingAnimals}</h3>
+                <p className="text-gray-600">Milking Animals</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Pregnant Animals */}
+          <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
+            <div className="flex items-start justify-between">
+              <HeartPulse className="text-pink-500 opacity-60" size={40} />
+              <div className="text-right">
+                <h3 className="text-2xl font-bold text-gray-900">{stats.pregnantAnimals}</h3>
+                <p className="text-gray-600">Pregnant Animals</p>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Filters Panel */}
-        {showFilters && (
-          <div className="mt-4 p-5 bg-primary-50/50 rounded-xl border border-primary-100">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Animal Type Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Animal Type
-                </label>
-                <select
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
-                  value={tempFilters.animalType || ""}
-                  onChange={(e) => handleFilterChange("animalType", e.target.value)}
-                >
-                  <option value="">All Types</option>
-                  {uniqueAnimalTypes.map(type => (
-                    <option key={type} value={type}>{type}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Calving Status Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Calving Status
-                </label>
-                <select
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
-                  value={tempFilters.calvingStatus || ""}
-                  onChange={(e) => handleFilterChange("calvingStatus", e.target.value)}
-                >
-                  <option value="">All Status</option>
-                  <option value="Milking">Milking</option>
-                  <option value="Pregnant">Pregnant</option>
-                </select>
-              </div>
-
-              {/* Date Range Filters */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  From Date
-                </label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input
-                    type="date"
-                    className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
-                    value={tempFilters.fromDate || ""}
-                    max={getCurrentDate()}
-                    onChange={(e) => handleFilterChange("fromDate", e.target.value)}
-                  />
+        {/* Search and Action Menu */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            {/* Left Side: Search and Filter Toggle */}
+            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+              {/* Search Input */}
+              <div className="relative w-full sm:w-80">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <BiSearch className="w-4 h-4 text-gray-400" />
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  To Date
-                </label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input
-                    type="date"
-                    className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
-                    value={tempFilters.toDate || ""}
-                    max={getCurrentDate()}
-                    min={tempFilters.fromDate || undefined}
-                    onChange={(e) => handleFilterChange("toDate", e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6 flex flex-col xs:flex-row justify-between items-start xs:items-center gap-4">
-              <div className="text-sm text-gray-600 w-full xs:w-auto">
-                {isFilterApplied && (
-                  <div className="flex flex-wrap items-center gap-2 bg-gradient-to-r from-primary-100 to-primary-50 px-3 py-2 rounded-lg border border-primary-200">
-                    <span className="inline-flex items-center px-2 py-1 rounded-md bg-gradient-to-r from-primary-500 to-primary-600 text-white text-xs">
-                      <Filter className="w-3 h-3 mr-1" />
-                      Filters Applied
-                    </span>
-                    <span className="text-primary-700 text-xs">
-                      {Object.keys(appliedFilters).length > 0 &&
-                        Object.keys(appliedFilters).filter(k => appliedFilters[k]).map(key => {
-                          if (key === 'fromDate' || key === 'toDate') {
-                            return key === 'fromDate' ? `From: ${appliedFilters[key]}` : `To: ${appliedFilters[key]}`;
-                          }
-                          return `${key}: ${appliedFilters[key]}`;
-                        }).join(', ')}
+                <input
+                  type="text"
+                  placeholder="Search by Ear Tag, Breed, Gender, Status..."
+                  className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-transparent text-sm bg-gray-50/50"
+                  value={searchInput}
+                  onChange={handleSearchChange}
+                />
+                {searchTerm && (
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                      {filteredAnimals.length} found
                     </span>
                   </div>
                 )}
               </div>
 
-              <div className="flex flex-wrap gap-2 w-full xs:w-auto justify-start xs:justify-end">
+              {/* Filter Toggle Button */}
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className={`px-4 py-2.5 border rounded-lg flex items-center gap-2 text-sm transition-all justify-center md:justify-start ${showFilters
+                    ? "bg-gradient-to-br from-primary-500 to-primary-600 text-white border-transparent"
+                    : "border-gray-300 hover:bg-gray-50 text-gray-700"
+                  }`}
+              >
+                <Filter className="w-4 h-4" />
+                Filters
+                {isFilterApplied && (
+                  <span className="ml-1 px-1.5 py-0.5 bg-primary-200 text-primary-800 rounded-full text-xs">
+                    •
+                  </span>
+                )}
+              </button>
+            </div>
+
+            {/* Right Side: Action Buttons */}
+            <div className="flex flex-wrap gap-2 w-full md:w-auto justify-center md:justify-start">
+              {/* Bulk Delete Button */}
+              {selectedAnimals.size > 0 && (
                 <button
-                  onClick={handleClearFilters}
-                  className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors border border-gray-300 whitespace-nowrap"
+                  onClick={() => handleBulkDelete(selectedAnimals)}
+                  className="px-4 py-2.5 bg-gradient-to-br from-red-500 to-red-600 text-white rounded-lg hover:shadow-md hover:opacity-90 transition-colors flex items-center gap-2 text-sm"
                 >
-                  <X size={14} className="inline mr-1" />
-                  Clear All
+                  <MdDelete className="w-4 h-4" />
+                  Delete ({selectedAnimals.size})
                 </button>
-                <button
-                  onClick={handleCancelFilters}
-                  className="px-4 py-2 text-sm text-primary-600 hover:text-primary-800 hover:bg-primary-50 rounded-lg transition-colors border border-primary-300 whitespace-nowrap"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleApplyFilters}
-                  className="px-5 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap bg-gradient-to-br from-primary-500 to-primary-600 text-white hover:shadow-md"
-                >
-                  Apply Filters
-                </button>
-              </div>
+              )}
             </div>
           </div>
-        )}
-      </div>
 
-      {/* Data Table */}
-      <DataTable
-        columns={columns}
-        data={sortedAnimals}
-        loading={loading}
-        onEdit={handleEdit}
-        onView={handleView}
-        onDelete={handleDelete}
-        onBulkDelete={handleBulkDelete}
-        addButtonLabel="Register New Animal"
-        emptyStateMessage="No animals found. Try adjusting your filters or register new animals."
-        loadingMessage="Loading animals data..."
-        enableSelection={true}
-        enablePagination={true}
-        selectedRows={selectedAnimals}
-        onSelectRow={toggleSelectAnimal}
-        onSelectAll={toggleSelectAll}
-        pagination={{
-          currentPage: pagination.currentPage,
-          totalPages: pagination.totalPages,
-          totalRecords: totalDisplayedRecords,
-          onPageChange: handlePageChange,
-          onLimitChange: handleLimitChange,
-          limit: pagination.limit,
-          limitOptions: [5, 10, 25, 50, 100]
-        }}
-        hideAddButton={true}
-        disableInternalDeleteModal={true}
-      />
+          {/* Filters Panel */}
+          {showFilters && (
+            <div className="mt-4 p-5 bg-primary-50/50 rounded-xl border border-primary-100">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Animal Type Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Animal Type
+                  </label>
+                  <select
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
+                    value={tempFilters.animalType || ""}
+                    onChange={(e) => handleFilterChange("animalType", e.target.value)}
+                  >
+                    <option value="">All Types</option>
+                    {uniqueAnimalTypes.map(type => (
+                      <option key={type} value={type}>{type}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Calving Status Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Calving Status
+                  </label>
+                  <select
+                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
+                    value={tempFilters.calvingStatus || ""}
+                    onChange={(e) => handleFilterChange("calvingStatus", e.target.value)}
+                  >
+                    <option value="">All Status</option>
+                    <option value="Milking">Milking</option>
+                    <option value="Pregnant">Pregnant</option>
+                  </select>
+                </div>
+
+                {/* Date Range Filters */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    From Date
+                  </label>
+                  <div className="relative">
+                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="date"
+                      className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
+                      value={tempFilters.fromDate || ""}
+                      max={getCurrentDate()}
+                      onChange={(e) => handleFilterChange("fromDate", e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    To Date
+                  </label>
+                  <div className="relative">
+                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="date"
+                      className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
+                      value={tempFilters.toDate || ""}
+                      max={getCurrentDate()}
+                      min={tempFilters.fromDate || undefined}
+                      onChange={(e) => handleFilterChange("toDate", e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 flex flex-col xs:flex-row justify-between items-start xs:items-center gap-4">
+                <div className="text-sm text-gray-600 w-full xs:w-auto">
+                  {isFilterApplied && (
+                    <div className="flex flex-wrap items-center gap-2 bg-gradient-to-r from-primary-100 to-primary-50 px-3 py-2 rounded-lg border border-primary-200">
+                      <span className="inline-flex items-center px-2 py-1 rounded-md bg-gradient-to-r from-primary-500 to-primary-600 text-white text-xs">
+                        <Filter className="w-3 h-3 mr-1" />
+                        Filters Applied
+                      </span>
+                      <span className="text-primary-700 text-xs">
+                        {Object.keys(appliedFilters).length > 0 &&
+                          Object.keys(appliedFilters).filter(k => appliedFilters[k]).map(key => {
+                            if (key === 'fromDate' || key === 'toDate') {
+                              return key === 'fromDate' ? `From: ${appliedFilters[key]}` : `To: ${appliedFilters[key]}`;
+                            }
+                            return `${key}: ${appliedFilters[key]}`;
+                          }).join(', ')}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap gap-2 w-full xs:w-auto justify-start xs:justify-end">
+                  <button
+                    onClick={handleClearFilters}
+                    className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors border border-gray-300 whitespace-nowrap"
+                  >
+                    <X size={14} className="inline mr-1" />
+                    Clear All
+                  </button>
+                  <button
+                    onClick={handleCancelFilters}
+                    className="px-4 py-2 text-sm text-primary-600 hover:text-primary-800 hover:bg-primary-50 rounded-lg transition-colors border border-primary-300 whitespace-nowrap"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleApplyFilters}
+                    className="px-5 py-2 text-sm font-medium rounded-lg transition-colors whitespace-nowrap bg-gradient-to-br from-primary-500 to-primary-600 text-white hover:shadow-md"
+                  >
+                    Apply Filters
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Data Table */}
+        <DataTable
+          columns={columns}
+          data={sortedAnimals}
+          loading={loading}
+          onEdit={handleEdit}
+          onView={handleView}
+          onDelete={handleDelete}
+          onBulkDelete={handleBulkDelete}
+          addButtonLabel="Register New Animal"
+          emptyStateMessage="No animals found. Try adjusting your filters or register new animals."
+          loadingMessage="Loading animals data..."
+          enableSelection={true}
+          enablePagination={true}
+          selectedRows={selectedAnimals}
+          onSelectRow={toggleSelectAnimal}
+          onSelectAll={toggleSelectAll}
+          pagination={{
+            currentPage: pagination.currentPage,
+            totalPages: pagination.totalPages,
+            totalRecords: totalDisplayedRecords,
+            onPageChange: handlePageChange,
+            onLimitChange: handleLimitChange,
+            limit: pagination.limit,
+            limitOptions: [5, 10, 25, 50, 100]
+          }}
+          hideAddButton={true}
+          disableInternalDeleteModal={true}
+        />
+      </div>
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
@@ -964,8 +966,8 @@ const AnimalsList = () => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
-export default AnimalsList;
+export default ProcuredAnimals;
