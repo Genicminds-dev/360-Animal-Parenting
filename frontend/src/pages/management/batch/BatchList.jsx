@@ -549,15 +549,15 @@ const BatchLists = () => {
         }
     };
 
-    const handleHealthDetails = (batch) => {
-        navigate(`/health-checkup/form/${batch.id}`, {
+    const handleVaccination = (batch) => {
+        navigate(`${PATHROUTES.vaccinationForm}/${batch.batchId}`, {
             state: { batch }
         });
     };
 
     // Event handlers
     const handleView = (batch) => {
-        navigate(`${PATHROUTES.procurementDetails}/${batch.batchId}`, {
+        navigate(`${PATHROUTES.batchDetails}/${batch.batchId}`, {
             state: { batch }
         });
     };
@@ -705,8 +705,8 @@ const BatchLists = () => {
                 {/* Header Section */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Procurement Batches</h1>
-                        <p className="text-gray-600">View and manage all animal procurement batches</p>
+                        <h1 className="text-2xl font-bold text-gray-900">Animal Batch List</h1>
+                        <p className="text-gray-600">View and manage all animal batches</p>
                     </div>
                     <div className="flex items-center space-x-4">
                         <button
@@ -946,7 +946,7 @@ const BatchLists = () => {
                     data={sortedBatches}
                     loading={loading}
                     onEdit={null}
-                    onAddVaccine={handleHealthDetails}
+                    onAddVaccine={handleVaccination}
                     enableVaccination={true}
                     vaccineLabel="Update Vaccination"
                     onView={handleView}

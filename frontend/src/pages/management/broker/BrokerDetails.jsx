@@ -232,15 +232,15 @@ const BrokerDetails = () => {
           {/* Broker Info */}
           <div className="flex-1">
             <div>
-              <h3 className="text-2xl font-bold text-gray-900">
+              <h3 className="text-xl font-bold text-gray-900">
                 {broker.fullName}
               </h3>
-              <p className="text-gray-600 mt-1">
+              <p className="text-gray-600 text-sm mt-1">
                 Broker ID: {broker.uid}
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-4 mt-4">
+            <div className="flex flex-wrap gap-4 text-sm mt-2">
               <div className="flex items-center gap-2">
                 <Phone className="text-gray-400" size={16} />
                 <span className="text-sm text-gray-600">

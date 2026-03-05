@@ -1000,7 +1000,7 @@ const AnimalDetails = () => {
       <div className="bg-white rounded-xl shadow-md p-3">
         <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
           <div className="flex-shrink-0">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary-100 to-primary-200 border-4 border-white shadow-lg flex items-center justify-center">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary-100 to-primary-200 border-4 border-white shadow-lg flex items-center justify-center">
               <GiCow className="text-primary-600" size={40} />
             </div>
           </div>
@@ -1008,7 +1008,7 @@ const AnimalDetails = () => {
           <div className="flex-1">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
               <div>
-                <h3 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                   <Tag className="text-primary-500" size={20} />
                   {animal.earTagId}
                 </h3>

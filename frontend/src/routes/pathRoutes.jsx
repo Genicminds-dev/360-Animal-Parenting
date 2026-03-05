@@ -7,7 +7,7 @@ export const PATHROUTES = {
   // healthCheckupList: "/procurement/health-checkup-List",
   // healthCheckupForm: "/health-checkup/form/:id",
   // healthCheckUpList: "/procurement/health-check",
-  
+
   // // Management Routes
   // sellersList: "/management/sellers",
   // sellerDetails: "/management/seller-details/:uid",
@@ -31,7 +31,7 @@ export const PATHROUTES = {
 
 
 
-/*********** Latest Path Routes************/
+  /*********** Latest Path Routes************/
 
   // Auth routes
   login: "/login",
@@ -45,8 +45,10 @@ export const PATHROUTES = {
   animalProcurement: "/animal-procurement",
 
   // Batch Management
-  animalBatches : "/animal-batches",
-  
+  animalBatches: "/animal-batches",
+  batchDetails: "/batch-details",
+  vaccinationForm: '/vaccination-form',
+
   // Procured Animals
   procuredAnimals: "/procured-animals",
   animalDetails: "/animal-details",
@@ -57,7 +59,7 @@ export const PATHROUTES = {
   addBeneficiary: "/add-beneficiary",
   editBeneficiary: "/edit-beneficiary",
   beneficiaryDetails: "/beneficiary-details",
-  
+
   // Handover Routes
   handoverList: "/handover",
   addHandover: "/add-handover",
@@ -70,6 +72,18 @@ export const PATHROUTES = {
   brokerDetails: "/broker-details",
   editBroker: "/edit-broker",
 
+  // Holding Station
+  holdingStationList: "/holding-station",
+  editHoldingStation: "/edit-holding-station",
+  holdingStationDetails: "/holding-stations/details",
+  addHoldingStation: '/holding-station-registration',
+
+  // Vehicle Management
+  vehiclesList: '/vehicles',
+  addVehicle: '/vehicles-registration',
+  editVehicle: '/edit-vehicles',
+  vehicleDetails: '/vehicles-details',
+
   // scheme Management
   schemeList: "/manage-schemes",
   addScheme: "/add-scheme",
@@ -80,7 +94,7 @@ export const PATHROUTES = {
   addUsers: "/add-user",
   editUsers: "/edit-user",
   viewUsers: "/view-user",
-  
+
   //Setting
   settings: "/settings",
 };

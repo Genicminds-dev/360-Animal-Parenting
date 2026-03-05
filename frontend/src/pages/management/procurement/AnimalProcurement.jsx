@@ -1057,27 +1057,7 @@ const AnimalProcurement = () => {
         }
       `}</style>
 
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          style: { 
-            background: "#fff", 
-            color: "#374151",
-            borderRadius: "12px",
-            padding: "16px",
-            boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-          },
-          success: { 
-            style: { background: "#f0fdf4", color: "#166534" },
-            icon: '✅',
-          },
-          error: { 
-            style: { background: "#fef2f2", color: "#991b1b" },
-            icon: '❌',
-          },
-          duration: 3000,
-        }}
-      />
+      <Toaster/>
 
       <div className="max-w-7xl mx-auto">
         {/* Header */}

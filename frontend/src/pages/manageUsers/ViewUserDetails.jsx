@@ -241,7 +241,7 @@ export default function ViewUserDetails() {
                 <div className="flex md:flex-row items-start md:items-center gap-6">
                     {/* Profile Image */}
                     <div className="flex-shrink-0">
-                        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary-100 to-primary-200 border-4 border-white shadow-lg flex items-center justify-center overflow-hidden">
+                        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary-100 to-primary-200 border-4 border-white shadow-lg flex items-center justify-center overflow-hidden">
                             {user.profileImg ? (
                                 <img
                                     src={getFileUrl(user.profileImg)}
@@ -273,7 +273,7 @@ export default function ViewUserDetails() {
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                             {/* Left Section */}
                             <div className="min-w-0">
-                                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 break-words">
+                                <h3 className="text-xl sm:text-xl font-bold text-gray-900 break-words">
                                     {user.firstName} {user.lastName}
                                 </h3>
 
