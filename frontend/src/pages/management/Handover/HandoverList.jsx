@@ -443,25 +443,10 @@ const HandoverList = () => {
             sortIcon: getSortIcon('handoverOfficerName'),
             render: (item) => (
                 <div className="flex items-center gap-3">
-                    <div className="p-2 bg-primary-50 rounded-full">
-                        <User size={16} className="text-primary-600" />
-                    </div>
                     <div>
                         <div className="font-medium text-gray-900">{item.handoverOfficerName}</div>
                         <div className="text-xs text-gray-500">{item.handoverOfficerMobile}</div>
                     </div>
-                </div>
-            )
-        },
-        {
-            key: "beneficiaryId",
-            label: "Beneficiary ID",
-            sortable: true,
-            onSort: () => requestSort('beneficiaryId'),
-            sortIcon: getSortIcon('beneficiaryId'),
-            render: (item) => (
-                <div className="flex items-center gap-2">
-                    <div className="font-medium text-gray-900">{item.beneficiaryId}</div>
                 </div>
             )
         },
@@ -473,7 +458,6 @@ const HandoverList = () => {
             sortIcon: getSortIcon('doNumber'),
             render: (item) => (
                 <div className="flex items-center gap-2">
-                    <FileText size={14} className="text-gray-400" />
                     <div className="font-medium text-gray-900">{item.doNumber}</div>
                 </div>
             )
@@ -486,7 +470,6 @@ const HandoverList = () => {
             sortIcon: getSortIcon('animalEarTag'),
             render: (item) => (
                 <div className="flex items-center gap-2">
-                    <Tag size={14} className="text-gray-400" />
                     <div>
                         <div className="font-medium text-gray-900">{item.animalEarTag}</div>
                         {item.animalType && (
@@ -523,17 +506,11 @@ const HandoverList = () => {
                     month: 'short',
                     year: 'numeric'
                 });
-                const formattedTime = date.toLocaleTimeString('en-US', {
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
 
                 return (
                     <div className="flex items-center gap-2">
-                        <Clock size={14} className="text-gray-400" />
                         <div>
                             <div className="font-medium text-gray-900">{formattedDate}</div>
-                            <div className="text-xs text-gray-500">{formattedTime}</div>
                         </div>
                     </div>
                 );

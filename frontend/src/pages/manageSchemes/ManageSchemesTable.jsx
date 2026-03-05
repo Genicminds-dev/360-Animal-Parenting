@@ -375,7 +375,9 @@ const ManageSchemesTable = () => {
     };
 
     const handleEditScheme = (scheme) => {
-        navigate(`${PATHROUTES.editScheme}/${scheme.id}`, { state: { scheme } });
+        navigate(`${PATHROUTES.editScheme}/${scheme.id}`, {
+            state: scheme
+        });
     };
 
     const handleAddScheme = () => {
@@ -535,10 +537,22 @@ const ManageSchemesTable = () => {
             key: "createdAt",
             label: "Created Date",
             sortable: true,
-            headerCenter: true,   // 👈 center enabled
+            headerCenter: true,
             onSort: () => requestSort('createdAt'),
             sortIcon: getSortIcon('createdAt'),
-            render: (item) => item.createdAt || 'N/A'
+            render: (item) => {
+                if (!item.createdAt) return "N/A";
+
+                const date = new Date(item.createdAt);
+
+                const formattedDate = date.toLocaleDateString("en-US", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric"
+                });
+
+                return formattedDate;
+            }
         }
     ], [getSortIcon, requestSort]);
 

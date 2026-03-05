@@ -63,6 +63,8 @@ export const PATHROUTES = {
 
   // scheme Management
   schemeList: "/manage-schemes",
+  addScheme: "/add-scheme",
+  editScheme: "/edit-scheme",
 
   // User Management
   userList: "/manage-users",
