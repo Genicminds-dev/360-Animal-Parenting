@@ -54,6 +54,12 @@ export const PATHROUTES = {
   animalDetails: "/animal-details",
   editAnimal: "/edit-animal",
 
+  // beneficiary Routes
+  beneficiaryList: "/beneficiary",
+  addBeneficiary: "/add-beneficiary",
+  editBeneficiary: "/edit-beneficiary",
+  beneficiaryDetails: "/beneficiary-details",
+
   // Handover Routes
   handoverList: "/handover",
   addHandover: "/add-handover",
@@ -75,8 +81,8 @@ export const PATHROUTES = {
   // Vehicle Management
   vehiclesList: '/vehicles',
   addVehicle: '/vehicles-registration',
-  editVehicle: '/vehicles/edit/:id',
-  vehicleDetails: '/vehicles/:uid',
+  editVehicle: '/edit-vehicles',
+  vehicleDetails: '/vehicles-details',
 
   // scheme Management
   schemeList: "/manage-schemes",

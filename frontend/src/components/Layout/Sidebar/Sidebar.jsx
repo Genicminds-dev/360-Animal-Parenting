@@ -17,6 +17,7 @@ import {
   List,
   UserCog,
   Warehouse
+  UserCheck
 } from 'lucide-react';
 import { GiCow } from 'react-icons/gi';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -159,6 +160,8 @@ const Sidebar = ({ toggleSidebar, onLogout, isMobile, onLogoutClick }) => {
   { path: PATHROUTES.holdingStationList, label: 'Holding Station', icon: <Warehouse size={20} />, roles: [1,2,3] },
 
   { path: PATHROUTES.vehiclesList, label: 'Vehicle Registration', icon: <Truck size={20} />, roles: [1,2,3] },
+    
+  { path: PATHROUTES.beneficiaryList, label: 'Beneficiary', icon: <UserCheck size={20} />, roles: [1, 2, 3] },
 
   { path: PATHROUTES.handoverList, label: 'Handover', icon: <Handshake size={20} />, roles: [1,2,3] },
 
