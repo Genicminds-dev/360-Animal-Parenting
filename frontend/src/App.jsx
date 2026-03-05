@@ -39,6 +39,8 @@ import AddBroker from './pages/management/broker/AddBroker';
 import EditBroker from './pages/management/broker/EditBroker';
 import BrokerDetails from './pages/management/broker/BrokerDetails';
 import ManageSchemesTable from './pages/manageSchemes/ManageSchemesTable';
+import AddScheme from './pages/manageSchemes/AddScheme';
+import EditScheme from './pages/manageSchemes/EditScheme';
 import ManageUsersForm from './pages/manageUsers/ManageUsersForm';
 import ManageUsersTable from './pages/manageUsers/ManageUsersTable';
 import ViewUserDetails from './pages/manageUsers/ViewUserDetails';
@@ -425,6 +427,23 @@ const AppContent = () => {
             element={
               <PrivateRoute allowedRoles={[1, 2]}>
                 <ManageSchemesTable />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path={PATHROUTES.addScheme.replace('/', '')}
+            element={
+              <PrivateRoute allowedRoles={[1, 2]}>
+                <AddScheme />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path={`${PATHROUTES.editScheme.replace('/', '')}/:id`}
+            element={
+              <PrivateRoute allowedRoles={[1, 2]}>
+                <EditScheme />
               </PrivateRoute>
             }
           />
