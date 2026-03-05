@@ -12,7 +12,11 @@ import {
   ChevronRight,
   X,
   FileCheck,
-  Handshake
+  Handshake,
+  Package,
+  List,
+  UserCog,
+  Warehouse
 } from 'lucide-react';
 import { GiCow } from 'react-icons/gi';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -142,15 +146,27 @@ const Sidebar = ({ toggleSidebar, onLogout, isMobile, onLogoutClick }) => {
     // { path: PATHROUTES.animalProcurement, label: 'Animal Registration', icon: <GiCow size={20} />, roles: [1, 2, 3] },
     // { path: PATHROUTES.animalProcuredList, label: 'Animal List', icon: <FileText size={20} />, roles: [1, 2, 3] },
     
-    { path: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} />, roles: [1, 2, 3] },
-    { path: PATHROUTES.animalProcurement, label: 'Animal Procurement', icon: <GiCow size={20} />, roles: [1, 2, 3] },
-    { path: PATHROUTES.animalBatches, label: 'Batch Management', icon: <GiCow size={20} />, roles: [1, 2, 3] },
-    { path: PATHROUTES.procuredAnimals, label: 'Procured Animals', icon: <GiCow size={20} />, roles: [1, 2, 3] },
-    { path: PATHROUTES.brokerList, label: 'Broker', icon: <Users size={20} />, roles: [1, 2, 3] },
-    { path: PATHROUTES.handoverList, label: 'Handover', icon: <Handshake size={20} />, roles: [1, 2, 3] },
-    { path: PATHROUTES.schemeList, label: 'Manage Schemes', icon: <FileCheck size={20} />, roles: [1, 2, 3] },
-    { path: PATHROUTES.userList, label: 'Manage Users', icon: <Users size={20} />, roles: [1, 2, 3] },
-    { path: '/settings', label: 'Settings', icon: <Settings size={20} />, roles: [1, 2, 3] },
+  { path: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} />, roles: [1,2,3] },
+
+  { path: PATHROUTES.animalProcurement, label: 'Animal Procurement', icon: <GiCow size={20} />, roles: [1,2,3] },
+
+  { path: PATHROUTES.animalBatches, label: 'Animal Batch', icon: <Package size={20} />, roles: [1,2,3] },
+
+  { path: PATHROUTES.procuredAnimals, label: 'Procured Animals', icon: <List size={20} />, roles: [1,2,3] },
+
+  { path: PATHROUTES.brokerList, label: 'Broker', icon: <UserCog size={20} />, roles: [1,2,3] },
+
+  { path: PATHROUTES.holdingStationList, label: 'Holding Station', icon: <Warehouse size={20} />, roles: [1,2,3] },
+
+  { path: PATHROUTES.vehiclesList, label: 'Vehicle Registration', icon: <Truck size={20} />, roles: [1,2,3] },
+
+  { path: PATHROUTES.handoverList, label: 'Handover', icon: <Handshake size={20} />, roles: [1,2,3] },
+
+  { path: PATHROUTES.schemeList, label: 'Manage Schemes', icon: <FileCheck size={20} />, roles: [1,2,3] },
+
+  { path: PATHROUTES.userList, label: 'Manage Users', icon: <Users size={20} />, roles: [1,2,3] },
+
+  { path: '/settings', label: 'Settings', icon: <Settings size={20} />, roles: [1,2,3] }
   ];
 
   const userRoleId = user?.role || 2;

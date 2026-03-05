@@ -47,6 +47,16 @@ import ViewUserDetails from './pages/manageUsers/ViewUserDetails';
 import SettingsPage from './pages/settings/SettingPage';
 import AnimalProcurement from './pages/management/procurement/AnimalProcurement';
 import BatchLists from './pages/management/batch/BatchList';
+import VaccinationForm from './pages/management/batch/VaccinationForm';
+import BatchDetails from './pages/management/batch/BatchDetails';
+import AddHoldingStation from './pages/management/holdingStation/AddHoldingStation';
+import HoldingStationList from './pages/management/holdingStation/HoldingStationList';
+import HoldingStationDetails from './pages/management/holdingStation/HoldingStationDetails';
+import EditHoldingStation from './pages/management/holdingStation/EditHoldingStation';
+import VehicleDetails from './pages/management/vehicle/VehicleDetails';
+import EditVehicle from './pages/management/vehicle/EditVehicle';
+import AddVehicle from './pages/management/vehicle/AddVehicle';
+import VehicleList from './pages/management/vehicle/VehicleList';
 
 
 
@@ -326,11 +336,29 @@ const AppContent = () => {
             }
           />
 
+          {/* Batch Management */}
           <Route
             path={PATHROUTES.animalBatches.replace('/', '')}
             element={
               <PrivateRoute allowedRoles={[1, 2, 3]}>
                 <BatchLists />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path={`${PATHROUTES.vaccinationForm.replace('/', '')}/:batchId`}
+            element={
+              <PrivateRoute allowedRoles={[1, 2, 3]}>
+                <VaccinationForm />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path={`${PATHROUTES.batchDetails.replace('/', '')}/:batchId`}
+            element={
+              <PrivateRoute allowedRoles={[1, 2, 3]}>
+                <BatchDetails />
               </PrivateRoute>
             }
           />
@@ -428,6 +456,76 @@ const AppContent = () => {
             element={
               <PrivateRoute allowedRoles={[1, 2]}>
                 <EditBroker />
+              </PrivateRoute>
+            }
+          />
+
+          {/* Holding Station */}
+          <Route
+            path={PATHROUTES.holdingStationList.replace('/', '')}
+            element={
+              <PrivateRoute allowedRoles={[1, 2]}>
+                <HoldingStationList />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path={PATHROUTES.addHoldingStation.replace('/', '')}
+            element={
+              <PrivateRoute allowedRoles={[1, 2]}>
+                <AddHoldingStation />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path={`${PATHROUTES.holdingStationDetails.replace('/', '')}/:uid`}
+            element={
+              <PrivateRoute allowedRoles={[1, 2]}>
+                <HoldingStationDetails />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path={`${PATHROUTES.editHoldingStation.replace('/', '')}/:uid`}
+            element={
+              <PrivateRoute allowedRoles={[1, 2]}>
+                <EditHoldingStation />
+              </PrivateRoute>
+            }
+          />
+
+                    {/* Vehicle Registration */}
+          <Route
+            path={PATHROUTES.vehiclesList.replace('/', '')}
+            element={
+              <PrivateRoute allowedRoles={[1, 2]}>
+                <VehicleList />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path={PATHROUTES.addVehicle.replace('/', '')}
+            element={
+              <PrivateRoute allowedRoles={[1, 2]}>
+                <AddVehicle />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path={`${PATHROUTES.editVehicle.replace('/', '')}/:uid`}
+            element={
+              <PrivateRoute allowedRoles={[1, 2]}>
+                <EditVehicle />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path={`${PATHROUTES.vehicleDetails.replace('/', '')}/:uid`}
+            element={
+              <PrivateRoute allowedRoles={[1, 2]}>
+                <VehicleDetails />
               </PrivateRoute>
             }
           />

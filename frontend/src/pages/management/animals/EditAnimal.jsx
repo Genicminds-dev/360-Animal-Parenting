@@ -2,8 +2,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { 
-  Camera, X, ChevronDown, Save, ArrowLeft 
+import {
+  Camera, X, ChevronDown, Save, ArrowLeft, Building2, Upload, Eye, File, Image as ImageIcon, Video
 } from 'lucide-react';
 import { PATHROUTES } from '../../../routes/pathRoutes';
 
@@ -39,9 +39,16 @@ const EditAnimal = () => {
   const [genderDropdownOpen, setGenderDropdownOpen] = useState(false);
   const [calfGenderDropdownOpen, setCalfGenderDropdownOpen] = useState(false);
   const [calvingStatusDropdownOpen, setCalvingStatusDropdownOpen] = useState(false);
-  const [previewModal, setPreviewModal] = useState({ open: false, src: '', type: '', name: '' });
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Preview states
+  const [photoPreviews, setPhotoPreviews] = useState({
+    frontImage: null,
+    sideImage: null,
+    rearImage: null
+  });
+  const [videoPreview, setVideoPreview] = useState(null);
 
   const breedRef = useRef(null);
   const genderRef = useRef(null);
@@ -51,7 +58,7 @@ const EditAnimal = () => {
   // Dummy Data
   const breedOptions = ['Gir', 'Sahiwal', 'Jersey Cross', 'HF-Cross'];
   const genderOptions = ['Male', 'Female'];
-  const calvingStatusOptions = ['Milking', 'Pregnant'];
+  const calvingStatusOptions = ['Milking', 'Pregnant', 'Dry', 'Heifer'];
 
   const ageYears = Array.from({ length: 21 }, (_, i) => i);
   const ageMonths = Array.from({ length: 12 }, (_, i) => i);
@@ -85,6 +92,12 @@ const EditAnimal = () => {
             rearImage: animalData.rearImage || null,
             video: animalData.video || null
           });
+
+          // Set previews if images exist
+          if (animalData.frontImage) setPhotoPreviews(prev => ({ ...prev, frontImage: animalData.frontImage }));
+          if (animalData.sideImage) setPhotoPreviews(prev => ({ ...prev, sideImage: animalData.sideImage }));
+          if (animalData.rearImage) setPhotoPreviews(prev => ({ ...prev, rearImage: animalData.rearImage }));
+          if (animalData.video) setVideoPreview(animalData.video);
         } else if (uid) {
           toast.error("No animal data provided");
           navigate(PATHROUTES.procuredAnimals);
@@ -102,6 +115,20 @@ const EditAnimal = () => {
 
     loadAnimalData();
   }, [uid, location.state, navigate]);
+
+  // Clean up preview URLs
+  useEffect(() => {
+    return () => {
+      Object.values(photoPreviews).forEach(preview => {
+        if (preview && preview.startsWith('blob:')) {
+          URL.revokeObjectURL(preview);
+        }
+      });
+      if (videoPreview && videoPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(videoPreview);
+      }
+    };
+  }, [photoPreviews, videoPreview]);
 
   // Filtered breeds based on search
   const filteredBreeds = breedOptions.filter(breed =>
@@ -142,31 +169,40 @@ const EditAnimal = () => {
   };
 
   const handleMediaUpload = (field, file) => {
-    const fileData = {
-      file: file,
-      name: file.name,
-      type: file.type,
-      size: (file.size / 1024 / 1024).toFixed(2),
-      uploadedAt: new Date().toISOString()
-    };
-
-    if (file.type.startsWith('image/') || file.type.startsWith('video/')) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        fileData.preview = reader.result;
-        setFormData(prev => ({
-          ...prev,
-          [field]: fileData
-        }));
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [field]: fileData
-      }));
+    // Validate file type
+    if (field.includes('Image') && !file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
     }
-    
+    if (field === 'video' && !file.type.startsWith('video/')) {
+      toast.error('Please select a video file');
+      return;
+    }
+
+    setFormData(prev => ({ ...prev, [field]: file }));
+
+    // Clear previous preview
+    if (field.includes('Image') && photoPreviews[field]) {
+      if (photoPreviews[field].startsWith('blob:')) {
+        URL.revokeObjectURL(photoPreviews[field]);
+      }
+      setPhotoPreviews(prev => ({ ...prev, [field]: null }));
+    }
+    if (field === 'video' && videoPreview) {
+      if (videoPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(videoPreview);
+      }
+      setVideoPreview(null);
+    }
+
+    // Set preview
+    if (field.includes('Image') && file.type.startsWith('image/')) {
+      setPhotoPreviews(prev => ({ ...prev, [field]: URL.createObjectURL(file) }));
+    }
+    if (field === 'video' && file.type.startsWith('video/')) {
+      setVideoPreview(URL.createObjectURL(file));
+    }
+
     // Clear any error for this field
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
@@ -174,18 +210,36 @@ const EditAnimal = () => {
   };
 
   const removeMedia = (field) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: null
-    }));
+    if (field.includes('Image')) {
+      if (photoPreviews[field]) {
+        if (photoPreviews[field].startsWith('blob:')) {
+          URL.revokeObjectURL(photoPreviews[field]);
+        }
+        setPhotoPreviews(prev => ({ ...prev, [field]: null }));
+      }
+    } else if (field === 'video') {
+      if (videoPreview) {
+        if (videoPreview.startsWith('blob:')) {
+          URL.revokeObjectURL(videoPreview);
+        }
+        setVideoPreview(null);
+      }
+    }
+    setFormData(prev => ({ ...prev, [field]: null }));
   };
 
-  const openPreview = (src, type, name) => {
-    setPreviewModal({ open: true, src, type, name });
+  const getDisplayFileName = (file, type) => {
+    if (!file) return '';
+    if (typeof file === 'string') return `Animal_${type}.jpg`;
+    
+    const extension = file.name.split('.').pop().toLowerCase();
+    return `Animal_${type}.${extension}`;
   };
 
-  const closePreview = () => {
-    setPreviewModal({ open: false, src: '', type: '', name: '' });
+  const openMedia = (type, preview) => {
+    if (preview) {
+      window.open(preview, '_blank');
+    }
   };
 
   const validateForm = () => {
@@ -218,7 +272,7 @@ const EditAnimal = () => {
       }
     }
 
-    // Additional validations (if needed)
+    // Additional validations
     if (formData.lactation && (parseInt(formData.lactation) < 0 || parseInt(formData.lactation) > 20)) {
       newErrors.lactation = 'Lactation number must be between 0 and 20';
     }
@@ -246,6 +300,7 @@ const EditAnimal = () => {
     setIsSubmitting(true);
 
     try {
+      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       const updatedAnimal = {
@@ -272,6 +327,17 @@ const EditAnimal = () => {
       };
 
       toast.success('Animal updated successfully!');
+      
+      // Clean up preview URLs
+      Object.values(photoPreviews).forEach(preview => {
+        if (preview && preview.startsWith('blob:')) {
+          URL.revokeObjectURL(preview);
+        }
+      });
+      if (videoPreview && videoPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(videoPreview);
+      }
+
       navigate(PATHROUTES.procuredAnimals);
 
     } catch (error) {
@@ -283,6 +349,15 @@ const EditAnimal = () => {
   };
 
   const handleCancel = () => {
+    // Clean up preview URLs
+    Object.values(photoPreviews).forEach(preview => {
+      if (preview && preview.startsWith('blob:')) {
+        URL.revokeObjectURL(preview);
+      }
+    });
+    if (videoPreview && videoPreview.startsWith('blob:')) {
+      URL.revokeObjectURL(videoPreview);
+    }
     navigate(PATHROUTES.procuredAnimals);
   };
 
@@ -291,8 +366,8 @@ const EditAnimal = () => {
   // Loading state
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-50 via-white to-gray-50">
-        <div className="text-center p-8 bg-white rounded-xl shadow-md">
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
           <h3 className="text-xl font-bold text-gray-700 mb-2">Loading Animal Details...</h3>
           <p className="text-gray-500">Please wait while we fetch the animal information.</p>
@@ -303,44 +378,6 @@ const EditAnimal = () => {
 
   return (
     <div className="space-y-6">
-      {/* Preview Modal */}
-      {previewModal.open && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
-            <div className="flex items-center justify-between p-4 border-b">
-              <h3 className="font-semibold text-lg">{previewModal.name}</h3>
-              <button
-                onClick={closePreview}
-                className="p-2 hover:bg-gray-100 rounded-full"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            <div className="p-4 max-h-[70vh] overflow-auto">
-              {previewModal.type.startsWith('image/') ? (
-                <img
-                  src={previewModal.src}
-                  alt="Preview"
-                  className="w-full h-auto rounded"
-                />
-              ) : previewModal.type.startsWith('video/') ? (
-                <video
-                  src={previewModal.src}
-                  controls
-                  className="w-full rounded"
-                  autoPlay
-                />
-              ) : (
-                <div className="text-center py-8">
-                  <X size={64} className="mx-auto text-gray-400 mb-4" />
-                  <p className="text-gray-600">Preview not available for this file type</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Header */}
       <div className="flex items-center gap-4">
         <button
@@ -352,17 +389,22 @@ const EditAnimal = () => {
         </button>
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Edit Animal</h1>
-          <p className="text-gray-600">Update animal information for {formData.earTagId}</p>
+          <p className="text-gray-600">Update animal information for <span className='text-primary-600 text-sm font-medium'>{formData.earTagId}</span></p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Animal Details Card */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-6">Animal Details</h2>
+        <div className="card">
+          <div className="flex items-center space-x-3 mb-6">
+            <div className="p-2 bg-primary-50 rounded-lg">
+              <Building2 className="text-primary-600" size={20} />
+            </div>
+            <h2 className="text-lg font-semibold text-gray-900">Animal Details</h2>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* 1. Ear Tag ID */}
+            {/* Ear Tag ID */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Ear Tag ID <RequiredStar />
@@ -373,13 +415,14 @@ const EditAnimal = () => {
                 onChange={(e) => handleInputChange('earTagId', e.target.value)}
                 className={`input-field ${errors.earTagId ? 'border-red-500' : ''}`}
                 placeholder="Enter Ear Tag ID"
+                disabled={isSubmitting}
               />
               {errors.earTagId && (
                 <p className="text-red-500 text-xs mt-1">{errors.earTagId}</p>
               )}
             </div>
 
-            {/* 2. Breed */}
+            {/* Breed */}
             <div className="relative" ref={breedRef}>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Breed <RequiredStar />
@@ -391,15 +434,16 @@ const EditAnimal = () => {
                   readOnly
                   className={`input-field ${errors.breed ? 'border-red-500' : ''}`}
                   placeholder="Select breed"
-                  onClick={() => setBreedDropdownOpen(!breedDropdownOpen)}
+                  onClick={() => !isSubmitting && setBreedDropdownOpen(!breedDropdownOpen)}
+                  disabled={isSubmitting}
                 />
                 <ChevronDown
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer"
+                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 ${!isSubmitting ? 'cursor-pointer' : 'opacity-50'}`}
                   size={20}
-                  onClick={() => setBreedDropdownOpen(!breedDropdownOpen)}
+                  onClick={() => !isSubmitting && setBreedDropdownOpen(!breedDropdownOpen)}
                 />
 
-                {breedDropdownOpen && (
+                {breedDropdownOpen && !isSubmitting && (
                   <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-hidden">
                     <div className="p-2 border-b border-gray-200">
                       <input
@@ -440,7 +484,7 @@ const EditAnimal = () => {
               )}
             </div>
 
-            {/* 3. Gender */}
+            {/* Gender */}
             <div className="relative" ref={genderRef}>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Gender <RequiredStar />
@@ -452,15 +496,16 @@ const EditAnimal = () => {
                   readOnly
                   className={`input-field ${errors.gender ? 'border-red-500' : ''}`}
                   placeholder="Select gender"
-                  onClick={() => setGenderDropdownOpen(!genderDropdownOpen)}
+                  onClick={() => !isSubmitting && setGenderDropdownOpen(!genderDropdownOpen)}
+                  disabled={isSubmitting}
                 />
                 <ChevronDown
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer"
+                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 ${!isSubmitting ? 'cursor-pointer' : 'opacity-50'}`}
                   size={20}
-                  onClick={() => setGenderDropdownOpen(!genderDropdownOpen)}
+                  onClick={() => !isSubmitting && setGenderDropdownOpen(!genderDropdownOpen)}
                 />
 
-                {genderDropdownOpen && (
+                {genderDropdownOpen && !isSubmitting && (
                   <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
                     {genderOptions.map(gender => (
                       <div
@@ -482,7 +527,7 @@ const EditAnimal = () => {
               )}
             </div>
 
-            {/* 4. Lactation */}
+            {/* Lactation */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Lactation (Number)
@@ -495,13 +540,14 @@ const EditAnimal = () => {
                 placeholder="Enter lactation number"
                 min="0"
                 max="20"
+                disabled={isSubmitting}
               />
               {errors.lactation && (
                 <p className="text-red-500 text-xs mt-1">{errors.lactation}</p>
               )}
             </div>
 
-            {/* 5. Age (Years & Months) */}
+            {/* Age */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Age
@@ -511,6 +557,7 @@ const EditAnimal = () => {
                   value={formData.ageYears}
                   onChange={(e) => handleInputChange('ageYears', e.target.value)}
                   className={`flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white ${errors.ageYears ? 'border-red-500' : 'border-gray-300'}`}
+                  disabled={isSubmitting}
                 >
                   <option value="">Years</option>
                   {ageYears.map(year => (
@@ -521,6 +568,7 @@ const EditAnimal = () => {
                   value={formData.ageMonths}
                   onChange={(e) => handleInputChange('ageMonths', e.target.value)}
                   className={`flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white ${errors.ageMonths ? 'border-red-500' : 'border-gray-300'}`}
+                  disabled={isSubmitting}
                 >
                   <option value="">Months</option>
                   {ageMonths.map(month => (
@@ -528,15 +576,14 @@ const EditAnimal = () => {
                   ))}
                 </select>
               </div>
-              {errors.ageYears && (
-                <p className="text-red-500 text-xs mt-1">{errors.ageYears}</p>
-              )}
-              {errors.ageMonths && (
-                <p className="text-red-500 text-xs mt-1">{errors.ageMonths}</p>
+              {(errors.ageYears || errors.ageMonths) && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.ageYears || errors.ageMonths}
+                </p>
               )}
             </div>
 
-            {/* 6. Calving Status */}
+            {/* Calving Status */}
             <div className="relative" ref={calvingStatusRef}>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Calving Status <RequiredStar />
@@ -548,15 +595,16 @@ const EditAnimal = () => {
                   readOnly
                   className={`input-field ${errors.calvingStatus ? 'border-red-500' : ''}`}
                   placeholder="Select calving status"
-                  onClick={() => setCalvingStatusDropdownOpen(!calvingStatusDropdownOpen)}
+                  onClick={() => !isSubmitting && setCalvingStatusDropdownOpen(!calvingStatusDropdownOpen)}
+                  disabled={isSubmitting}
                 />
                 <ChevronDown
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer"
+                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 ${!isSubmitting ? 'cursor-pointer' : 'opacity-50'}`}
                   size={20}
-                  onClick={() => setCalvingStatusDropdownOpen(!calvingStatusDropdownOpen)}
+                  onClick={() => !isSubmitting && setCalvingStatusDropdownOpen(!calvingStatusDropdownOpen)}
                 />
 
-                {calvingStatusDropdownOpen && (
+                {calvingStatusDropdownOpen && !isSubmitting && (
                   <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
                     {calvingStatusOptions.map(status => (
                       <div
@@ -577,75 +625,74 @@ const EditAnimal = () => {
                 <p className="text-red-500 text-xs mt-1">{errors.calvingStatus}</p>
               )}
             </div>
-          </div>
 
-          {/* Conditional fields for Milking */}
-          {formData.calvingStatus === 'milking' && (
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-6 border-t border-gray-200">
-              {/* Calf Tag ID */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Calf Tag ID <RequiredStar />
-                </label>
-                <input
-                  type="text"
-                  value={formData.calfTagId}
-                  onChange={(e) => handleInputChange('calfTagId', e.target.value)}
-                  className={`input-field ${errors.calfTagId ? 'border-red-500' : ''}`}
-                  placeholder="Enter Calf Tag ID"
-                />
-                {errors.calfTagId && (
-                  <p className="text-red-500 text-xs mt-1">{errors.calfTagId}</p>
-                )}
-              </div>
-
-              {/* Calf Gender */}
-              <div className="relative" ref={calfGenderRef}>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Calf Gender <RequiredStar />
-                </label>
-                <div className="relative">
+            {/* Conditional fields for Milking */}
+            {formData.calvingStatus === 'milking' && (
+              <>
+                {/* Calf Tag ID */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Calf Tag ID <RequiredStar />
+                  </label>
                   <input
                     type="text"
-                    value={formData.calfGender}
-                    readOnly
-                    className={`input-field ${errors.calfGender ? 'border-red-500' : ''}`}
-                    placeholder="Select calf gender"
-                    onClick={() => setCalfGenderDropdownOpen(!calfGenderDropdownOpen)}
+                    value={formData.calfTagId}
+                    onChange={(e) => handleInputChange('calfTagId', e.target.value)}
+                    className={`input-field ${errors.calfTagId ? 'border-red-500' : ''}`}
+                    placeholder="Enter Calf Tag ID"
+                    disabled={isSubmitting}
                   />
-                  <ChevronDown
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer"
-                    size={20}
-                    onClick={() => setCalfGenderDropdownOpen(!calfGenderDropdownOpen)}
-                  />
-
-                  {calfGenderDropdownOpen && (
-                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
-                      {genderOptions.map(gender => (
-                        <div
-                          key={gender}
-                          className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
-                          onClick={() => {
-                            handleInputChange('calfGender', gender);
-                            setCalfGenderDropdownOpen(false);
-                          }}
-                        >
-                          {gender}
-                        </div>
-                      ))}
-                    </div>
+                  {errors.calfTagId && (
+                    <p className="text-red-500 text-xs mt-1">{errors.calfTagId}</p>
                   )}
                 </div>
-                {errors.calfGender && (
-                  <p className="text-red-500 text-xs mt-1">{errors.calfGender}</p>
-                )}
-              </div>
-            </div>
-          )}
 
-          {/* Date Fields */}
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-6 border-t border-gray-200">
-            {/* 7. Calving Date */}
+                {/* Calf Gender */}
+                <div className="relative" ref={calfGenderRef}>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Calf Gender <RequiredStar />
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={formData.calfGender}
+                      readOnly
+                      className={`input-field ${errors.calfGender ? 'border-red-500' : ''}`}
+                      placeholder="Select calf gender"
+                      onClick={() => !isSubmitting && setCalfGenderDropdownOpen(!calfGenderDropdownOpen)}
+                      disabled={isSubmitting}
+                    />
+                    <ChevronDown
+                      className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 ${!isSubmitting ? 'cursor-pointer' : 'opacity-50'}`}
+                      size={20}
+                      onClick={() => !isSubmitting && setCalfGenderDropdownOpen(!calfGenderDropdownOpen)}
+                    />
+
+                    {calfGenderDropdownOpen && !isSubmitting && (
+                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
+                        {genderOptions.map(gender => (
+                          <div
+                            key={gender}
+                            className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                            onClick={() => {
+                              handleInputChange('calfGender', gender);
+                              setCalfGenderDropdownOpen(false);
+                            }}
+                          >
+                            {gender}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {errors.calfGender && (
+                    <p className="text-red-500 text-xs mt-1">{errors.calfGender}</p>
+                  )}
+                </div>
+              </>
+            )}
+
+            {/* Calving Date */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Calving Date
@@ -655,10 +702,11 @@ const EditAnimal = () => {
                 value={formData.calvingDate}
                 onChange={(e) => handleInputChange('calvingDate', e.target.value)}
                 className="input-field"
+                disabled={isSubmitting}
               />
             </div>
 
-            {/* 8. Exam Date */}
+            {/* Exam Date */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Exam Date
@@ -668,10 +716,11 @@ const EditAnimal = () => {
                 value={formData.examDate}
                 onChange={(e) => handleInputChange('examDate', e.target.value)}
                 className="input-field"
+                disabled={isSubmitting}
               />
             </div>
 
-            {/* 9. Examine By */}
+            {/* Examine By */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Examine By
@@ -682,10 +731,11 @@ const EditAnimal = () => {
                 onChange={(e) => handleInputChange('examineBy', e.target.value)}
                 className="input-field"
                 placeholder="Enter examiner name"
+                disabled={isSubmitting}
               />
             </div>
 
-            {/* 10. Receiving Date */}
+            {/* Receiving Date */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Receiving Date
@@ -695,82 +745,102 @@ const EditAnimal = () => {
                 value={formData.receivingDate}
                 onChange={(e) => handleInputChange('receivingDate', e.target.value)}
                 className="input-field"
+                disabled={isSubmitting}
               />
             </div>
-          </div>
 
-          {/* 11. Remark */}
-          <div className="mt-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Remark
-            </label>
-            <textarea
-              value={formData.remark}
-              onChange={(e) => handleInputChange('remark', e.target.value)}
-              rows="3"
-              className="input-field"
-              placeholder="Enter any remarks..."
-            />
-          </div>
-
-          {/* Media Section */}
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Media</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* 12. Front Image */}
-              <MediaUploadBox
-                type="photo"
-                preview={formData.frontImage?.preview}
-                label="Front Image"
-                onUpload={(file) => handleMediaUpload('frontImage', file)}
-                onRemove={() => removeMedia('frontImage')}
-                onPreview={openPreview}
-              />
-
-              {/* 13. Side Image */}
-              <MediaUploadBox
-                type="photo"
-                preview={formData.sideImage?.preview}
-                label="Side Image"
-                onUpload={(file) => handleMediaUpload('sideImage', file)}
-                onRemove={() => removeMedia('sideImage')}
-                onPreview={openPreview}
-              />
-
-              {/* 14. Rear Image */}
-              <MediaUploadBox
-                type="photo"
-                preview={formData.rearImage?.preview}
-                label="Rear Image"
-                onUpload={(file) => handleMediaUpload('rearImage', file)}
-                onRemove={() => removeMedia('rearImage')}
-                onPreview={openPreview}
-              />
-
-              {/* 15. Video */}
-              <MediaUploadBox
-                type="video"
-                preview={formData.video?.preview}
-                label="Video"
-                instructions="Front → Left → Back → Right → Front"
-                onUpload={(file) => handleMediaUpload('video', file)}
-                onRemove={() => removeMedia('video')}
-                onPreview={openPreview}
+            {/* Remark */}
+            <div className="md:col-span-2 lg:col-span-3">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Remark
+              </label>
+              <textarea
+                value={formData.remark}
+                onChange={(e) => handleInputChange('remark', e.target.value)}
+                rows="3"
+                className="input-field"
+                placeholder="Enter any remarks..."
+                disabled={isSubmitting}
               />
             </div>
           </div>
         </div>
 
-        {/* Form Actions */}
-        <div className="flex items-center justify-between pt-6 border-t border-gray-200">
-          <div className="text-sm text-gray-500">
-            <strong>Note:</strong> Fields marked with <span className="text-red-500">*</span> are required
+        {/* Media Section */}
+        <div className="card">
+          <div className="flex items-center space-x-3 mb-6">
+            <div className="p-2 bg-green-50 rounded-lg">
+              <Camera className="text-green-600" size={20} />
+            </div>
+            <h2 className="text-lg font-semibold text-gray-900">Animal Media</h2>
           </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+            {/* Front Image */}
+            <MediaUploadBox
+              field="frontImage"
+              file={formData.frontImage}
+              preview={photoPreviews.frontImage}
+              label="Front Image"
+              type="photo"
+              onUpload={handleMediaUpload}
+              onRemove={removeMedia}
+              onOpen={openMedia}
+              isSubmitting={isSubmitting}
+              getDisplayFileName={getDisplayFileName}
+            />
+
+            {/* Side Image */}
+            <MediaUploadBox
+              field="sideImage"
+              file={formData.sideImage}
+              preview={photoPreviews.sideImage}
+              label="Side Image"
+              type="photo"
+              onUpload={handleMediaUpload}
+              onRemove={removeMedia}
+              onOpen={openMedia}
+              isSubmitting={isSubmitting}
+              getDisplayFileName={getDisplayFileName}
+            />
+
+            {/* Rear Image */}
+            <MediaUploadBox
+              field="rearImage"
+              file={formData.rearImage}
+              preview={photoPreviews.rearImage}
+              label="Rear Image"
+              type="photo"
+              onUpload={handleMediaUpload}
+              onRemove={removeMedia}
+              onOpen={openMedia}
+              isSubmitting={isSubmitting}
+              getDisplayFileName={getDisplayFileName}
+            />
+
+            {/* Video */}
+            <MediaUploadBox
+              field="video"
+              file={formData.video}
+              preview={videoPreview}
+              label="Video"
+              type="video"
+              onUpload={handleMediaUpload}
+              onRemove={removeMedia}
+              onOpen={openMedia}
+              isSubmitting={isSubmitting}
+              getDisplayFileName={getDisplayFileName}
+            />
+          </div>
+        </div>
+
+        {/* Form Actions */}
+        <div className="flex items-center justify-end pt-6 border-t border-gray-200">
           <div className="flex space-x-4">
             <button
               type="button"
               onClick={handleCancel}
-              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              className={`px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
               disabled={isSubmitting}
             >
               Cancel
@@ -778,16 +848,19 @@ const EditAnimal = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 disabled:opacity-50"
+              className={`px-6 py-2 bg-primary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center min-w-[140px] ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {isSubmitting ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
                   Updating...
                 </>
               ) : (
                 <>
-                  <Save size={16} />
+                  <Save size={16} className="mr-2" />
                   Update Animal
                 </>
               )}
@@ -800,82 +873,128 @@ const EditAnimal = () => {
 };
 
 // Media Upload Component
-const MediaUploadBox = ({ type, preview, onUpload, onRemove, onPreview, label, instructions }) => {
+const MediaUploadBox = ({ 
+  field, 
+  file, 
+  preview, 
+  label, 
+  type, 
+  onUpload, 
+  onRemove, 
+  onOpen, 
+  isSubmitting,
+  getDisplayFileName 
+}) => {
+  const inputId = `upload-${field}-${Date.now()}`;
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (type === 'photo' && !file.type.startsWith('image/')) {
-        alert('Please select an image file');
-        return;
-      }
-      if (type === 'video' && !file.type.startsWith('video/')) {
-        alert('Please select a video file');
-        return;
-      }
-      onUpload(file);
+      onUpload(field, file);
     }
   };
 
-  const inputId = `upload-${label}-${Date.now()}`;
-
   return (
-    <div className="relative">
-      {preview ? (
-        <div className="relative">
-          {type === 'photo' ? (
-            <img
-              src={preview}
-              alt={label}
-              className="w-full h-48 object-cover rounded-lg cursor-pointer"
-              onClick={() => onPreview(preview, 'image/jpeg', label)}
-            />
-          ) : (
-            <div className="relative">
-              <video
-                src={preview}
-                className="w-full h-48 object-cover rounded-lg cursor-pointer"
-                onClick={() => onPreview(preview, 'video/mp4', label)}
-                controls
-              />
-              {instructions && (
-                <div className="absolute bottom-2 left-2 right-2 bg-black bg-opacity-50 text-white text-xs p-2 rounded">
-                  {instructions}
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-4">
+        {label}
+      </label>
+      <div className="flex flex-col items-center justify-center">
+        <div className="w-full">
+          {file ? (
+            <div className="border-2 border-gray-300 rounded-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className={`p-3 rounded-lg ${type === 'photo' ? 'bg-primary-100 text-primary-600' : 'bg-red-100 text-red-600'}`}>
+                    {type === 'photo' ? <ImageIcon size={24} /> : <Video size={24} />}
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900">
+                      {getDisplayFileName(file, label.toLowerCase().replace(' ', '_'))}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {typeof file === 'object' && file.size ? `${Math.round(file.size / 1024)} KB` : 'Existing file'}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex space-x-2">
+                  <button
+                    type="button"
+                    onClick={() => onOpen(type, preview)}
+                    className={`p-2 ${type === 'photo' ? 'bg-primary-100 text-primary-600 hover:bg-primary-200' : 'bg-red-100 text-red-600 hover:bg-red-200'} rounded-lg transition-colors`}
+                    title={`Preview ${label}`}
+                    disabled={isSubmitting}
+                  >
+                    <Eye size={18} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onRemove(field)}
+                    className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+                    title="Remove"
+                    disabled={isSubmitting}
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+              </div>
+
+              {preview && (
+                <div className="mt-4 border border-gray-200 rounded-lg overflow-hidden">
+                  <div className="p-2 bg-gray-50 border-b border-gray-200">
+                    <p className="text-sm font-medium text-gray-700">{label} Preview</p>
+                  </div>
+                  <div className="p-4 flex items-center justify-center bg-gray-50">
+                    {type === 'photo' ? (
+                      <img
+                        src={preview}
+                        alt={label}
+                        className="max-w-full max-h-48 object-contain rounded"
+                      />
+                    ) : (
+                      <video
+                        src={preview}
+                        controls
+                        className="max-w-full max-h-48 rounded"
+                      >
+                        Your browser does not support the video tag.
+                      </video>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
-          )}
-          <button
-            type="button"
-            onClick={onRemove}
-            className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
-          >
-            <X size={16} />
-          </button>
-        </div>
-      ) : (
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary-500 transition-colors h-48 flex flex-col items-center justify-center">
-          {type === 'photo' ? (
-            <Camera className="text-gray-400 mb-2" size={24} />
           ) : (
-            <Camera className="text-gray-400 mb-2" size={24} />
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary-500 transition-colors">
+              <div className="flex flex-col items-center justify-center">
+                <Upload className="text-gray-400 mb-3" size={32} />
+                <p className="text-sm text-gray-700 mb-2 font-medium">
+                  Upload {label}
+                </p>
+                <p className="text-xs text-gray-500 mb-3">
+                  {type === 'photo' ? 'Click to upload image' : 'Click to upload video'}
+                </p>
+
+                <label
+                  htmlFor={inputId}
+                  className={`px-4 py-2 bg-primary-600 text-white rounded-lg cursor-pointer hover:bg-primary-700 transition-colors text-sm ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  Browse File
+                </label>
+              </div>
+            </div>
           )}
-          <p className="text-sm text-gray-600 mb-1">{label}</p>
-          <p className="text-xs text-gray-500 mb-3">Click to upload</p>
+
           <input
             type="file"
-            accept={type === 'photo' ? 'image/*' : 'video/*'}
             onChange={handleFileChange}
             className="hidden"
             id={inputId}
+            accept={type === 'photo' ? 'image/*' : 'video/*'}
+            disabled={isSubmitting}
           />
-          <label
-            htmlFor={inputId}
-            className="px-3 py-1 bg-primary-50 text-primary-700 rounded text-sm font-medium cursor-pointer hover:bg-primary-100"
-          >
-            Upload
-          </label>
         </div>
-      )}
+      </div>
     </div>
   );
 };
