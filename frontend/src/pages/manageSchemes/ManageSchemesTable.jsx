@@ -503,7 +503,12 @@ const ManageSchemesTable = () => {
             label: "Sr. No.",
             sortable: false,
             headerCenter: true,
-            render: (item) => item.id
+            render: (item) => (
+                <span className="font-medium text-primary-600">
+                    {item.id}
+                </span>
+            )
+
         },
         {
             key: "schemeName",

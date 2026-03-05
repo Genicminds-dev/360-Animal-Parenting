@@ -1,52 +1,171 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 import {
-    FaUserPlus,
-    FaUserCheck,
-    FaUser,
-    FaUserTimes,
-    FaDownload,
-    FaPrint
-} from 'react-icons/fa';
-import { MdDelete } from 'react-icons/md';
-import { HiOutlineTrash } from 'react-icons/hi';
-import { BiSearch } from 'react-icons/bi';
-import { toast, Toaster } from 'react-hot-toast';
-import {
-    Shield,
-    Filter,
-    X,
     Calendar,
     ArrowRight,
+    HeartPulse,
+    Milk,
+    Filter,
+    X,
     ChevronDown,
     ChevronUp,
-    Minus
+    Minus,
+    Eye,
+    Package,
+    CalendarClock,
 } from "lucide-react";
+import { GiCow } from "react-icons/gi";
+import { BiSearch } from 'react-icons/bi';
+import { MdDelete } from 'react-icons/md';
+import { HiOutlineTrash } from 'react-icons/hi';
+import DataTable from "../../../components/common/Table/DataTable";
+import { PATHROUTES } from "../../../routes/pathRoutes";
 
-import DataTable from '../../components/common/Table/DataTable';
-import { Endpoints } from '../../services/api/EndPoint';
-import api from '../../services/api/api';
-import { PATHROUTES } from '../../routes/pathRoutes';
+// Mock data for procurement batches
+const MOCK_PROCUREMENT_BATCHES = [
+    {
+        id: "BATCH-001",
+        batchId: "PRC-2024-001",
+        batchSize: 6,
+        procurementOfficer: "John Doe",
+        broker: "Rajesh Kumar",
+        sourceType: "Bazaar",
+        sourceLocation: "Mumbai Market",
+        date: "2024-01-15",
+        time: "10:30",
+        animals: [
+            {
+                earTagId: "TAG-001",
+                breed: "Gir",
+                calvingStatus: "Milking",
+                gender: "Female"
+            },
+            {
+                earTagId: "TAG-002",
+                breed: "Sahiwal",
+                calvingStatus: "Pregnant",
+                gender: "Female"
+            },
+            {
+                earTagId: "TAG-003",
+                breed: "Jersey Cross",
+                calvingStatus: "Milking",
+                gender: "Female"
+            },
+            {
+                earTagId: "TAG-004",
+                breed: "Jersey Cross",
+                calvingStatus: "Milking",
+                gender: "Female"
+            },
+            {
+                earTagId: "TAG-005",
+                breed: "Jersey Cross",
+                calvingStatus: "Milking",
+                gender: "Female"
+            },
+            {
+                earTagId: "TAG-006",
+                breed: "Jersey Cross",
+                calvingStatus: "Milking",
+                gender: "Female"
+            }
+        ],
+        vehicleNo: "MH-01-AB-1234",
+        holdingStation: "Central Holding Station",
+        placeFrom: "Mumbai Market",
+        placeTo: "Main Farm",
+        createdAt: "2024-01-15T10:30:00Z"
+    },
+    {
+        id: "BATCH-002",
+        batchId: "PRC-2024-002",
+        batchSize: 2,
+        procurementOfficer: "Jane Smith",
+        broker: "Suresh Patel",
+        sourceType: "Farm",
+        sourceLocation: "Pune Dairy Farm",
+        date: "2024-01-20",
+        time: "14:45",
+        animals: [
+            {
+                earTagId: "TAG-004",
+                breed: "Murrah",
+                calvingStatus: "Milking",
+                gender: "Female"
+            },
+            {
+                earTagId: "TAG-005",
+                breed: "Gir",
+                calvingStatus: "Pregnant",
+                gender: "Female"
+            }
+        ],
+        vehicleNo: "MH-02-CD-5678",
+        holdingStation: "North Holding Station",
+        placeFrom: "Pune Dairy Farm",
+        placeTo: "North Farm",
+        createdAt: "2024-01-20T14:45:00Z"
+    },
+    {
+        id: "BATCH-003",
+        batchId: "PRC-2024-003",
+        batchSize: 4,
+        procurementOfficer: "Mike Johnson",
+        broker: "Amit Singh",
+        sourceType: "Bazaar",
+        sourceLocation: "Nagpur Market",
+        date: "2024-01-25",
+        time: "09:15",
+        animals: [
+            {
+                earTagId: "TAG-006",
+                breed: "HF-Cross",
+                calvingStatus: "Milking",
+                gender: "Female"
+            },
+            {
+                earTagId: "TAG-007",
+                breed: "Gir",
+                calvingStatus: "Pregnant",
+                gender: "Female"
+            },
+            {
+                earTagId: "TAG-008",
+                breed: "Sahiwal",
+                calvingStatus: "Milking",
+                gender: "Female"
+            },
+            {
+                earTagId: "TAG-009",
+                breed: "Jersey Cross",
+                calvingStatus: "Pregnant",
+                gender: "Female"
+            }
+        ],
+        vehicleNo: "MH-03-EF-9012",
+        holdingStation: "East Holding Station",
+        placeFrom: "Nagpur Market",
+        placeTo: "East Farm",
+        createdAt: "2024-01-25T09:15:00Z"
+    }
+];
 
-const ManageUsersTable = () => {
-    const [users, setUsers] = useState([]);
-    const [filteredUsers, setFilteredUsers] = useState([]);
-    
+const BatchLists = () => {
+    const navigate = useNavigate();
+    const [batches, setBatches] = useState([]);
+    const [filteredBatches, setFilteredBatches] = useState([]);
+
+    // Search state
     const [searchInput, setSearchInput] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
     const searchTimeoutRef = useRef(null);
 
-    const [currentPage, setCurrentPage] = useState(1);
-    const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [deleteTarget, setDeleteTarget] = useState(null);
-    const [deleteId, setDeleteId] = useState(null);
-    const [itemsPerPage, setItemsPerPage] = useState(10);
-    const [showItemsPerPageDropdown, setShowItemsPerPageDropdown] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [filters, setFilters] = useState({});
-    const [loading, setLoading] = useState(true);
     const [isDeleting, setIsDeleting] = useState(false);
-    
+
     // Filter UI state
     const [showFilters, setShowFilters] = useState(false);
     const [tempFilters, setTempFilters] = useState({});
@@ -54,15 +173,20 @@ const ManageUsersTable = () => {
     const [appliedFilters, setAppliedFilters] = useState({});
 
     // Selection state
-    const [selectedIds, setSelectedIds] = useState(new Set());
+    const [selectedBatches, setSelectedBatches] = useState(new Set());
 
-    const [stats, setStats] = useState({
-        totalUsers: 0,
-        activeUsers: 0,
-        inactiveUsers: 0,
-        adminUsers: 0,
+    // Delete modal state
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleteTarget, setDeleteTarget] = useState(null);
+    const [deleteId, setDeleteId] = useState(null);
+
+    // Sorting state
+    const [sortConfig, setSortConfig] = useState({
+        key: "createdAt",
+        direction: "desc",
     });
 
+    // Pagination state
     const [pagination, setPagination] = useState({
         currentPage: 1,
         totalPages: 1,
@@ -70,110 +194,11 @@ const ManageUsersTable = () => {
         limit: 10
     });
 
-    const navigate = useNavigate();
-
-    // Get unique roles for dropdown
-    const getRoleOptions = useMemo(() => {
-        const roles = new Set();
-        users.forEach(user => {
-            if (user.Role?.name) {
-                roles.add(user.Role.name);
-            }
-        });
-        return Array.from(roles).sort();
-    }, [users]);
-
-    // Get unique status for dropdown
-    const getStatusOptions = useMemo(() => {
-        const statuses = new Set();
-        users.forEach(user => {
-            if (user.status && user.status !== 'NA') {
-                statuses.add(user.status);
-            }
-        });
-        return Array.from(statuses).sort();
-    }, [users]);
-
-    // API functions directly in component
-    const fetchUsers = async () => {
-        try {
-            setLoading(true);
-            const response = await api.get(Endpoints.GET_USERS);
-
-            const apiUsers = Array.isArray(response.data.data)
-                ? response.data.data
-                : [response.data.data];
-
-            const normalizedUsers = apiUsers.map(user => ({
-                ...user,
-                id: user.id || user.uid,
-                status: user.status ?? "NA",
-                createdAt: user.createdAt ? new Date(user.createdAt).toISOString().split('T')[0] : 'N/A'
-            }));
-
-            setUsers(normalizedUsers);
-            setFilteredUsers(normalizedUsers);
-            calculateStats(normalizedUsers);
-            
-            setPagination(prev => ({
-                ...prev,
-                totalRecords: normalizedUsers.length,
-                totalPages: Math.ceil(normalizedUsers.length / prev.limit)
-            }));
-        } catch (error) {
-            console.error('Error fetching users:', error);
-            toast.error(error.response?.data?.message || "Failed to fetch users");
-            setUsers([]);
-            setFilteredUsers([]);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const deleteUser = async (userId) => {
-        try {
-            const response = await api.delete(Endpoints.DELETE_USER(userId));
-            return response.data;
-        } catch (error) {
-            console.error('Error deleting user:', error);
-            throw error;
-        }
-    };
-
-    const deleteMultipleUsers = async (userIds) => {
-        try {
-            const deletePromises = userIds.map(id => deleteUser(id));
-            const results = await Promise.allSettled(deletePromises);
-
-            const successful = results.filter(r => r.status === 'fulfilled').length;
-            const failed = results.filter(r => r.status === 'rejected').length;
-
-            return { successful, failed };
-        } catch (error) {
-            console.error('Error in bulk delete:', error);
-            throw error;
-        }
-    };
-
-    // Fetch users on component mount
-    useEffect(() => {
-        fetchUsers();
-    }, []);
-
-    // Calculate statistics
-    const calculateStats = (usersData) => {
-        const totalUsers = usersData.length;
-        const activeUsers = usersData.filter(user => user.status === 'active').length;
-        const inactiveUsers = usersData.filter(user => user.status === 'inactive').length;
-        const adminUsers = usersData.filter(user => user.Role?.name === 'Admin').length;
-
-        setStats({
-            totalUsers,
-            activeUsers,
-            inactiveUsers,
-            adminUsers,
-        });
-    };
+    const [stats, setStats] = useState({
+        totalBatches: 0,
+        totalAnimals: 0,
+        lastBatchDate: null,
+    });
 
     // Initialize tempFilters when component mounts
     useEffect(() => {
@@ -184,6 +209,67 @@ const ManageUsersTable = () => {
         setIsFilterApplied(hasAppliedFilters);
         setAppliedFilters(filters);
     }, [filters]);
+
+    // Format date function
+    const formatDate = (dateString) => {
+        if (!dateString) return '-';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
+    // Get the latest batch creation date
+    const getLastBatchDate = useCallback((batchesData) => {
+        if (!batchesData || batchesData.length === 0) return null;
+
+        const dates = batchesData.map(batch => new Date(batch.createdAt).getTime());
+        const latestDate = Math.max(...dates);
+        return new Date(latestDate).toISOString();
+    }, []);
+
+    // Fetch batches with simulated API call
+    const fetchBatches = useCallback(async () => {
+        setLoading(true);
+        try {
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 800));
+
+            // Calculate stats
+            const totalAnimals = MOCK_PROCUREMENT_BATCHES.reduce((sum, batch) => sum + batch.batchSize, 0);
+            const lastBatchDate = getLastBatchDate(MOCK_PROCUREMENT_BATCHES);
+
+            setStats({
+                totalBatches: MOCK_PROCUREMENT_BATCHES.length,
+                totalAnimals: totalAnimals,
+                lastBatchDate: lastBatchDate,
+            });
+
+            setBatches(MOCK_PROCUREMENT_BATCHES);
+            setFilteredBatches(MOCK_PROCUREMENT_BATCHES);
+
+            setPagination(prev => ({
+                ...prev,
+                totalRecords: MOCK_PROCUREMENT_BATCHES.length,
+                totalPages: Math.ceil(MOCK_PROCUREMENT_BATCHES.length / prev.limit)
+            }));
+
+        } catch (error) {
+            toast.error("Failed to fetch procurement batches");
+            setBatches([]);
+            setFilteredBatches([]);
+        } finally {
+            setLoading(false);
+        }
+    }, [getLastBatchDate]);
+
+    useEffect(() => {
+        fetchBatches();
+    }, [fetchBatches]);
 
     // Debounce search
     useEffect(() => {
@@ -205,63 +291,71 @@ const ManageUsersTable = () => {
 
     // Apply filters function
     const applyFilters = useCallback((filterValues) => {
-        let filtered = [...users];
+        let filtered = [...MOCK_PROCUREMENT_BATCHES];
 
         // Apply search filter
         if (searchTerm) {
             const searchLower = searchTerm.toLowerCase();
-            filtered = filtered.filter((user) => {
-                const fullName = `${user.firstName || ''} ${user.lastName || ''}`.toLowerCase();
-                const roleName = user.Role?.name?.toLowerCase() || "";
-                return user.id?.toString().includes(searchTerm) ||
-                    fullName.includes(searchLower) ||
-                    user.email?.toLowerCase().includes(searchLower) ||
-                    roleName.includes(searchLower);
-            });
+            filtered = filtered.filter(batch =>
+                batch.batchId.toLowerCase().includes(searchLower) ||
+                batch.procurementOfficer.toLowerCase().includes(searchLower) ||
+                batch.broker.toLowerCase().includes(searchLower) ||
+                batch.sourceLocation.toLowerCase().includes(searchLower) ||
+                batch.animals.some(animal => animal.earTagId.toLowerCase().includes(searchLower))
+            );
         }
 
-        // Apply role filter
-        if (filterValues.role) {
-            filtered = filtered.filter(user => user.Role?.name === filterValues.role);
+        // Apply source type filter
+        if (filterValues.sourceType) {
+            filtered = filtered.filter(batch => batch.sourceType === filterValues.sourceType);
         }
 
-        // Apply status filter
-        if (filterValues.status) {
-            filtered = filtered.filter(user => user.status === filterValues.status);
+        // Apply holding station filter
+        if (filterValues.holdingStation) {
+            filtered = filtered.filter(batch => batch.holdingStation.includes(filterValues.holdingStation));
         }
 
         // Apply date range filter
         if (filterValues.fromDate || filterValues.toDate) {
-            filtered = filtered.filter(user => {
-                if (!user.createdAt || user.createdAt === 'N/A') return false;
-                
-                const userDate = new Date(user.createdAt);
+            filtered = filtered.filter(batch => {
+                const batchDate = new Date(batch.createdAt);
 
                 if (filterValues.fromDate) {
                     const fromDate = new Date(filterValues.fromDate);
                     fromDate.setHours(0, 0, 0, 0);
-                    if (userDate < fromDate) return false;
+                    if (batchDate < fromDate) return false;
                 }
 
                 if (filterValues.toDate) {
                     const toDate = new Date(filterValues.toDate);
                     toDate.setHours(23, 59, 59, 999);
-                    if (userDate > toDate) return false;
+                    if (batchDate > toDate) return false;
                 }
 
                 return true;
             });
         }
 
-        setFilteredUsers(filtered);
-        
+        setFilteredBatches(filtered);
+
+        // Update stats based on filtered data
+        const totalAnimals = filtered.reduce((sum, batch) => sum + batch.batchSize, 0);
+        const lastBatchDate = getLastBatchDate(filtered);
+
+        setStats({
+            totalBatches: filtered.length,
+            totalAnimals: totalAnimals,
+            lastBatchDate: lastBatchDate,
+        });
+
         setPagination(prev => ({
             ...prev,
             currentPage: 1,
             totalRecords: filtered.length,
             totalPages: Math.ceil(filtered.length / prev.limit)
         }));
-    }, [users, searchTerm]);
+
+    }, [searchTerm, getLastBatchDate]);
 
     // Fetch when search term changes
     useEffect(() => {
@@ -295,8 +389,8 @@ const ManageUsersTable = () => {
 
     const handleClearFilters = () => {
         const emptyFilters = {
-            role: "",
-            status: "",
+            sourceType: "",
+            holdingStation: "",
             fromDate: "",
             toDate: ""
         };
@@ -326,58 +420,116 @@ const ManageUsersTable = () => {
     };
 
     // Sorting
-    const requestSort = (key) => {
-        let direction = 'asc';
-        if (sortConfig.key === key && sortConfig.direction === 'asc') {
-            direction = 'desc';
-        }
-        setSortConfig({ key, direction });
-    };
+    const requestSort = useCallback((key) => {
+        setSortConfig((prev) => {
+            if (prev.key !== key) {
+                return { key, direction: "asc" };
+            }
+            if (prev.direction === "asc") {
+                return { key, direction: "desc" };
+            }
+            return { key: null, direction: null };
+        });
+    }, []);
 
-    const sortedUsers = useMemo(() => {
-        if (!sortConfig.key) return filteredUsers;
+    // Apply sorting to data
+    const sortedBatches = useMemo(() => {
+        if (!sortConfig.key || !sortConfig.direction) return filteredBatches;
 
-        return [...filteredUsers].sort((a, b) => {
-            const getValue = (user, key) => {
-                if (key === "name") return `${user.firstName || ''} ${user.lastName || ''}`;
-                if (key === "role") return user.Role?.name || "";
-                if (key === "createdAt") {
-                    return user.createdAt && user.createdAt !== 'N/A' ? new Date(user.createdAt).getTime() : 0;
-                }
-                return user[key];
-            };
+        return [...filteredBatches].sort((a, b) => {
+            const key = sortConfig.key;
+            let aValue = a[key] ?? "";
+            let bValue = b[key] ?? "";
 
-            const aValue = getValue(a, sortConfig.key);
-            const bValue = getValue(b, sortConfig.key);
+            if (key === 'createdAt' || key === 'date') {
+                aValue = new Date(aValue).getTime();
+                bValue = new Date(bValue).getTime();
+            } else {
+                aValue = String(aValue).toLowerCase();
+                bValue = String(bValue).toLowerCase();
+            }
 
             if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
             if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
             return 0;
         });
-    }, [filteredUsers, sortConfig]);
+    }, [filteredBatches, sortConfig]);
 
     // Get sort icon
     const getSortIcon = useCallback(
         (key) => {
-            if (sortConfig.key !== key) {
+            if (sortConfig.key !== key || !sortConfig.direction) {
                 return <Minus className="ml-1 text-gray-400" size={16} />;
             }
 
-            if (sortConfig.key === key && sortConfig.direction === 'asc') {
+            if (sortConfig.direction === "asc") {
                 return <ChevronUp className="ml-1 text-gray-600" size={16} />;
-            } else if (sortConfig.key === key && sortConfig.direction === 'desc') {
-                return <ChevronDown className="ml-1 text-gray-600" size={16} />;
             } else {
-                return <Minus className="ml-1 text-gray-400" size={16} />;
+                return <ChevronDown className="ml-1 text-gray-600" size={16} />;
             }
         },
         [sortConfig]
     );
 
+    // Get ear tag IDs as comma-separated string
+    const getEarTagIds = (animals) => {
+        return animals.map(animal => animal.earTagId).join(', ');
+    };
+
+    // Table columns
+    const columns = useMemo(() => [
+        {
+            key: "batchId",
+            label: "Batch ID",
+            sortable: true,
+            onSort: () => requestSort('batchId'),
+            sortIcon: getSortIcon('batchId'),
+            render: (item) => (
+                <div className="font-medium text-primary-600">{item.batchId}</div>
+            )
+        },
+        {
+            key: "batchSize",
+            label: "Batch Size",
+            sortable: true,
+            onSort: () => requestSort('batchSize'),
+            sortIcon: getSortIcon('batchSize'),
+            render: (item) => (
+                <div className="font-medium text-gray-800">
+                    <span className="items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {item.batchSize} Animals
+                    </span>
+                </div>
+            )
+        },
+        {
+            key: "earTagIds",
+            label: "Ear Tag IDs",
+            sortable: false,
+            render: (item) => (
+                <div className="font-medium text-gray-800 text-sm break-words whitespace-normal line-clamp-3">
+                    {getEarTagIds(item.animals)}
+                </div>
+            )
+        },
+        {
+            key: "createdAt",
+            label: "Created At",
+            sortable: true,
+            onSort: () => requestSort('createdAt'),
+            sortIcon: getSortIcon('createdAt'),
+            render: (item) => (
+                <div className="font-medium text-gray-800 text-sm">
+                    {formatDate(item.createdAt)}
+                </div>
+            )
+        }
+    ], [getSortIcon, requestSort]);
+
     // Selection handlers
-    const toggleSelectUser = (id) => {
+    const toggleSelectBatch = (id) => {
         if (!id) return;
-        setSelectedIds((prev) => {
+        setSelectedBatches((prev) => {
             const newSet = new Set(prev);
             if (newSet.has(id)) {
                 newSet.delete(id);
@@ -389,32 +541,31 @@ const ManageUsersTable = () => {
     };
 
     const toggleSelectAll = () => {
-        const allIds = filteredUsers.map(user => user.id).filter(Boolean);
-        if (selectedIds.size === allIds.length && allIds.length > 0) {
-            setSelectedIds(new Set());
+        const allIds = filteredBatches.map(batch => batch.id).filter(Boolean);
+        if (selectedBatches.size === allIds.length && allIds.length > 0) {
+            setSelectedBatches(new Set());
         } else {
-            setSelectedIds(new Set(allIds));
+            setSelectedBatches(new Set(allIds));
         }
     };
 
-    // Navigation handlers
-    const handleEditUser = (user) => {
-        navigate(`${PATHROUTES.editUsers}/${user.id}`, { state: { user } });
+    const handleHealthDetails = (batch) => {
+        navigate(`/health-checkup/form/${batch.id}`, {
+            state: { batch }
+        });
     };
 
-    const handleViewUser = (user) => {
-        navigate(`${PATHROUTES.viewUsers}/${user.id}`);
+    // Event handlers
+    const handleView = (batch) => {
+        navigate(`${PATHROUTES.procurementDetails}/${batch.batchId}`, {
+            state: { batch }
+        });
     };
 
-    const handleAddUser = () => {
-        navigate(PATHROUTES.addUsers);
-    };
-
-    // Delete handlers
-    const handleDeleteClick = (id) => {
-        const user = users.find(u => u.id === id);
-        if (!user) {
-            toast.error("Cannot delete user: Invalid user ID");
+    const handleDelete = (id) => {
+        const batch = batches.find(b => b.id === id);
+        if (!batch) {
+            toast.error("Cannot delete batch: Invalid batch ID");
             return;
         }
         setDeleteTarget("single");
@@ -424,7 +575,7 @@ const ManageUsersTable = () => {
 
     const handleBulkDelete = (ids) => {
         if (!ids || ids.size === 0) {
-            toast.error("Please select users to delete");
+            toast.error("Please select batches to delete");
             return;
         }
         setDeleteTarget("selected");
@@ -439,83 +590,88 @@ const ManageUsersTable = () => {
             setIsDeleting(true);
             setLoading(true);
 
-            if (deleteTarget === 'selected') {
-                const result = await deleteMultipleUsers(deleteId);
-                if (result.successful > 0) {
-                    const updatedUsers = users.filter(user => !deleteId.includes(user.id));
-                    setUsers(updatedUsers);
-                    setFilteredUsers(updatedUsers.filter(user => {
-                        // Re-apply current filters to filtered list
-                        let include = true;
-                        
-                        if (filters.role && user.Role?.name !== filters.role) include = false;
-                        if (filters.status && user.status !== filters.status) include = false;
-                        
-                        // Date range check would go here if needed
-                        
-                        return include;
-                    }));
-                    
-                    calculateStats(updatedUsers);
-                    
-                    setPagination(prev => ({
-                        ...prev,
-                        totalRecords: updatedUsers.length,
-                        totalPages: Math.ceil(updatedUsers.length / prev.limit)
-                    }));
-                    
-                    toast.success(`${result.successful} user(s) deleted successfully`);
-                    if (result.failed > 0) {
-                        toast.error(`${result.failed} user(s) failed to delete`);
-                    }
-                }
-                setSelectedIds(new Set());
-            } else {
-                await deleteUser(deleteId);
-                const updatedUsers = users.filter(user => user.id !== deleteId);
-                setUsers(updatedUsers);
-                setFilteredUsers(updatedUsers.filter(user => {
-                    // Re-apply current filters
-                    let include = true;
-                    
-                    if (filters.role && user.Role?.name !== filters.role) include = false;
-                    if (filters.status && user.status !== filters.status) include = false;
-                    
-                    return include;
-                }));
-                
-                calculateStats(updatedUsers);
-                
+            if (deleteTarget === "selected") {
+                // Simulate API call for bulk delete
+                await new Promise(resolve => setTimeout(resolve, 800));
+
+                // Remove from local state
+                const idsToDelete = deleteId;
+                setBatches(prev => prev.filter(batch => !idsToDelete.includes(batch.id)));
+                setFilteredBatches(prev => prev.filter(batch => !idsToDelete.includes(batch.id)));
+
+                // Clear selection
+                setSelectedBatches(new Set());
+
+                // Update stats after deletion
+                const remainingBatches = batches.filter(batch => !idsToDelete.includes(batch.id));
+                const totalAnimals = remainingBatches.reduce((sum, batch) => sum + batch.batchSize, 0);
+                const lastBatchDate = getLastBatchDate(remainingBatches);
+
+                setStats({
+                    totalBatches: remainingBatches.length,
+                    totalAnimals: totalAnimals,
+                    lastBatchDate: lastBatchDate,
+                });
+
+                // Update pagination
                 setPagination(prev => ({
                     ...prev,
-                    totalRecords: updatedUsers.length,
-                    totalPages: Math.ceil(updatedUsers.length / prev.limit)
+                    totalRecords: filteredBatches.length - idsToDelete.length,
+                    totalPages: Math.ceil((filteredBatches.length - idsToDelete.length) / prev.limit)
                 }));
-                
+
+                toast.success(`${idsToDelete.length} batch(es) deleted successfully!`);
+
+            } else if (deleteTarget === "single" && deleteId) {
+                // Simulate API call for single delete
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                // Remove from local state
+                setBatches(prev => prev.filter(batch => batch.id !== deleteId));
+                setFilteredBatches(prev => prev.filter(batch => batch.id !== deleteId));
+
                 // Remove from selection if present
-                setSelectedIds((prev) => {
+                setSelectedBatches((prev) => {
                     const newSet = new Set(prev);
                     newSet.delete(deleteId);
                     return newSet;
                 });
-                
-                toast.success('User deleted successfully');
+
+                // Update stats after deletion
+                const remainingBatches = batches.filter(batch => batch.id !== deleteId);
+                const totalAnimals = remainingBatches.reduce((sum, batch) => sum + batch.batchSize, 0);
+                const lastBatchDate = getLastBatchDate(remainingBatches);
+
+                setStats({
+                    totalBatches: remainingBatches.length,
+                    totalAnimals: totalAnimals,
+                    lastBatchDate: lastBatchDate,
+                });
+
+                // Update pagination
+                setPagination(prev => ({
+                    ...prev,
+                    totalRecords: filteredBatches.length - 1,
+                    totalPages: Math.ceil((filteredBatches.length - 1) / prev.limit)
+                }));
+
+                toast.success("Batch deleted successfully!");
             }
         } catch (error) {
-            console.error('Error deleting user:', error);
-            toast.error(error.response?.data?.message || "Failed to delete user");
+            console.error("Error in delete operation:", error);
+            toast.error("Failed to delete batch");
         } finally {
-            setLoading(false);
-            setIsDeleting(false);
             setShowDeleteModal(false);
             setDeleteTarget(null);
             setDeleteId(null);
+            setIsDeleting(false);
+            setLoading(false);
         }
     };
 
     const handleRefresh = () => {
-        toast.success("Refreshing data...");
-        fetchUsers();
+        toast.success("Refreshing procurement data...");
+        fetchBatches();
     };
 
     const handlePageChange = (page) => {
@@ -523,7 +679,6 @@ const ManageUsersTable = () => {
     };
 
     const handleLimitChange = (newLimit) => {
-        setItemsPerPage(newLimit);
         setPagination(prev => ({
             ...prev,
             limit: newLimit,
@@ -536,111 +691,22 @@ const ManageUsersTable = () => {
         return new Date().toISOString().split("T")[0];
     };
 
-    // Table columns
-    const columns = useMemo(() => [
-        {
-            key: "id",
-            label: "User ID",
-            sortable: true,
-            onSort: () => requestSort('id'),
-            sortIcon: getSortIcon('id'),
-            render: (item) => (
-                <div className="flex items-center gap-1">
-                    <span className="font-medium text-primary-600">{item.id}</span>
-                </div>
-            )
-        },
-        {
-            key: "name",
-            label: "Full Name",
-            sortable: true,
-            onSort: () => requestSort('name'),
-            sortIcon: getSortIcon('name'),
-            render: (item) => (
-                <div className="flex items-center gap-2">
-                    <span className="font-medium text-gray-800">
-                        {item.firstName || ''} {item.lastName || ''}
-                    </span>
-                </div>
-            )
-        },
-        {
-            key: "email",
-            label: "Email",
-            sortable: true,
-            onSort: () => requestSort('email'),
-            sortIcon: getSortIcon('email'),
-            render: (item) => (
-                <div className="flex items-center gap-1">
-                    <span className="font-medium">{item.email || ''}</span>
-                </div>
-            )
-        },
-        {
-            key: "role",
-            label: "Role",
-            sortable: true,
-            onSort: () => requestSort('role'),
-            sortIcon: getSortIcon('role'),
-            render: (item) => (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
-                    {item.Role?.name || "N/A"}
-                </span>
-            )
-        },
-        {
-            key: "status",
-            label: "Status",
-            sortable: true,
-            onSort: () => requestSort('status'),
-            sortIcon: getSortIcon('status'),
-            render: (item) => {
-                const getStatusStyle = (status) => {
-                    switch (status?.toLowerCase()) {
-                        case 'active': return { bg: 'bg-green-100', text: 'text-green-800' };
-                        case 'inactive': return { bg: 'bg-pink-100', text: 'text-pink-800' };
-                        default: return { bg: 'bg-gray-100', text: 'text-gray-600' };
-                    }
-                };
+    // Get unique values for filter dropdowns
+    const uniqueSourceTypes = useMemo(() => {
+        const types = [...new Set(MOCK_PROCUREMENT_BATCHES.map(b => b.sourceType))];
+        return types.sort();
+    }, []);
 
-                const style = getStatusStyle(item.status);
-
-                return (
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${style.bg} ${style.text}`}>
-                        {item.status === "active" ? "Active" : item.status === "inactive" ? "Inactive" : "NA"}
-                    </span>
-                );
-            }
-        },
-        {
-            key: "createdAt",
-            label: "Created Date",
-            sortable: true,
-            onSort: () => requestSort('createdAt'),
-            sortIcon: getSortIcon('createdAt'),
-            render: (item) => {
-                const date = item.createdAt && item.createdAt !== 'N/A' ? new Date(item.createdAt) : null;
-                const formattedDate = date ? date.toLocaleDateString('en-GB') : 'N/A';
-
-                return (
-                    <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-900">{formattedDate}</span>
-                    </div>
-                );
-            }
-        }
-    ], [getSortIcon, requestSort]);
-
-    const totalDisplayedRecords = filteredUsers.length;
+    const totalDisplayedRecords = filteredBatches.length;
 
     return (
         <>
-            <div className="space-y-6 bg-gray-50 dark:bg-gray-900">
-                {/* Header Section - SellersList style */}
+            <div className="space-y-6">
+                {/* Header Section */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
-                        <p className="text-gray-600">Manage all users and their access permissions</p>
+                        <h1 className="text-2xl font-bold text-gray-900">Procurement Batches</h1>
+                        <p className="text-gray-600">View and manage all animal procurement batches</p>
                     </div>
                     <div className="flex items-center space-x-4">
                         <button
@@ -651,60 +717,54 @@ const ManageUsersTable = () => {
                             <span>Refresh</span>
                             <ArrowRight size={16} />
                         </button>
-                        <button
-                            onClick={handleAddUser}
-                            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium flex items-center space-x-2"
-                        >
-                            <FaUserPlus className="w-4 h-4" />
-                            <span>Add User</span>
-                        </button>
                     </div>
                 </div>
 
-                {/* Stats Cards - SellersList style */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {/* Stats Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Total Batches */}
                     <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
                         <div className="flex items-start justify-between">
-                            <FaUser className="text-primary-500 opacity-60" size={40} />
+                            <div className="p-3 bg-primary-100 rounded-lg">
+                                <Package className="text-primary-600" size={24} />
+                            </div>
                             <div className="text-right">
-                                <h3 className="text-2xl font-bold text-gray-900">{stats.totalUsers}</h3>
-                                <p className="text-gray-600">Total Users</p>
+                                <h3 className="text-2xl font-bold text-gray-900">{stats.totalBatches}</h3>
+                                <p className="text-gray-600">Total Batches</p>
                             </div>
                         </div>
                     </div>
 
+                    {/* Total Animals */}
                     <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
                         <div className="flex items-start justify-between">
-                            <FaUserCheck className="text-green-500 opacity-60" size={40} />
+                            <div className="p-3 bg-green-100 rounded-lg">
+                                <GiCow className="text-green-600" size={24} />
+                            </div>
                             <div className="text-right">
-                                <h3 className="text-2xl font-bold text-gray-900">{stats.activeUsers}</h3>
-                                <p className="text-gray-600">Active Users</p>
+                                <h3 className="text-2xl font-bold text-gray-900">{stats.totalAnimals}</h3>
+                                <p className="text-gray-600">Total Animals</p>
                             </div>
                         </div>
                     </div>
 
+                    {/* Last Batch Creation Date */}
                     <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
                         <div className="flex items-start justify-between">
-                            <FaUserTimes className="text-pink-500 opacity-60" size={40} />
-                            <div className="text-right">
-                                <h3 className="text-2xl font-bold text-gray-900">{stats.inactiveUsers}</h3>
-                                <p className="text-gray-600">Inactive Users</p>
+                            <div className="p-3 bg-purple-100 rounded-lg">
+                                <CalendarClock className="text-purple-600" size={24} />
                             </div>
-                        </div>
-                    </div>
-
-                    <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
-                        <div className="flex items-start justify-between">
-                            <Shield className="text-purple-500 opacity-60" size={40} />
                             <div className="text-right">
-                                <h3 className="text-2xl font-bold text-gray-900">{stats.adminUsers}</h3>
-                                <p className="text-gray-600">Admin Users</p>
+                                <h3 className="text-xl font-bold text-gray-900">
+                                    {stats.lastBatchDate ? formatDate(stats.lastBatchDate) : 'No batches'}
+                                </h3>
+                                <p className="text-gray-600">Last Batch Created</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Search and Action Menu - SellersList style */}
+                {/* Search and Action Menu */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         {/* Left Side: Search and Filter Toggle */}
@@ -716,7 +776,7 @@ const ManageUsersTable = () => {
                                 </div>
                                 <input
                                     type="text"
-                                    placeholder="Search by User ID, Name, Email or Role..."
+                                    placeholder="Search by Batch ID, Officer, Location, Ear Tag..."
                                     className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-transparent text-sm bg-gray-50/50"
                                     value={searchInput}
                                     onChange={handleSearchChange}
@@ -724,7 +784,7 @@ const ManageUsersTable = () => {
                                 {searchTerm && (
                                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                                         <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                                            {sortedUsers.length} found
+                                            {filteredBatches.length} found
                                         </span>
                                     </div>
                                 )}
@@ -733,11 +793,10 @@ const ManageUsersTable = () => {
                             {/* Filter Toggle Button */}
                             <button
                                 onClick={() => setShowFilters(!showFilters)}
-                                className={`px-4 py-2.5 border rounded-lg flex items-center gap-2 text-sm transition-all justify-center md:justify-start ${
-                                    showFilters
-                                        ? "bg-gradient-to-br from-primary-500 to-primary-600 text-white border-transparent"
-                                        : "border-gray-300 hover:bg-gray-50 text-gray-700"
-                                }`}
+                                className={`px-4 py-2.5 border rounded-lg flex items-center gap-2 text-sm transition-all justify-center md:justify-start ${showFilters
+                                    ? "bg-gradient-to-br from-primary-500 to-primary-600 text-white border-transparent"
+                                    : "border-gray-300 hover:bg-gray-50 text-gray-700"
+                                    }`}
                             >
                                 <Filter className="w-4 h-4" />
                                 Filters
@@ -752,56 +811,51 @@ const ManageUsersTable = () => {
                         {/* Right Side: Action Buttons */}
                         <div className="flex flex-wrap gap-2 w-full md:w-auto justify-center md:justify-start">
                             {/* Bulk Delete Button */}
-                            {selectedIds.size > 0 && (
+                            {selectedBatches.size > 0 && (
                                 <button
-                                    onClick={() => handleBulkDelete(selectedIds)}
+                                    onClick={() => handleBulkDelete(selectedBatches)}
                                     className="px-4 py-2.5 bg-gradient-to-br from-red-500 to-red-600 text-white rounded-lg hover:shadow-md hover:opacity-90 transition-colors flex items-center gap-2 text-sm"
                                 >
                                     <MdDelete className="w-4 h-4" />
-                                    Delete ({selectedIds.size})
+                                    Delete ({selectedBatches.size})
                                 </button>
                             )}
                         </div>
                     </div>
 
-                    {/* Filters Panel - SellersList style */}
+                    {/* Filters Panel */}
                     {showFilters && (
                         <div className="mt-4 p-5 bg-primary-50/50 rounded-xl border border-primary-100">
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                {/* Role Filter */}
+                                {/* Source Type Filter */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Select Role
+                                        Source Type
                                     </label>
                                     <select
                                         className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
-                                        value={tempFilters.role || ""}
-                                        onChange={(e) => handleFilterChange("role", e.target.value)}
+                                        value={tempFilters.sourceType || ""}
+                                        onChange={(e) => handleFilterChange("sourceType", e.target.value)}
                                     >
-                                        <option value="">All Roles</option>
-                                        {getRoleOptions.map(role => (
-                                            <option key={role} value={role}>{role}</option>
+                                        <option value="">All Types</option>
+                                        {uniqueSourceTypes.map(type => (
+                                            <option key={type} value={type}>{type}</option>
                                         ))}
                                     </select>
                                 </div>
 
-                                {/* Status Filter */}
+                                {/* Holding Station Filter */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Select Status
+                                        Holding Station
                                     </label>
-                                    <select
+                                    <input
+                                        type="text"
+                                        placeholder="Search station..."
                                         className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
-                                        value={tempFilters.status || ""}
-                                        onChange={(e) => handleFilterChange("status", e.target.value)}
-                                    >
-                                        <option value="">All Statuses</option>
-                                        {getStatusOptions.map(status => (
-                                            <option key={status} value={status}>
-                                                {status.charAt(0).toUpperCase() + status.slice(1)}
-                                            </option>
-                                        ))}
-                                    </select>
+                                        value={tempFilters.holdingStation || ""}
+                                        onChange={(e) => handleFilterChange("holdingStation", e.target.value)}
+                                    />
                                 </div>
 
                                 {/* Date Range Filters */}
@@ -886,22 +940,24 @@ const ManageUsersTable = () => {
                     )}
                 </div>
 
-                {/* Data Table - Using DataTable component */}
+                {/* Data Table */}
                 <DataTable
                     columns={columns}
-                    data={sortedUsers}
+                    data={sortedBatches}
                     loading={loading}
-                    onEdit={handleEditUser}
-                    onView={handleViewUser}
-                    onDelete={handleDeleteClick}
+                    onEdit={null}
+                    onAddVaccine={handleHealthDetails}
+                    enableVaccination={true}
+                    vaccineLabel="Update Vaccination"
+                    onView={handleView}
+                    onDelete={handleDelete}
                     onBulkDelete={handleBulkDelete}
-                    addButtonLabel="Add New User"
-                    emptyStateMessage="No users found. Try adjusting your search or filters."
-                    loadingMessage="Loading users data..."
+                    emptyStateMessage="No procurement batches found. Try adjusting your filters or create a new batch."
+                    loadingMessage="Loading procurement data..."
                     enableSelection={true}
                     enablePagination={true}
-                    selectedRows={selectedIds}
-                    onSelectRow={toggleSelectUser}
+                    selectedRows={selectedBatches}
+                    onSelectRow={toggleSelectBatch}
                     onSelectAll={toggleSelectAll}
                     pagination={{
                         currentPage: pagination.currentPage,
@@ -917,7 +973,7 @@ const ManageUsersTable = () => {
                 />
             </div>
 
-            {/* Delete Confirmation Modal - SellersList style */}
+            {/* Delete Confirmation Modal */}
             {showDeleteModal && (
                 <div
                     className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 overflow-y-auto"
@@ -936,8 +992,8 @@ const ManageUsersTable = () => {
                             </h3>
                             <p className="text-gray-500 text-sm sm:text-base leading-relaxed p-3">
                                 {deleteTarget === "selected"
-                                    ? `You're about to delete ${deleteId?.length || 0} selected user(s). This action cannot be undone.`
-                                    : "You're about to delete this user. This action cannot be undone."}
+                                    ? `You're about to delete ${deleteId?.length || 0} selected batch(es). This action cannot be undone.`
+                                    : "You're about to delete this batch. This action cannot be undone."}
                             </p>
                         </div>
 
@@ -976,4 +1032,4 @@ const ManageUsersTable = () => {
     );
 };
 
-export default ManageUsersTable;
+export default BatchLists;

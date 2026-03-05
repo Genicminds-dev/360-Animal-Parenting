@@ -43,6 +43,9 @@ export const PATHROUTES = {
 
   // Animal Procurement
   animalProcurement: "/animal-procurement",
+
+  // Batch Management
+  animalBatches : "/animal-batches",
   
   // Procured Animals
   procuredAnimals: "/procured-animals",

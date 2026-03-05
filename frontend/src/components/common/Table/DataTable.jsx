@@ -36,7 +36,7 @@ const DataTable = ({
   onView,
   onDelete,
   onBulkDelete,
-  onHealthCheck,
+  onAddVaccine,
 
   // Customization
   addButtonLabel = "Add New",
@@ -49,8 +49,8 @@ const DataTable = ({
   renderEmptyState,
 
   // Health Check specific props
-  enableHealthCheck = false,
-  healthCheckLabel,
+  enableVaccination = false,
+  vaccineLabel,
 
   // Props for external selection management
   selectedRows,
@@ -166,14 +166,14 @@ const DataTable = ({
   // Default actions renderer
   const defaultRenderActions = (item) => (
     <div className="flex items-center space-x-2">
-      {enableHealthCheck && onHealthCheck && (
+      {enableVaccination && onAddVaccine && (
         <button
-          onClick={() => onHealthCheck(item)}
+          onClick={() => onAddVaccine(item)}
           className="p-2 rounded-md text-xs font-medium bg-indigo-100 text-indigo-800 hover:bg-indigo-200 hover:text-indigo-900 flex items-center space-x-2 transition-colors duration-200"
-          title={healthCheckLabel}
+          title={vaccineLabel}
         >
           <Stethoscope size={14} />
-          <span>{healthCheckLabel}</span>
+          <span>{vaccineLabel}</span>
         </button>
       )}
       {onView && (
@@ -216,7 +216,7 @@ const DataTable = ({
   );
 
   // Determine if we should show actions column
-  const showActionsColumn = onView || onEdit || onDelete || enableHealthCheck;
+  const showActionsColumn = onView || onEdit || onDelete || enableVaccination;
 
   return (
     <>

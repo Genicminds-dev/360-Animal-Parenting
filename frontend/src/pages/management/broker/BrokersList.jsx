@@ -358,7 +358,7 @@ const BrokersList = () => {
       sortIcon: getSortIcon('uid'),
       render: (item) => (
         <div className="flex items-center gap-3">
-          <div className="font-medium text-gray-900">{item.uid}</div>
+          <div className="font-medium text-primary-600">{item.uid}</div>
         </div>
       )
     },
@@ -371,7 +371,7 @@ const BrokersList = () => {
       render: (item) => (
         <div className="flex items-center gap-3">
           <div>
-            <div className="font-medium text-gray-900">{item.fullName}</div>
+            <div className="font-medium text-gray-800">{item.fullName}</div>
           </div>
         </div>
       )
@@ -384,7 +384,7 @@ const BrokersList = () => {
       sortIcon: getSortIcon('mobile'),
       render: (item) => (
         <div className="flex items-center gap-2">
-          <div className="font-medium text-gray-900">{item.mobile}</div>
+          <div className="font-medium text-gray-800">{item.mobile}</div>
         </div>
       )
     },
@@ -401,7 +401,7 @@ const BrokersList = () => {
           <div className="flex items-center gap-2">
             <div>
               {hasAadhar ? (
-                <div className="font-medium text-gray-900">
+                <div className="font-medium text-gray-800">
                   {item.aadharNumber.replace(/(\d{4})(?=\d)/g, "$1 ")}
                 </div>
               ) : (
@@ -429,7 +429,7 @@ const BrokersList = () => {
         return (
           <div className="flex items-center gap-2">
             <div>
-              <div className="font-medium text-gray-900">{formattedDate}</div>
+              <div className="font-medium text-gray-800">{formattedDate}</div>
             </div>
           </div>
         );
