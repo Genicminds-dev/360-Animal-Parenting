@@ -43,6 +43,8 @@ import ManageUsersForm from './pages/manageUsers/ManageUsersForm';
 import ManageUsersTable from './pages/manageUsers/ManageUsersTable';
 import ViewUserDetails from './pages/manageUsers/ViewUserDetails';
 import SettingsPage from './pages/settings/SettingPage';
+import AnimalProcurement from './pages/management/procurement/AnimalProcurement';
+import BatchLists from './pages/management/batch/BatchList';
 
 
 
@@ -317,7 +319,16 @@ const AppContent = () => {
             path={PATHROUTES.animalProcurement.replace('/', '')}
             element={
               <PrivateRoute allowedRoles={[1, 2, 3]}>
-                <Placeholder title="Beneficiaries" />
+                <AnimalProcurement />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path={PATHROUTES.animalBatches.replace('/', '')}
+            element={
+              <PrivateRoute allowedRoles={[1, 2, 3]}>
+                <BatchLists />
               </PrivateRoute>
             }
           />

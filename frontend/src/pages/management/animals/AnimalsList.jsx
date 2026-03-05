@@ -415,7 +415,18 @@ const ProcuredAnimals = () => {
     }
   };
 
-  // Table columns - Only Ear Tag ID, Breed, Gender, Calving Status, Action
+  // Format date function
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
+  };
+
+  // Table columns - Updated with Date column after Calving Status
   const columns = useMemo(() => [
     {
       key: "earTagId",
@@ -424,7 +435,7 @@ const ProcuredAnimals = () => {
       onSort: () => requestSort('earTagId'),
       sortIcon: getSortIcon('earTagId'),
       render: (item) => (
-        <div className="font-medium text-gray-900">{item.earTagId}</div>
+        <div className="font-medium text-primary-600">{item.earTagId}</div>
       )
     },
     {
@@ -434,7 +445,7 @@ const ProcuredAnimals = () => {
       onSort: () => requestSort('breed'),
       sortIcon: getSortIcon('breed'),
       render: (item) => (
-        <div className="text-gray-900">{item.breed}</div>
+        <div className="font-medium text-gray-800">{item.breed}</div>
       )
     },
     {
@@ -444,7 +455,7 @@ const ProcuredAnimals = () => {
       onSort: () => requestSort('gender'),
       sortIcon: getSortIcon('gender'),
       render: (item) => (
-        <div className="text-gray-900 capitalize">{item.gender}</div>
+        <div className="font-medium text-gray-800">{item.gender}</div>
       )
     },
     {
@@ -456,6 +467,18 @@ const ProcuredAnimals = () => {
       render: (item) => (
         <div>
           {getCalvingStatusBadge(item.calvingStatus)}
+        </div>
+      )
+    },
+    {
+      key: "createdAt",
+      label: "Date",
+      sortable: true,
+      onSort: () => requestSort('createdAt'),
+      sortIcon: getSortIcon('createdAt'),
+      render: (item) => (
+        <div className="font-medium text-gray-800">
+          {formatDate(item.createdAt)}
         </div>
       )
     }

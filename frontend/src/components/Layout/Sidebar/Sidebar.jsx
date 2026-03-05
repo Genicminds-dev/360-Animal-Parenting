@@ -112,45 +112,43 @@ const Sidebar = ({ toggleSidebar, onLogout, isMobile, onLogoutClick }) => {
   };
 
   const navItems = [
-    { path: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} />, roles: [1, 2, 3] },
     // {
-    //   path: '/procurement',
-    //   label: 'Animal Procurement',
-    //   icon: <GiCow size={20} />,
-    //   roles: [1, 2, 3],
-    //   hasSubmenu: true,
-    //   subItems: [
-    //     { path: PATHROUTES.agentRegistration, label: 'Agent Registration', roles: [1, 2] },
-    //     { path: PATHROUTES.sellerRegistration, label: 'Seller Registration', roles: [1, 2] },
-    //     { path: PATHROUTES.animalRegistration, label: 'Animal Registration', roles: [1, 2, 3] },
-    //     { path: PATHROUTES.healthCheckupList, label: 'Health Check', roles: [1, 2, 3] },
-    //     // { path: '/procurement/health-check', label: 'Health Check', roles: [3]},
-    //     { path: '/procurement/price-approval', label: 'Price & Approval', roles: [1, 2] },
-    //     { path: '/procurement/payment', label: 'Payment', roles: [1] },
-    //     { path: '/procurement/animal-transfer', label: 'Animal Transfer', roles: [1, 2] },
-    //   ]
-    // },
-    // { path: PATHROUTES.sellersList, label: 'Sellers', icon: <Users size={20} />, roles: [1, 2, 3] },
-    // { path: PATHROUTES.brokerList, label: 'Commission Agents', icon: <Users size={20} />, roles: [1, 2, 3] },
-    // { path: PATHROUTES.animalsList, label: 'Animals', icon: <GiCow size={20} />, roles: [1, 2, 3] },
+      //   path: '/procurement',
+      //   label: 'Animal Procurement',
+      //   icon: <GiCow size={20} />,
+      //   roles: [1, 2, 3],
+      //   hasSubmenu: true,
+      //   subItems: [
+        //     { path: PATHROUTES.agentRegistration, label: 'Agent Registration', roles: [1, 2] },
+        //     { path: PATHROUTES.sellerRegistration, label: 'Seller Registration', roles: [1, 2] },
+        //     { path: PATHROUTES.animalRegistration, label: 'Animal Registration', roles: [1, 2, 3] },
+        //     { path: PATHROUTES.healthCheckupList, label: 'Health Check', roles: [1, 2, 3] },
+        //     // { path: '/procurement/health-check', label: 'Health Check', roles: [3]},
+        //     { path: '/procurement/price-approval', label: 'Price & Approval', roles: [1, 2] },
+        //     { path: '/procurement/payment', label: 'Payment', roles: [1] },
+        //     { path: '/procurement/animal-transfer', label: 'Animal Transfer', roles: [1, 2] },
+        //   ]
+        // },
+        // { path: PATHROUTES.sellersList, label: 'Sellers', icon: <Users size={20} />, roles: [1, 2, 3] },
+        // { path: PATHROUTES.brokerList, label: 'Commission Agents', icon: <Users size={20} />, roles: [1, 2, 3] },
+        // { path: PATHROUTES.animalsList, label: 'Animals', icon: <GiCow size={20} />, roles: [1, 2, 3] },
     // { path: '/transporters', label: 'Transporters', icon: <Truck size={20} />, roles: [1, 2, 3] },
     // { path: '/suppliers', label: 'Suppliers', icon: <UserCircle size={20} />, roles: [1, 2, 3] },
     // { path: '/beneficiaries', label: 'Beneficiaries', icon: <Users size={20} />, roles: [1, 2, 3] },
     // { path: '/team', label: 'Team Members', icon: <Users size={20} />, roles: [1, 2, 3] },
     // { path: '/reports', label: 'Reports', icon: <FileText size={20} />, roles: [1, 2, 3] },
-
-        // { path: PATHROUTES.sellersList, label: 'Sellers', icon: <Users size={20} />, roles: [1, 2, 3] },
-        // { path: PATHROUTES.animalProcurement, label: 'Animal Registration', icon: <GiCow size={20} />, roles: [1, 2, 3] },
-        // { path: PATHROUTES.animalProcuredList, label: 'Animal List', icon: <FileText size={20} />, roles: [1, 2, 3] },
-
-    { path: PATHROUTES.brokerList, label: 'Broker', icon: <Users size={20} />, roles: [1, 2, 3] },
+    
+    // { path: PATHROUTES.sellersList, label: 'Sellers', icon: <Users size={20} />, roles: [1, 2, 3] },
+    // { path: PATHROUTES.animalProcurement, label: 'Animal Registration', icon: <GiCow size={20} />, roles: [1, 2, 3] },
+    // { path: PATHROUTES.animalProcuredList, label: 'Animal List', icon: <FileText size={20} />, roles: [1, 2, 3] },
+    
+    { path: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} />, roles: [1, 2, 3] },
     { path: PATHROUTES.animalProcurement, label: 'Animal Procurement', icon: <GiCow size={20} />, roles: [1, 2, 3] },
+    { path: PATHROUTES.animalBatches, label: 'Batch Management', icon: <GiCow size={20} />, roles: [1, 2, 3] },
     { path: PATHROUTES.procuredAnimals, label: 'Procured Animals', icon: <GiCow size={20} />, roles: [1, 2, 3] },
+    { path: PATHROUTES.brokerList, label: 'Broker', icon: <Users size={20} />, roles: [1, 2, 3] },
     { path: PATHROUTES.handoverList, label: 'Handover', icon: <Handshake size={20} />, roles: [1, 2, 3] },
     { path: PATHROUTES.schemeList, label: 'Manage Schemes', icon: <FileCheck size={20} />, roles: [1, 2, 3] },
- 
-
-
     { path: PATHROUTES.userList, label: 'Manage Users', icon: <Users size={20} />, roles: [1, 2, 3] },
     { path: '/settings', label: 'Settings', icon: <Settings size={20} />, roles: [1, 2, 3] },
   ];
