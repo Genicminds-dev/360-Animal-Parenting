@@ -12,7 +12,8 @@ import {
   ChevronRight,
   X,
   FileCheck,
-  Handshake
+  Handshake,
+  UserCheck
 } from 'lucide-react';
 import { GiCow } from 'react-icons/gi';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -147,6 +148,7 @@ const Sidebar = ({ toggleSidebar, onLogout, isMobile, onLogoutClick }) => {
     { path: PATHROUTES.animalBatches, label: 'Batch Management', icon: <GiCow size={20} />, roles: [1, 2, 3] },
     { path: PATHROUTES.procuredAnimals, label: 'Procured Animals', icon: <GiCow size={20} />, roles: [1, 2, 3] },
     { path: PATHROUTES.brokerList, label: 'Broker', icon: <Users size={20} />, roles: [1, 2, 3] },
+    { path: PATHROUTES.beneficiaryList, label: 'Beneficiary', icon: <UserCheck size={20} />, roles: [1, 2, 3] },
     { path: PATHROUTES.handoverList, label: 'Handover', icon: <Handshake size={20} />, roles: [1, 2, 3] },
     { path: PATHROUTES.schemeList, label: 'Manage Schemes', icon: <FileCheck size={20} />, roles: [1, 2, 3] },
     { path: PATHROUTES.userList, label: 'Manage Users', icon: <Users size={20} />, roles: [1, 2, 3] },
