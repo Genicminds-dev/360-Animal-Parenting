@@ -51,6 +51,12 @@ export const PATHROUTES = {
   procuredAnimals: "/procured-animals",
   animalDetails: "/animal-details",
   editAnimal: "/edit-animal",
+
+  // beneficiary Routes
+  beneficiaryList: "/beneficiary",
+  addBeneficiary: "/add-beneficiary",
+  editBeneficiary: "/edit-beneficiary",
+  beneficiaryDetails: "/beneficiary-details",
   
   // Handover Routes
   handoverList: "/handover",

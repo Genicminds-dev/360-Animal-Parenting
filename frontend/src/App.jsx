@@ -30,6 +30,10 @@ import ResetPassword from './pages/Auth/ResetPassword';
 import AnimalDetails from './pages/management/animals/AnimalDetails';
 import ProcuredAnimals from './pages/management/animals/AnimalsList';
 import EditAnimal from './pages/management/animals/EditAnimal';
+import BeneficiaryList from './pages/management/beneficiary/BeneficiaryList';
+import AddBeneficiary from './pages/management/beneficiary/AddBeneficiary';
+import EditBeneficiary from './pages/management/beneficiary/EditBeneficiary';
+import BeneficiaryDetails from './pages/management/beneficiary/BeneficiaryDetails';
 import HandoverList from './pages/management/handover/HandoverList';
 import AddHandover from './pages/management/handover/AddHandover';
 import EditHandover from './pages/management/handover/EditHandover';
@@ -357,6 +361,40 @@ const AppContent = () => {
             element={
               <PrivateRoute allowedRoles={[1, 2, 3]}>
                 <EditAnimal />
+              </PrivateRoute>
+            }
+          />
+
+          {/* Beneficiary */}
+          <Route
+            path={PATHROUTES.beneficiaryList.replace('/', '')}
+            element={
+              <PrivateRoute allowedRoles={[1, 2]}>
+                <BeneficiaryList />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path={`${PATHROUTES.beneficiaryDetails.replace('/', '')}/:uid`}
+            element={
+              <PrivateRoute allowedRoles={[1, 2]}>
+                <BeneficiaryDetails />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path={PATHROUTES.addBeneficiary.replace('/', '')}
+            element={
+              <PrivateRoute allowedRoles={[1, 2]}>
+                <AddBeneficiary />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path={`${PATHROUTES.editBeneficiary.replace('/', '')}/:uid`}
+            element={
+              <PrivateRoute allowedRoles={[1, 2]}>
+                <EditBeneficiary />
               </PrivateRoute>
             }
           />
