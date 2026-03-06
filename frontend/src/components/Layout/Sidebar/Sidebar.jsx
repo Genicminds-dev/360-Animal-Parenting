@@ -16,7 +16,7 @@ import {
   Package,
   List,
   UserCog,
-  Warehouse
+  Warehouse,
   UserCheck
 } from 'lucide-react';
 import { GiCow } from 'react-icons/gi';
@@ -147,30 +147,37 @@ const Sidebar = ({ toggleSidebar, onLogout, isMobile, onLogoutClick }) => {
     // { path: PATHROUTES.animalProcurement, label: 'Animal Registration', icon: <GiCow size={20} />, roles: [1, 2, 3] },
     // { path: PATHROUTES.animalProcuredList, label: 'Animal List', icon: <FileText size={20} />, roles: [1, 2, 3] },
     
-  { path: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} />, roles: [1,2,3] },
+       { path: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} />, roles: [1,2,3] },
 
-  { path: PATHROUTES.animalProcurement, label: 'Animal Procurement', icon: <GiCow size={20} />, roles: [1,2,3] },
+       { 
+        path: '/procurement',
+        label: 'Procurement',
+        icon: <GiCow size={20} />,
+        roles: [1, 2, 3],
+        hasSubmenu: true,
+        subItems: [
+            { path: PATHROUTES.animalProcurement, label: 'Animal Procurement', roles: [1,2,3] },
+            { path: PATHROUTES.animalBatches, label: 'Animal Batch', roles: [1,2,3] },
+            { path: PATHROUTES.procuredAnimals, label: 'Procured Animals', roles: [1,2,3] },
+        ] },
 
-  { path: PATHROUTES.animalBatches, label: 'Animal Batch', icon: <Package size={20} />, roles: [1,2,3] },
+        { path: PATHROUTES.handoverList, label: 'Handover', icon: <Handshake size={20} />, roles: [1,2,3] },
 
-  { path: PATHROUTES.procuredAnimals, label: 'Procured Animals', icon: <List size={20} />, roles: [1,2,3] },
+        { path: PATHROUTES.brokerList, label: 'Broker', icon: <UserCog size={20} />, roles: [1,2,3] },
 
-  { path: PATHROUTES.brokerList, label: 'Broker', icon: <UserCog size={20} />, roles: [1,2,3] },
+        { path: PATHROUTES.holdingStationList, label: 'Holding Station', icon: <Warehouse size={20} />, roles: [1,2,3] },
 
-  { path: PATHROUTES.holdingStationList, label: 'Holding Station', icon: <Warehouse size={20} />, roles: [1,2,3] },
+        { path: PATHROUTES.vehiclesList, label: 'Vehicle Registration', icon: <Truck size={20} />, roles: [1,2,3] },
+          
+        { path: PATHROUTES.beneficiaryList, label: 'Beneficiary', icon: <UserCheck size={20} />, roles: [1, 2, 3] },
 
-  { path: PATHROUTES.vehiclesList, label: 'Vehicle Registration', icon: <Truck size={20} />, roles: [1,2,3] },
-    
-  { path: PATHROUTES.beneficiaryList, label: 'Beneficiary', icon: <UserCheck size={20} />, roles: [1, 2, 3] },
 
-  { path: PATHROUTES.handoverList, label: 'Handover', icon: <Handshake size={20} />, roles: [1,2,3] },
+        { path: PATHROUTES.schemeList, label: 'Manage Schemes', icon: <FileCheck size={20} />, roles: [1,2,3] },
 
-  { path: PATHROUTES.schemeList, label: 'Manage Schemes', icon: <FileCheck size={20} />, roles: [1,2,3] },
+        { path: PATHROUTES.userList, label: 'Manage Users', icon: <Users size={20} />, roles: [1,2,3] },
 
-  { path: PATHROUTES.userList, label: 'Manage Users', icon: <Users size={20} />, roles: [1,2,3] },
-
-  { path: '/settings', label: 'Settings', icon: <Settings size={20} />, roles: [1,2,3] }
-  ];
+        { path: '/settings', label: 'Settings', icon: <Settings size={20} />, roles: [1,2,3] }
+      ];
 
   const userRoleId = user?.role || 2;
 
@@ -233,19 +240,19 @@ const Sidebar = ({ toggleSidebar, onLogout, isMobile, onLogoutClick }) => {
                         .filter(sub => sub.roles.includes(userRoleId))
                         .map((sub) => (
                           <NavLink
-                            key={sub.path}
-                            to={sub.path}
-                            onClick={handleNavClick}
-                            className={({ isActive }) =>
-                              `block mt-1 ml-6 sm:ml-10 pl-3 sm:pl-4 py-2 text-sm rounded-lg truncate transition-colors ${
-                                isActive
-                                  ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 border-l-4 border-primary-500 dark:border-primary-400'
-                                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white'
-                              }`
-                            }
-                          >
-                            {sub.label}
-                          </NavLink>
+                              key={sub.path}
+                              to={sub.path}
+                              onClick={handleNavClick}
+                              className={({ isActive }) =>
+                                `block mt-1 ml-6 sm:ml-5 pl-3 sm:pl-4 py-2 text-sm rounded-lg truncate transition-colors ${
+                                  isActive
+                                    ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 border-l-4 border-primary-500 dark:border-primary-400'
+                                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white'
+                                }`
+                              }
+                            >
+                              <span className="mr-1">•</span> {sub.label}
+                            </NavLink>
                         ))}
                   </>
                 ) : (

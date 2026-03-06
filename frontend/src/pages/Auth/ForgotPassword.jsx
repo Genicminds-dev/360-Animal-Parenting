@@ -97,7 +97,7 @@ const ForgetPassword = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className={`w-full bg-gradient-to-r from-primary-600 to-secondary-600 text-white py-3 px-4 rounded-lg font-medium transition-all ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
+                        className={`w-full bg-primary-600 text-white py-2 px-4 rounded-lg font-medium transition-all ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
                             }`}
                     >
                         {loading ? (
