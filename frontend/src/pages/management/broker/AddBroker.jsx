@@ -486,7 +486,7 @@ const AddBroker = () => {
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className={`px-6 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center min-w-[120px] ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        className={`px-6 py-2 bg-primary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center min-w-[120px] ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                         {isSubmitting ? (
                             <>

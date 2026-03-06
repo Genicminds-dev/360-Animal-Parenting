@@ -448,7 +448,7 @@ const VehicleList = () => {
     const columns = useMemo(() => [
         {
             key: "uid",
-            label: "Vehicle ID.",
+            label: "Vehicle ID",
             sortable: true,
             onSort: () => requestSort('uid'),
             sortIcon: getSortIcon('uid'),

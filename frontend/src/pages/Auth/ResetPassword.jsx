@@ -168,7 +168,7 @@ const ResetPassword = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full bg-gradient-to-r from-primary-600 to-secondary-600 text-white py-3 px-4 rounded-lg font-medium transition-all ${
+            className={`w-full bg-primary-600 text-white py-2 px-4 rounded-lg font-medium transition-all ${
               isLoading ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"
             }`}
           >

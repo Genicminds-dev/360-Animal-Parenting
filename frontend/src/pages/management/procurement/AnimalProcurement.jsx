@@ -621,7 +621,7 @@ const AnimalProcurement = () => {
                   }`}
                   disabled={isLoadingData}
                 >
-                  <option value="">Select Procurement Officer</option>
+                  <option value="" disabled>Select Procurement Officer</option>
                   {procurementOfficers.map(officer => (
                     <option key={officer.id} value={officer.id}>
                       {officer.firstName} {officer.lastName} - {officer.mobile}
@@ -656,7 +656,7 @@ const AnimalProcurement = () => {
                   }`}
                   disabled={isLoadingData}
                 >
-                  <option value="">Select Broker</option>
+                  <option value="" disabled>Select Broker</option>
                   {brokers.map(broker => (
                     <option key={broker.id} value={broker.id}>
                       {broker.name} - {broker.phone}
