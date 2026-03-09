@@ -1,7 +1,6 @@
-// pages/holding-station/HoldingStationDetails.jsx
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { toast } from "react-hot-toast";
+import { toast, Toaster } from "react-hot-toast";
 import {
     ArrowLeft,
     Building2,
@@ -123,11 +122,11 @@ const HoldingStationDetails = () => {
     // Loading state
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-50 via-white to-gray-50">
-                <div className="text-center p-8 bg-white rounded-xl shadow-md">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-                    <h3 className="text-xl font-bold text-gray-700 mb-2">Loading Station Details...</h3>
-                    <p className="text-gray-500">Please wait while we fetch the holding station information.</p>
+            <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+                <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/30">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 dark:border-primary-400 mx-auto mb-4"></div>
+                    <h3 className="text-xl font-bold text-gray-700 dark:text-gray-200 mb-2">Loading Station Details...</h3>
+                    <p className="text-gray-500 dark:text-gray-400">Please wait while we fetch the holding station information.</p>
                 </div>
             </div>
         );
@@ -135,16 +134,16 @@ const HoldingStationDetails = () => {
 
     if (!station) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-50 via-white to-gray-50">
-                <div className="text-center p-8 bg-white rounded-xl shadow-md">
-                    <div className="p-4 bg-primary-100 rounded-full mb-4 inline-block">
-                        <Building2 className="w-12 h-12 text-primary-600" />
+            <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+                <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/30">
+                    <div className="p-4 bg-primary-100 dark:bg-primary-900/30 rounded-full mb-4 inline-block">
+                        <Building2 className="w-12 h-12 text-primary-600 dark:text-primary-400" />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-700 mb-2">Station Not Found</h3>
-                    <p className="text-gray-500 mb-6">No holding station data found in the system.</p>
+                    <h3 className="text-xl font-bold text-gray-700 dark:text-gray-200 mb-2">Station Not Found</h3>
+                    <p className="text-gray-500 dark:text-gray-400 mb-6">No holding station data found in the system.</p>
                     <button
                         onClick={handleGoBack}
-                        className="px-5 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 mx-auto"
+                        className="px-5 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 dark:from-primary-500 dark:to-primary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 mx-auto"
                     >
                         <ArrowLeft size={16} />
                         Back to Holding Stations
@@ -156,28 +155,28 @@ const HoldingStationDetails = () => {
 
     return (
         <>
-            <div className="space-y-6">
+            <div className="space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
                 {/* Header Section */}
                 <div className="flex items-center gap-4">
                     <button
                         onClick={handleGoBack}
-                        className="p-2 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+                        className="p-2 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-colors"
                         title="Go back to list"
                     >
                         <ArrowLeft size={20} />
                     </button>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Holding Station Details</h1>
-                        <p className="text-gray-600">View complete holding station information</p>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Holding Station Details</h1>
+                        <p className="text-gray-600 dark:text-gray-400">View complete holding station information</p>
                     </div>
                 </div>
 
                 {/* Station Header */}
-                <div className="bg-white rounded-xl shadow-md p-6">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/30 p-6 transition-colors duration-300">
                     <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
                         {/* Station Icon/Image - Fixed size thumbnail */}
                         <div className="flex-shrink-0">
-                            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary-100 to-primary-200 border-4 border-white shadow-lg flex items-center justify-center overflow-hidden">
+                            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900/50 dark:to-primary-800/50 border-4 border-white dark:border-gray-700 shadow-lg flex items-center justify-center overflow-hidden">
                                 {station.photoUrl && !mediaError.photo ? (
                                     <img
                                         src={station.photoUrl}
@@ -187,8 +186,8 @@ const HoldingStationDetails = () => {
                                     />
                                 ) : (
                                     <div className="flex flex-col items-center justify-center">
-                                        <Building2 className="text-primary-600 w-8 h-8 md:w-10 md:h-10" />
-                                        <p className="text-[10px] text-gray-500 mt-0.5">
+                                        <Building2 className="text-primary-600 dark:text-primary-400 w-8 h-8 md:w-10 md:h-10" />
+                                        <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
                                             {station.photoUrl ? 'No Image' : 'No Photo'}
                                         </p>
                                     </div>
@@ -200,10 +199,10 @@ const HoldingStationDetails = () => {
                         <div className="flex-1">
                             <div className="flex items-start justify-between">
                                 <div>
-                                    <h3 className="text-xl font-bold text-gray-900">
+                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                                         {station.name}
                                     </h3>
-                                    <p className="text-gray-600 text-sm mt-1">
+                                    <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
                                         Station ID: {station.uid || station.id}
                                     </p>
                                 </div>
@@ -211,16 +210,16 @@ const HoldingStationDetails = () => {
 
                             <div className="flex flex-wrap gap-4 text-sm mt-4">
                                 <div className="flex items-center gap-2">
-                                    <MapPin className="text-gray-400" size={16} />
-                                    <span className="text-sm text-gray-600">
-                                        Location: <span className="font-medium">{station.city}, {station.state} - {station.pinCode}</span>
+                                    <MapPin className="text-gray-400 dark:text-gray-500" size={16} />
+                                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                                        Location: <span className="font-medium dark:text-gray-300">{station.city}, {station.state} - {station.pinCode}</span>
                                     </span>
                                 </div>
 
                                 <div className="flex items-center gap-2">
-                                    <Calendar className="text-gray-400" size={16} />
-                                    <span className="text-sm text-gray-600">
-                                        Created: <span className="font-medium">{formatDate(station.createdAt)}</span>
+                                    <Calendar className="text-gray-400 dark:text-gray-500" size={16} />
+                                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                                        Created: <span className="font-medium dark:text-gray-300">{formatDate(station.createdAt)}</span>
                                     </span>
                                 </div>
                             </div>
@@ -229,7 +228,7 @@ const HoldingStationDetails = () => {
                 </div>
 
                 {/* Single Tab Content - All Details */}
-                <div className="bg-white rounded-xl shadow-md p-6">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/30 p-6 transition-colors duration-300">
                     {/* Station Details Section */}
                     <div className="space-y-8">
                         {/* Basic Information */}
@@ -262,21 +261,21 @@ const HoldingStationDetails = () => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {/* Photo Section */}
                                     {station.hasPhoto && station.photoUrl && !mediaError.photo && (
-                                        <div className="border border-gray-200 rounded-lg p-4">
+                                        <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                                             <div className="flex items-center gap-3 mb-4">
-                                                <div className="p-2 rounded-lg bg-primary-100 text-primary-600">
+                                                <div className="p-2 rounded-lg bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400">
                                                     <ImageIcon size={20} />
                                                 </div>
                                                 <div>
-                                                    <p className="font-medium text-gray-900">Station Photograph</p>
-                                                    <p className="text-xs text-gray-500">
+                                                    <p className="font-medium text-gray-900 dark:text-white">Station Photograph</p>
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400">
                                                         Uploaded on: {formatDate(station.createdAt)}
                                                     </p>
                                                 </div>
                                             </div>
 
                                             {/* Image Preview */}
-                                            <div className="border border-gray-200 rounded-lg overflow-hidden bg-gray-50 mb-3">
+                                            <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-700 mb-3">
                                                 <div className="flex items-center justify-center p-2" style={{ height: '200px' }}>
                                                     <img
                                                         src={station.photoUrl}
@@ -290,7 +289,7 @@ const HoldingStationDetails = () => {
 
                                             <button
                                                 onClick={() => handleViewMedia('photo', station.photoUrl)}
-                                                className="w-full px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm flex items-center justify-center gap-2"
+                                                className="w-full px-3 py-2 bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors text-sm flex items-center justify-center gap-2"
                                             >
                                                 <Eye size={14} />
                                                 View Full Screen
@@ -300,21 +299,21 @@ const HoldingStationDetails = () => {
 
                                     {/* Video Section */}
                                     {station.hasVideo && station.videoUrl && !mediaError.video && (
-                                        <div className="border border-gray-200 rounded-lg p-4">
+                                        <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                                             <div className="flex items-center gap-3 mb-4">
-                                                <div className="p-2 rounded-lg bg-red-100 text-red-600">
+                                                <div className="p-2 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">
                                                     <Video size={20} />
                                                 </div>
                                                 <div>
-                                                    <p className="font-medium text-gray-900">Station Video Tour</p>
-                                                    <p className="text-xs text-gray-500">
+                                                    <p className="font-medium text-gray-900 dark:text-white">Station Video Tour</p>
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400">
                                                         Uploaded on: {formatDate(station.createdAt)}
                                                     </p>
                                                 </div>
                                             </div>
 
                                             {/* Video Preview */}
-                                            <div className="border border-gray-200 rounded-lg overflow-hidden bg-gray-50 mb-3">
+                                            <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-700 mb-3">
                                                 <div className="flex items-center justify-center p-2" style={{ height: '200px' }}>
                                                     <video
                                                         src={station.videoUrl}
@@ -329,7 +328,7 @@ const HoldingStationDetails = () => {
 
                                             <button
                                                 onClick={() => handleViewMedia('video', station.videoUrl)}
-                                                className="w-full px-3 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm flex items-center justify-center gap-2"
+                                                className="w-full px-3 py-2 bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors text-sm flex items-center justify-center gap-2"
                                             >
                                                 <Eye size={14} />
                                                 Watch Video
@@ -382,7 +381,7 @@ const HoldingStationDetails = () => {
             {/* Media Preview Modal - Full screen view */}
             {mediaPreview && (
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-95"
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-95 dark:bg-opacity-98"
                     style={{ top: 0, left: 0, right: 0, bottom: 0 }}
                     onClick={handleClosePreview}
                 >
@@ -417,19 +416,25 @@ const HoldingStationDetails = () => {
                     </div>
                 </div>
             )}
+            
+            <Toaster 
+                toastOptions={{
+                    className: 'dark:bg-gray-800 dark:text-white dark:border-gray-700',
+                }}
+            />
         </>
     );
 };
 
 // Reusable Components
 const DetailSection = ({ title, icon, children }) => (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-200 bg-gray-50">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm dark:shadow-gray-900/30 border border-gray-200 dark:border-gray-700 overflow-hidden transition-colors duration-300">
+        <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
             <div className="flex items-center gap-3">
-                <div className="p-2 bg-primary-50 rounded-lg">
-                    <span className="text-primary-600">{icon}</span>
+                <div className="p-2 bg-primary-50 dark:bg-primary-900/30 rounded-lg">
+                    <span className="text-primary-600 dark:text-primary-400">{icon}</span>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
             </div>
         </div>
         <div className="p-5">{children}</div>
@@ -438,10 +443,10 @@ const DetailSection = ({ title, icon, children }) => (
 
 const DetailRow = ({ label, value }) => (
     <div>
-        <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-1">
+        <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider block mb-1">
             {label}
         </label>
-        <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-sm text-gray-800 break-words">
+        <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-700 text-sm text-gray-800 dark:text-gray-200 break-words">
             {value || "Not provided"}
         </div>
     </div>

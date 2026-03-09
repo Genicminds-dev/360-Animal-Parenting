@@ -201,42 +201,42 @@ const HandoverDetails = () => {
     switch(status?.toLowerCase()) {
       case 'completed':
         return {
-          bg: 'bg-green-100',
-          text: 'text-green-800',
-          border: 'border-green-200',
-          icon: <CheckCircle size={16} className="text-green-600" />,
+          bg: 'bg-green-100 dark:bg-green-900/30',
+          text: 'text-green-800 dark:text-green-300',
+          border: 'border-green-200 dark:border-green-800',
+          icon: <CheckCircle size={16} className="text-green-600 dark:text-green-400" />,
           label: 'Completed'
         };
       case 'inprogress':
         return {
-          bg: 'bg-blue-100',
-          text: 'text-blue-800',
-          border: 'border-blue-200',
-          icon: <Loader size={16} className="text-blue-600" />,
+          bg: 'bg-blue-100 dark:bg-blue-900/30',
+          text: 'text-blue-800 dark:text-blue-300',
+          border: 'border-blue-200 dark:border-blue-800',
+          icon: <Loader size={16} className="text-blue-600 dark:text-blue-400" />,
           label: 'In Progress'
         };
       case 'pending':
         return {
-          bg: 'bg-yellow-100',
-          text: 'text-yellow-800',
-          border: 'border-yellow-200',
-          icon: <AlertCircle size={16} className="text-yellow-600" />,
+          bg: 'bg-yellow-100 dark:bg-yellow-900/30',
+          text: 'text-yellow-800 dark:text-yellow-300',
+          border: 'border-yellow-200 dark:border-yellow-800',
+          icon: <AlertCircle size={16} className="text-yellow-600 dark:text-yellow-400" />,
           label: 'Pending'
         };
       case 'cancelled':
         return {
-          bg: 'bg-red-100',
-          text: 'text-red-800',
-          border: 'border-red-200',
-          icon: <XCircle size={16} className="text-red-600" />,
+          bg: 'bg-red-100 dark:bg-red-900/30',
+          text: 'text-red-800 dark:text-red-300',
+          border: 'border-red-200 dark:border-red-800',
+          icon: <XCircle size={16} className="text-red-600 dark:text-red-400" />,
           label: 'Cancelled'
         };
       default:
         return {
-          bg: 'bg-gray-100',
-          text: 'text-gray-800',
-          border: 'border-gray-200',
-          icon: <AlertCircle size={16} className="text-gray-600" />,
+          bg: 'bg-gray-100 dark:bg-gray-700',
+          text: 'text-gray-800 dark:text-gray-300',
+          border: 'border-gray-200 dark:border-gray-600',
+          icon: <AlertCircle size={16} className="text-gray-600 dark:text-gray-400" />,
           label: status || 'Unknown'
         };
     }
@@ -281,11 +281,11 @@ const HandoverDetails = () => {
   // Loading state
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-50 via-white to-gray-50">
-        <div className="text-center p-8 bg-white rounded-xl shadow-md">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <h3 className="text-xl font-bold text-gray-700 mb-2">Loading Handover Details...</h3>
-          <p className="text-gray-500">Please wait while we fetch the handover information.</p>
+      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/30">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 dark:border-primary-400 mx-auto mb-4"></div>
+          <h3 className="text-xl font-bold text-gray-700 dark:text-gray-200 mb-2">Loading Handover Details...</h3>
+          <p className="text-gray-500 dark:text-gray-400">Please wait while we fetch the handover information.</p>
         </div>
       </div>
     );
@@ -293,16 +293,16 @@ const HandoverDetails = () => {
 
   if (!handover) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-50 via-white to-gray-50">
-        <div className="text-center p-8 bg-white rounded-xl shadow-md">
-          <div className="p-4 bg-primary-100 rounded-full mb-4 inline-block">
-            <FileText className="w-12 h-12 text-primary-600" />
+      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/30">
+          <div className="p-4 bg-primary-100 dark:bg-primary-900/30 rounded-full mb-4 inline-block">
+            <FileText className="w-12 h-12 text-primary-600 dark:text-primary-400" />
           </div>
-          <h3 className="text-xl font-bold text-gray-700 mb-2">Handover Record Not Found</h3>
-          <p className="text-gray-500 mb-6">No handover record found with the provided ID.</p>
+          <h3 className="text-xl font-bold text-gray-700 dark:text-gray-200 mb-2">Handover Record Not Found</h3>
+          <p className="text-gray-500 dark:text-gray-400 mb-6">No handover record found with the provided ID.</p>
           <button
             onClick={() => navigate(PATHROUTES.handoverList)}
-            className="px-5 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 mx-auto"
+            className="px-5 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 dark:from-primary-500 dark:to-primary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 mx-auto"
           >
             <ArrowLeft size={16} />
             Back to Handover List
@@ -315,19 +315,19 @@ const HandoverDetails = () => {
   const statusBadge = getStatusBadge(handover.status);
 
   return (
-    <div className="space-y-6 bg-gradient-to-r from-gray-50 via-white to-gray-50">
+    <div className="space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
       {/* Header Section */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate(PATHROUTES.handoverList)}
-            className="p-2 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+            className="p-2 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-colors"
           >
             <ArrowLeft size={20} />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Handover Details</h1>
-            <p className="text-gray-600">View complete handover information</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Handover Details</h1>
+            <p className="text-gray-600 dark:text-gray-400">View complete handover information</p>
           </div>
         </div>
         
@@ -339,49 +339,49 @@ const HandoverDetails = () => {
       </div>
 
       {/* Summary Card */}
-      <div className="bg-white rounded-xl shadow-md p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/30 p-6 transition-colors duration-300">
         <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
           {/* Icon */}
           <div className="flex-shrink-0">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary-100 to-primary-200 border-4 border-white shadow-lg flex items-center justify-center">
-              <FileText className="text-primary-600" size={40} />
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900/50 dark:to-primary-800/50 border-4 border-white dark:border-gray-700 shadow-lg flex items-center justify-center">
+              <FileText className="text-primary-600 dark:text-primary-400" size={40} />
             </div>
           </div>
 
           {/* Handover Info */}
           <div className="flex-1">
             <div className="flex flex-wrap items-center gap-3">
-              <h3 className="text-xl font-bold text-gray-900">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                 Handover ID: {handover.uid}
               </h3>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
               <div className="flex items-center gap-2">
-                <User className="text-gray-400" size={16} />
-                <span className="text-sm text-gray-600">
-                  Officer: <span className="font-medium">{handover.handoverOfficerName}</span>
+                <User className="text-gray-400 dark:text-gray-500" size={16} />
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  Officer: <span className="font-medium dark:text-gray-300">{handover.handoverOfficerName}</span>
                 </span>
               </div>
 
               <div className="flex items-center gap-2">
-                <Tag className="text-gray-400" size={16} />
-                <span className="text-sm text-gray-600">
-                  Beneficiary: <span className="font-medium">{handover.beneficiaryId}</span>
+                <Tag className="text-gray-400 dark:text-gray-500" size={16} />
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  Beneficiary: <span className="font-medium dark:text-gray-300">{handover.beneficiaryId}</span>
                 </span>
               </div>
 
               <div className="flex items-center gap-2">
-                <Calendar className="text-gray-400" size={16} />
-                <span className="text-sm text-gray-600">
-                  Date: <span className="font-medium">{formatDate(handover.date)}</span>
+                <Calendar className="text-gray-400 dark:text-gray-500" size={16} />
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  Date: <span className="font-medium dark:text-gray-300">{formatDate(handover.date)}</span>
                 </span>
               </div>
 
               <div className="flex items-center gap-2">
-                <Clock className="text-gray-400" size={16} />
-                <span className="text-sm text-gray-600">
-                  Time: <span className="font-medium">{formatTime(handover.time)}</span>
+                <Clock className="text-gray-400 dark:text-gray-500" size={16} />
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  Time: <span className="font-medium dark:text-gray-300">{formatTime(handover.time)}</span>
                 </span>
               </div>
             </div>
@@ -390,14 +390,14 @@ const HandoverDetails = () => {
       </div>
 
       {/* Tabs Navigation */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-gray-200 dark:border-gray-700">
         <nav className="flex space-x-2 overflow-x-auto">
           <button
             onClick={() => setActiveTab("details")}
             className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
               activeTab === "details"
-                ? "border-primary-600 text-primary-700"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                ? "border-primary-600 dark:border-primary-400 text-primary-700 dark:text-primary-400"
+                : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600"
             }`}
           >
             <div className="flex items-center gap-2">
@@ -409,8 +409,8 @@ const HandoverDetails = () => {
             onClick={() => setActiveTab("beneficiary")}
             className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
               activeTab === "beneficiary"
-                ? "border-primary-600 text-primary-700"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                ? "border-primary-600 dark:border-primary-400 text-primary-700 dark:text-primary-400"
+                : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600"
             }`}
           >
             <div className="flex items-center gap-2">
@@ -422,8 +422,8 @@ const HandoverDetails = () => {
             onClick={() => setActiveTab("animal")}
             className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
               activeTab === "animal"
-                ? "border-primary-600 text-primary-700"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                ? "border-primary-600 dark:border-primary-400 text-primary-700 dark:text-primary-400"
+                : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600"
             }`}
           >
             <div className="flex items-center gap-2">
@@ -435,8 +435,8 @@ const HandoverDetails = () => {
             onClick={() => setActiveTab("media")}
             className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
               activeTab === "media"
-                ? "border-primary-600 text-primary-700"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                ? "border-primary-600 dark:border-primary-400 text-primary-700 dark:text-primary-400"
+                : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600"
             }`}
           >
             <div className="flex items-center gap-2">
@@ -549,19 +549,25 @@ const HandoverDetails = () => {
           )}
         </div>
       )}
+      
+      <Toaster 
+        toastOptions={{
+          className: 'dark:bg-gray-800 dark:text-white dark:border-gray-700',
+        }}
+      />
     </div>
   );
 };
 
 // Reusable Components
 const DetailSection = ({ title, icon, children }) => (
-  <div className="bg-white rounded-xl shadow-md overflow-hidden">
-    <div className="px-5 py-4 border-b border-gray-200">
+  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/30 overflow-hidden transition-colors duration-300">
+    <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-700">
       <div className="flex items-center gap-3">
-        <div className="p-2 bg-primary-50 rounded-lg">
-          <span className="text-primary-600">{icon}</span>
+        <div className="p-2 bg-primary-50 dark:bg-primary-900/30 rounded-lg">
+          <span className="text-primary-600 dark:text-primary-400">{icon}</span>
         </div>
-        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
       </div>
     </div>
     <div className="p-5">{children}</div>
@@ -570,10 +576,10 @@ const DetailSection = ({ title, icon, children }) => (
 
 const DetailRow = ({ label, value }) => (
   <div>
-    <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-1">
+    <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider block mb-1">
       {label}
     </label>
-    <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-sm text-gray-800 break-words">
+    <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-700 text-sm text-gray-800 dark:text-gray-200 break-words">
       {value || "Not provided"}
     </div>
   </div>
@@ -591,23 +597,23 @@ const MediaFileDisplay = ({ file, fileName, mediaError, onView, onDownload, onEr
   };
 
   const getIconBg = () => {
-    if (isPDF) return "bg-red-100 text-red-600";
-    if (isVideo) return "bg-purple-100 text-purple-600";
-    return "bg-primary-100 text-primary-600";
+    if (isPDF) return "bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400";
+    if (isVideo) return "bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400";
+    return "bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400";
   };
 
   return (
-    <div className="border border-gray-200 rounded-lg p-6">
+    <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className={`p-3 rounded-lg ${getIconBg()}`}>
             {getIcon()}
           </div>
           <div>
-            <p className="font-medium text-gray-900 break-all max-w-xs">
+            <p className="font-medium text-gray-900 dark:text-white break-all max-w-xs">
               {fileName}
             </p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {isPDF ? 'PDF Document' : isVideo ? 'Video File' : 'Image File'}
             </p>
           </div>
@@ -616,11 +622,11 @@ const MediaFileDisplay = ({ file, fileName, mediaError, onView, onDownload, onEr
 
       {/* Preview */}
       {isImage && file.url && !mediaError && (
-        <div className="mt-4 mb-4 border border-gray-200 rounded-lg overflow-hidden">
-          <div className="p-2 bg-gray-50 border-b border-gray-200">
-            <p className="text-sm font-medium text-gray-700">Preview</p>
+        <div className="mt-4 mb-4 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+          <div className="p-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Preview</p>
           </div>
-          <div className="p-4 flex items-center justify-center bg-gray-50">
+          <div className="p-4 flex items-center justify-center bg-gray-50 dark:bg-gray-800">
             <img 
               src={file.url} 
               alt="Preview" 
@@ -633,11 +639,11 @@ const MediaFileDisplay = ({ file, fileName, mediaError, onView, onDownload, onEr
 
       {/* Video Preview */}
       {isVideo && file.url && (
-        <div className="mt-4 mb-4 border border-gray-200 rounded-lg overflow-hidden">
-          <div className="p-2 bg-gray-50 border-b border-gray-200">
-            <p className="text-sm font-medium text-gray-700">Preview</p>
+        <div className="mt-4 mb-4 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+          <div className="p-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Preview</p>
           </div>
-          <div className="p-4 flex items-center justify-center bg-gray-50">
+          <div className="p-4 flex items-center justify-center bg-gray-50 dark:bg-gray-800">
             <video 
               src={file.url} 
               controls 
@@ -649,35 +655,35 @@ const MediaFileDisplay = ({ file, fileName, mediaError, onView, onDownload, onEr
 
       {/* Error Message */}
       {mediaError && (
-        <div className="mt-4 text-center p-6 border border-gray-200 rounded-lg bg-gray-50">
+        <div className="mt-4 text-center p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
           {isPDF ? (
-            <File className="mx-auto text-red-400 mb-3" size={48} />
+            <File className="mx-auto text-red-400 dark:text-red-500 mb-3" size={48} />
           ) : isVideo ? (
-            <Video className="mx-auto text-purple-400 mb-3" size={48} />
+            <Video className="mx-auto text-purple-400 dark:text-purple-500 mb-3" size={48} />
           ) : (
-            <Image className="mx-auto text-gray-400 mb-3" size={48} />
+            <Image className="mx-auto text-gray-400 dark:text-gray-500 mb-3" size={48} />
           )}
-          <p className="text-sm text-gray-700 font-medium mb-2">
+          <p className="text-sm text-gray-700 dark:text-gray-300 font-medium mb-2">
             Failed to load preview
           </p>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
             Click view button to open the file
           </p>
         </div>
       )}
 
       {/* Action Buttons */}
-      <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
+      <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
         <button
           onClick={() => onView(file.url)}
-          className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm flex items-center justify-center gap-2"
+          className="flex-1 px-4 py-2 bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors text-sm flex items-center justify-center gap-2"
         >
           <Eye size={14} />
           View
         </button>
         <button
           onClick={() => onDownload(file.url, fileName)}
-          className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm flex items-center justify-center gap-2"
+          className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm flex items-center justify-center gap-2"
         >
           <Download size={14} />
           Download
@@ -691,10 +697,10 @@ const EmptyMediaSection = ({ title, icon }) => (
   <DetailSection title={title} icon={icon}>
     <div className="text-center p-8">
       <div className="flex flex-col items-center justify-center">
-        <div className="p-3 bg-gray-100 rounded-full mb-3">
-          {icon}
+        <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-full mb-3">
+          <span className="text-gray-500 dark:text-gray-400">{icon}</span>
         </div>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-500 dark:text-gray-400">
           No file uploaded
         </p>
       </div>
