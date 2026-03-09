@@ -11,16 +11,16 @@ import { Endpoints } from "./services/api/EndPoint";
 import SessionTimeoutModal from './components/Layout/Session/SessionTimeoutModal';
 
 // Pages
-import SellerRegistration from './pages/procurement/SellerRegistration';
-import AnimalRegistration from './pages/procurement/AnimalRegistration';
-import SellersList from './pages/management/sellers/SellersList';
-import HealthCheckupList from './pages/procurement/HealthCheckupList';
-import SellerDetails from './pages/management/sellers/SellerDetails';
-import EditSeller from './pages/management/sellers/EditSeller';
-import HealthCheckupForm from './pages/procurement/HealthCheckupForm';
-import ProcurementView from './pages/AnimalProcuredList/ProcurementView';
-import ProcurementList from './pages/AnimalProcuredList/ProcurementList';
-import PAnimalRegistration from './pages/AnimalProcurementOld/PAnimalRegistration';
+// import SellerRegistration from './pages/procurement/SellerRegistration';
+// import AnimalRegistration from './pages/procurement/AnimalRegistration';
+// import SellersList from './pages/management/sellers/SellersList';
+// import HealthCheckupList from './pages/procurement/HealthCheckupList';
+// import SellerDetails from './pages/management/sellers/SellerDetails';
+// import EditSeller from './pages/management/sellers/EditSeller';
+// import HealthCheckupForm from './pages/procurement/HealthCheckupForm';
+// import ProcurementView from './pages/AnimalProcuredList/ProcurementView';
+// import ProcurementList from './pages/AnimalProcuredList/ProcurementList';
+// import PAnimalRegistration from './pages/AnimalProcurementOld/PAnimalRegistration';
 
 
 import Login from './pages/Auth/Login';

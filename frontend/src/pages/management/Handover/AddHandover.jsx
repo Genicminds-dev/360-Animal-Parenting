@@ -266,28 +266,28 @@ const AddHandover = () => {
         description 
     }) => (
         <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 {label} {required && <span className="text-red-500">*</span>}
             </label>
             
             {formData[name] ? (
-                <div className="border-2 border-gray-300 rounded-lg p-4">
+                <div className="border-2 border-gray-300 dark:border-gray-600 rounded-lg p-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
                             <div className={`p-2 rounded-lg ${
-                                isPDF(formData[name]) ? 'bg-red-100 text-red-600' :
-                                isVideo(formData[name]) ? 'bg-purple-100 text-purple-600' :
-                                'bg-primary-100 text-primary-600'
+                                isPDF(formData[name]) ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' :
+                                isVideo(formData[name]) ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400' :
+                                'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
                             }`}>
                                 {isPDF(formData[name]) ? <File size={20} /> :
                                  isVideo(formData[name]) ? <Video size={20} /> :
                                  <Image size={20} />}
                             </div>
                             <div>
-                                <p className="text-sm font-medium text-gray-900">
+                                <p className="text-sm font-medium text-gray-900 dark:text-white">
                                     {getDisplayFileName(formData[name], label)}
                                 </p>
-                                <p className="text-xs text-gray-500">
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
                                     {Math.round(formData[name].size / 1024)} KB
                                 </p>
                             </div>
@@ -297,7 +297,11 @@ const AddHandover = () => {
                                 <button
                                     type="button"
                                     onClick={() => openDocument(formData[name], previews[name])}
-                                    className="p-1.5 bg-gray-100 text-gray-600 rounded hover:bg-gray-200 transition-colors"
+                                    className={`p-1.5 rounded-lg hover:opacity-90 transition-colors ${
+                                        isPDF(formData[name]) ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-800/50' :
+                                        isVideo(formData[name]) ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 hover:bg-purple-200 dark:hover:bg-purple-800/50' :
+                                        'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 hover:bg-primary-200 dark:hover:bg-primary-800/50'
+                                    }`}
                                     title="Preview"
                                     disabled={isSubmitting}
                                 >
@@ -307,7 +311,7 @@ const AddHandover = () => {
                             <button
                                 type="button"
                                 onClick={() => removeFile(name)}
-                                className="p-1.5 bg-gray-100 text-gray-600 rounded hover:bg-gray-200 transition-colors"
+                                className="p-1.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                                 title="Remove"
                                 disabled={isSubmitting}
                             >
@@ -337,14 +341,14 @@ const AddHandover = () => {
                     )}
                 </div>
             ) : (
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary-500 transition-colors">
+                <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center hover:border-primary-500 dark:hover:border-primary-400 transition-colors">
                     <div className="flex flex-col items-center">
-                        <Icon className="text-gray-400 mb-2" size={24} />
-                        <p className="text-sm text-gray-600 mb-1">{description}</p>
-                        <p className="text-xs text-gray-500 mb-2">Click to browse</p>
+                        <Icon className="text-gray-400 dark:text-gray-500 mb-2" size={24} />
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{description}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-500 mb-2">Click to browse</p>
                         <label 
                             htmlFor={name}
-                            className="px-3 py-1.5 bg-primary-600 text-white text-sm rounded cursor-pointer hover:bg-primary-700 transition-colors"
+                            className="px-3 py-1.5 bg-primary-600 dark:bg-primary-500 text-white text-sm rounded cursor-pointer hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors"
                         >
                             Choose File
                         </label>
@@ -361,70 +365,72 @@ const AddHandover = () => {
                 </div>
             )}
             {errors[name] && (
-                <p className="text-red-500 text-xs mt-1">{errors[name]}</p>
+                <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors[name]}</p>
             )}
         </div>
     );
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">Create Handover Record</h1>
-                <p className="text-gray-600">Complete the handover process for beneficiary</p>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Create Handover Record</h1>
+                <p className="text-gray-600 dark:text-gray-400">Complete the handover process for beneficiary</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-8">
                 {/* Handover Officer Dropdown */}
-                <div className="card">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/30 border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-300">
                     <div className="flex items-center space-x-3 mb-6">
-                        <div className="p-2 bg-primary-50 rounded-lg">
-                            <User className="text-primary-600" size={20} />
+                        <div className="p-2 bg-primary-50 dark:bg-primary-900/30 rounded-lg">
+                            <User className="text-primary-600 dark:text-primary-400" size={20} />
                         </div>
-                        <h2 className="text-lg font-semibold text-gray-900">Handover Details</h2>
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Handover Details</h2>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Handover Officer Dropdown */}
                         <div className="relative">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Handover Officer <span className="text-red-500">*</span>
                             </label>
                             <div className="relative">
                                 <button
                                     type="button"
                                     onClick={() => setShowOfficerDropdown(!showOfficerDropdown)}
-                                    className={`w-full input-field text-left flex items-center justify-between ${
-                                        errors.handoverOfficerId ? 'border-red-500' : ''
+                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 text-left flex items-center justify-between ${
+                                        errors.handoverOfficerId 
+                                            ? 'border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600' 
+                                            : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
                                     }`}
                                     disabled={isSubmitting}
                                 >
-                                    <span className={selectedOfficer ? 'text-gray-900' : 'text-gray-500'}>
+                                    <span className={selectedOfficer ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}>
                                         {selectedOfficer 
                                             ? `${selectedOfficer.name} - ${selectedOfficer.mobile}`
                                             : 'Select Handover Officer'
                                         }
                                     </span>
-                                    <ChevronDown size={18} className="text-gray-400" />
+                                    <ChevronDown size={18} className="text-gray-400 dark:text-gray-500" />
                                 </button>
                                 
                                 {showOfficerDropdown && (
-                                    <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg">
-                                        <div className="p-2 border-b">
+                                    <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg dark:shadow-gray-900/30">
+                                        <div className="p-2 border-b border-gray-200 dark:border-gray-700">
                                             <div className="relative">
-                                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
                                                 <input
                                                     type="text"
                                                     placeholder="Search by name or mobile..."
                                                     value={officerSearchTerm}
                                                     onChange={(e) => setOfficerSearchTerm(e.target.value)}
-                                                    className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                                    className="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
                                                     autoFocus
                                                 />
                                             </div>
                                         </div>
                                         <div className="max-h-60 overflow-y-auto">
                                             {loading.officers ? (
-                                                <div className="p-4 text-center text-gray-500">
+                                                <div className="p-4 text-center text-gray-500 dark:text-gray-400">
                                                     Loading...
                                                 </div>
                                             ) : filteredOfficers.length > 0 ? (
@@ -433,21 +439,21 @@ const AddHandover = () => {
                                                         key={officer.id}
                                                         type="button"
                                                         onClick={() => handleOfficerSelect(officer)}
-                                                        className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 flex items-center space-x-2"
+                                                        className="w-full px-4 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-700 focus:bg-gray-50 dark:focus:bg-gray-700 flex items-center space-x-2"
                                                     >
-                                                        <User size={16} className="text-gray-400" />
+                                                        <User size={16} className="text-gray-400 dark:text-gray-500" />
                                                         <div>
-                                                            <p className="text-sm font-medium text-gray-900">
+                                                            <p className="text-sm font-medium text-gray-900 dark:text-white">
                                                                 {officer.name}
                                                             </p>
-                                                            <p className="text-xs text-gray-500">
+                                                            <p className="text-xs text-gray-500 dark:text-gray-400">
                                                                 {officer.mobile}
                                                             </p>
                                                         </div>
                                                     </button>
                                                 ))
                                             ) : (
-                                                <div className="p-4 text-center text-gray-500">
+                                                <div className="p-4 text-center text-gray-500 dark:text-gray-400">
                                                     No officers found
                                                 </div>
                                             )}
@@ -456,13 +462,13 @@ const AddHandover = () => {
                                 )}
                             </div>
                             {errors.handoverOfficerId && (
-                                <p className="text-red-500 text-xs mt-1">{errors.handoverOfficerId}</p>
+                                <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors.handoverOfficerId}</p>
                             )}
                         </div>
 
                         {/* Beneficiary ID */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Beneficiary ID <span className="text-red-500">*</span>
                             </label>
                             <input
@@ -470,18 +476,22 @@ const AddHandover = () => {
                                 name="beneficiaryId"
                                 value={formData.beneficiaryId}
                                 onChange={handleChange}
-                                className={`input-field ${errors.beneficiaryId ? 'border-red-500' : ''}`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${
+                                    errors.beneficiaryId 
+                                        ? 'border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600' 
+                                        : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                                }`}
                                 placeholder="Enter beneficiary ID"
                                 disabled={isSubmitting}
                             />
                             {errors.beneficiaryId && (
-                                <p className="text-red-500 text-xs mt-1">{errors.beneficiaryId}</p>
+                                <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors.beneficiaryId}</p>
                             )}
                         </div>
 
                         {/* DO Number */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 DO Number <span className="text-red-500">*</span>
                             </label>
                             <input
@@ -489,56 +499,62 @@ const AddHandover = () => {
                                 name="doNumber"
                                 value={formData.doNumber}
                                 onChange={handleChange}
-                                className={`input-field ${errors.doNumber ? 'border-red-500' : ''}`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${
+                                    errors.doNumber 
+                                        ? 'border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600' 
+                                        : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                                }`}
                                 placeholder="Enter DO number"
                                 disabled={isSubmitting}
                             />
                             {errors.doNumber && (
-                                <p className="text-red-500 text-xs mt-1">{errors.doNumber}</p>
+                                <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors.doNumber}</p>
                             )}
                         </div>
 
                         {/* Animal Ear Tag Dropdown */}
                         <div className="relative">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Animal Ear Tag ID <span className="text-red-500">*</span>
                             </label>
                             <div className="relative">
                                 <button
                                     type="button"
                                     onClick={() => setShowEarTagDropdown(!showEarTagDropdown)}
-                                    className={`w-full input-field text-left flex items-center justify-between ${
-                                        errors.animalEarTagId ? 'border-red-500' : ''
+                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 text-left flex items-center justify-between ${
+                                        errors.animalEarTagId 
+                                            ? 'border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600' 
+                                            : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
                                     }`}
                                     disabled={isSubmitting}
                                 >
-                                    <span className={selectedEarTag ? 'text-gray-900' : 'text-gray-500'}>
+                                    <span className={selectedEarTag ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}>
                                         {selectedEarTag 
                                             ? `${selectedEarTag.tagId} ${selectedEarTag.animalType ? `- ${selectedEarTag.animalType}` : ''}`
                                             : 'Select Animal Ear Tag'
                                         }
                                     </span>
-                                    <ChevronDown size={18} className="text-gray-400" />
+                                    <ChevronDown size={18} className="text-gray-400 dark:text-gray-500" />
                                 </button>
                                 
                                 {showEarTagDropdown && (
-                                    <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg">
-                                        <div className="p-2 border-b">
+                                    <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg dark:shadow-gray-900/30">
+                                        <div className="p-2 border-b border-gray-200 dark:border-gray-700">
                                             <div className="relative">
-                                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
                                                 <input
                                                     type="text"
                                                     placeholder="Search by tag ID (e.g., TAG-0001)..."
                                                     value={earTagSearchTerm}
                                                     onChange={(e) => setEarTagSearchTerm(e.target.value)}
-                                                    className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                                    className="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
                                                     autoFocus
                                                 />
                                             </div>
                                         </div>
                                         <div className="max-h-60 overflow-y-auto">
                                             {loading.earTags ? (
-                                                <div className="p-4 text-center text-gray-500">
+                                                <div className="p-4 text-center text-gray-500 dark:text-gray-400">
                                                     Loading...
                                                 </div>
                                             ) : filteredEarTags.length > 0 ? (
@@ -547,15 +563,15 @@ const AddHandover = () => {
                                                         key={tag.id}
                                                         type="button"
                                                         onClick={() => handleEarTagSelect(tag)}
-                                                        className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 flex items-center space-x-2"
+                                                        className="w-full px-4 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-700 focus:bg-gray-50 dark:focus:bg-gray-700 flex items-center space-x-2"
                                                     >
-                                                        <Tag size={16} className="text-gray-400" />
+                                                        <Tag size={16} className="text-gray-400 dark:text-gray-500" />
                                                         <div>
-                                                            <p className="text-sm font-medium text-gray-900">
+                                                            <p className="text-sm font-medium text-gray-900 dark:text-white">
                                                                 {tag.tagId}
                                                             </p>
                                                             {tag.animalType && (
-                                                                <p className="text-xs text-gray-500">
+                                                                <p className="text-xs text-gray-500 dark:text-gray-400">
                                                                     {tag.animalType}
                                                                 </p>
                                                             )}
@@ -563,7 +579,7 @@ const AddHandover = () => {
                                                     </button>
                                                 ))
                                             ) : (
-                                                <div className="p-4 text-center text-gray-500">
+                                                <div className="p-4 text-center text-gray-500 dark:text-gray-400">
                                                     No ear tags found matching "{earTagSearchTerm}"
                                                 </div>
                                             )}
@@ -572,61 +588,69 @@ const AddHandover = () => {
                                 )}
                             </div>
                             {errors.animalEarTagId && (
-                                <p className="text-red-500 text-xs mt-1">{errors.animalEarTagId}</p>
+                                <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors.animalEarTagId}</p>
                             )}
                         </div>
 
                         {/* Date */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Date <span className="text-red-500">*</span>
                             </label>
                             <div className="relative">
-                                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
                                 <input
                                     type="date"
                                     name="date"
                                     value={formData.date}
                                     onChange={handleChange}
-                                    className={`input-field pl-10 ${errors.date ? 'border-red-500' : ''}`}
+                                    className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${
+                                        errors.date 
+                                            ? 'border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600' 
+                                            : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                                    }`}
                                     disabled={isSubmitting}
                                 />
                             </div>
                             {errors.date && (
-                                <p className="text-red-500 text-xs mt-1">{errors.date}</p>
+                                <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors.date}</p>
                             )}
                         </div>
 
                         {/* Time */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Time <span className="text-red-500">*</span>
                             </label>
                             <div className="relative">
-                                <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                                <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
                                 <input
                                     type="time"
                                     name="time"
                                     value={formData.time}
                                     onChange={handleChange}
-                                    className={`input-field pl-10 ${errors.time ? 'border-red-500' : ''}`}
+                                    className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${
+                                        errors.time 
+                                            ? 'border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600' 
+                                            : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                                    }`}
                                     disabled={isSubmitting}
                                 />
                             </div>
                             {errors.time && (
-                                <p className="text-red-500 text-xs mt-1">{errors.time}</p>
+                                <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors.time}</p>
                             )}
                         </div>
                     </div>
                 </div>
 
                 {/* Media Upload Section */}
-                <div className="card">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/30 border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-300">
                     <div className="flex items-center space-x-3 mb-6">
-                        <div className="p-2 bg-green-50 rounded-lg">
-                            <Camera className="text-green-600" size={20} />
+                        <div className="p-2 bg-green-50 dark:bg-green-900/30 rounded-lg">
+                            <Camera className="text-green-600 dark:text-green-400" size={20} />
                         </div>
-                        <h2 className="text-lg font-semibold text-gray-900">Media Files</h2>
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Media Files</h2>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -649,12 +673,12 @@ const AddHandover = () => {
                 </div>
 
                 {/* Final Handover Document */}
-                <div className="card">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/30 border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-300">
                     <div className="flex items-center space-x-3 mb-6">
-                        <div className="p-2 bg-purple-50 rounded-lg">
-                            <FileText className="text-purple-600" size={20} />
+                        <div className="p-2 bg-purple-50 dark:bg-purple-900/30 rounded-lg">
+                            <FileText className="text-purple-600 dark:text-purple-400" size={20} />
                         </div>
-                        <h2 className="text-lg font-semibold text-gray-900">Final Handover Document</h2>
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Final Handover Document</h2>
                     </div>
 
                     <FileUploadField
@@ -670,11 +694,11 @@ const AddHandover = () => {
                 <input type="hidden" name="status" value="inprogress" />
 
                 {/* Form Actions */}
-                <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+                <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
                     <button
                         type="button"
                         onClick={() => window.history.back()}
-                        className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                        className="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
                         disabled={isSubmitting}
                     >
                         Cancel
@@ -682,7 +706,7 @@ const AddHandover = () => {
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="px-6 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center min-w-[160px] disabled:opacity-50"
+                        className="px-6 py-2 bg-primary-600 dark:from-primary-500 dark:to-secondary-500 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center min-w-[160px] disabled:opacity-50"
                     >
                         {isSubmitting ? (
                             <>
@@ -698,6 +722,12 @@ const AddHandover = () => {
                     </button>
                 </div>
             </form>
+
+            <Toaster
+                toastOptions={{
+                    className: 'dark:bg-gray-800 dark:text-white dark:border-gray-700',
+                }}
+            />
         </div>
     );
 };

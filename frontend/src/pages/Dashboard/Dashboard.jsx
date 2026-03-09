@@ -69,11 +69,15 @@ const Dashboard = () => {
             {/* Welcome Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-                    <p className="text-gray-600">Welcome to 360 Animal Parenting System</p>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-300">
+                        Dashboard
+                    </h1>
+                    <p className="text-gray-600 dark:text-gray-400 transition-colors duration-300">
+                        Welcome to 360 Animal Parenting System
+                    </p>
                 </div>
                 <div className="flex items-center space-x-4">
-                    <button className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors duration-300">
+                    <button className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 transition-colors duration-300">
                         <span className="flex items-center space-x-2">
                             <span>Refresh</span>
                             <ArrowRight size={16} />
@@ -88,13 +92,17 @@ const Dashboard = () => {
                     <Link
                         key={index}
                         to={stat.link}
-                        className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300"
+                        className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 hover:shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-700"
                     >
                         <div className="flex items-start justify-between">
                             {stat.icon}
                             <div className="text-right">
-                                <h3 className="text-2xl font-bold text-gray-900">{stat.value}</h3>
-                                <p className="text-gray-600">{stat.title}</p>
+                                <h3 className="text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-300">
+                                    {stat.value}
+                                </h3>
+                                <p className="text-gray-600 dark:text-gray-400 transition-colors duration-300">
+                                    {stat.title}
+                                </p>
                             </div>
                         </div>
                     </Link>

@@ -244,7 +244,7 @@ const Sidebar = ({ toggleSidebar, onLogout, isMobile, onLogoutClick }) => {
                               to={sub.path}
                               onClick={handleNavClick}
                               className={({ isActive }) =>
-                                `block mt-1 ml-6 sm:ml-5 pl-3 sm:pl-4 py-2 text-sm rounded-lg truncate transition-colors ${
+                                `block mt-1 ml-6 sm:ml-5 pl-3 sm:pl-4 py-2 text-sm rounded-lg truncate transition-colors font-medium ${
                                   isActive
                                     ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 border-l-4 border-primary-500 dark:border-primary-400'
                                     : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white'

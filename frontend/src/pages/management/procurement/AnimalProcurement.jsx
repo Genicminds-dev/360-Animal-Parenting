@@ -465,17 +465,17 @@ const AnimalProcurement = () => {
   };
 
   const getStepColor = (step, isActive, isCompleted) => {
-    if (isCompleted) return 'bg-gradient-to-r from-green-400 to-green-500';
-    if (isActive) return 'bg-gradient-to-r from-primary-400 to-primary-500';
-    if (hoveredStep === step) return 'bg-gradient-to-r from-gray-400 to-gray-500';
-    return 'bg-gradient-to-r from-gray-200 to-gray-300';
+    if (isCompleted) return 'bg-gradient-to-r from-green-400 to-green-500 dark:from-green-500 dark:to-green-600';
+    if (isActive) return 'bg-gradient-to-r from-primary-400 to-primary-500 dark:from-primary-500 dark:to-primary-600';
+    if (hoveredStep === step) return 'bg-gradient-to-r from-gray-400 to-gray-500 dark:from-gray-500 dark:to-gray-600';
+    return 'bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700';
   };
 
   const renderStepIndicator = () => (
     <div className="relative mb-12">
-      <div className="absolute top-5 left-0 w-full h-1 bg-gray-200 rounded-full">
+      <div className="absolute top-5 left-0 w-full h-1 bg-gray-200 dark:bg-gray-700 rounded-full">
         <div 
-          className="h-full bg-gradient-to-r from-green-400 to-green-500 rounded-full transition-all duration-500"
+          className="h-full bg-gradient-to-r from-green-400 to-green-500 dark:from-green-500 dark:to-green-600 rounded-full transition-all duration-500"
           style={{ width: `${((currentStep - 1) / 2) * 100}%` }}
         />
       </div>
@@ -498,7 +498,7 @@ const AnimalProcurement = () => {
                   w-12 h-12 rounded-full flex items-center justify-center
                   shadow-md transition-all duration-300 transform
                   ${getStepColor(step, isActive, isCompleted)}
-                  ${isActive ? 'scale-110 ring-4 ring-primary-100' : ''}
+                  ${isActive ? 'scale-110 ring-4 ring-primary-100 dark:ring-primary-900/30' : ''}
                   ${hoveredStep === step ? 'scale-105' : ''}
                 `}
               >
@@ -510,11 +510,11 @@ const AnimalProcurement = () => {
               </div>
               <span className={`
                 mt-3 text-sm font-medium transition-colors duration-300
-                ${isActive ? 'text-primary-600' : isCompleted ? 'text-green-600' : 'text-gray-500'}
+                ${isActive ? 'text-primary-600 dark:text-primary-400' : isCompleted ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}
               `}>
                 Step {step}
               </span>
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-gray-400 dark:text-gray-500">
                 {step === 1 && "Procurement Details"}
                 {step === 2 && "Animal Details"}
                 {step === 3 && "Transport Details"}
@@ -531,13 +531,13 @@ const AnimalProcurement = () => {
     
     return (
       <div className="space-y-1">
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
         </label>
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
-            {Icon && <Icon size={18} className={hasError ? 'text-red-400' : 'text-gray-400'} />}
+            {Icon && <Icon size={18} className={hasError ? 'text-red-400' : 'text-gray-400 dark:text-gray-500'} />}
           </div>
           
           {options ? (
@@ -546,10 +546,10 @@ const AnimalProcurement = () => {
               value={formData[field] || ''}
               onChange={handleChange}
               onBlur={handleBlur}
-              className={`w-full px-4 py-3 pl-10 border rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none ${
+              className={`w-full px-4 py-3 pl-10 border rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-800 dark:text-white dark:border-gray-600 ${
                 hasError 
-                  ? "border-red-500 bg-red-50/50 focus:ring-red-500/20 focus:border-red-500" 
-                  : "border-gray-200 hover:border-gray-300"
+                  ? "border-red-500 bg-red-50/50 focus:ring-red-500/20 focus:border-red-500 dark:bg-red-900/20 dark:border-red-600" 
+                  : "border-gray-200 hover:border-gray-300 dark:border-gray-600 dark:hover:border-gray-500"
               }`}
               disabled={isLoadingData}
             >
@@ -568,16 +568,16 @@ const AnimalProcurement = () => {
               onChange={handleChange}
               onBlur={handleBlur}
               placeholder={placeholder}
-              className={`w-full px-4 py-3 pl-10 border rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none ${
+              className={`w-full px-4 py-3 pl-10 border rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${
                 hasError 
-                  ? "border-red-500 bg-red-50/50 focus:ring-red-500/20 focus:border-red-500" 
-                  : "border-gray-200 hover:border-gray-300"
+                  ? "border-red-500 bg-red-50/50 focus:ring-red-500/20 focus:border-red-500 dark:bg-red-900/20 dark:border-red-600" 
+                  : "border-gray-200 hover:border-gray-300 dark:border-gray-600 dark:hover:border-gray-500"
               }`}
             />
           )}
         </div>
         {hasError && (
-          <p className="text-red-500 text-xs mt-1 flex items-center gap-1 animate-fadeIn">
+          <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-fadeIn">
             <AlertCircle size={12} />
             {errors[field]}
           </p>
@@ -588,15 +588,15 @@ const AnimalProcurement = () => {
 
   const renderStep1 = () => (
     <div className="space-y-8 animate-fadeIn">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="bg-gray-50 px-6 py-4 border-b border-gray-100">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-colors duration-300">
+        <div className="bg-gray-50 dark:bg-gray-700/50 px-6 py-4 border-b border-gray-100 dark:border-gray-700">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary-50 rounded-lg">
-              <ClipboardList className="text-primary-600" size={20} />
+            <div className="p-2 bg-primary-50 dark:bg-primary-900/30 rounded-lg">
+              <ClipboardList className="text-primary-600 dark:text-primary-400" size={20} />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">Procurement Details</h2>
-              <p className="text-sm text-gray-500">All fields in this section are required</p>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Procurement Details</h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400">All fields in this section are required</p>
             </div>
           </div>
         </div>
@@ -605,7 +605,7 @@ const AnimalProcurement = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Procurement Officer Dropdown */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Procurement Officer <span className="text-red-500">*</span>
               </label>
               <div className="relative">
@@ -614,10 +614,10 @@ const AnimalProcurement = () => {
                   value={formData.procurementOfficer || ''}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`w-full px-4 py-3 pl-10 border rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none ${
+                  className={`w-full px-4 py-3 pl-10 border rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-800 dark:text-white dark:border-gray-600 ${
                     errors.procurementOfficer && touchedFields.procurementOfficer 
-                      ? "border-red-500 bg-red-50/50 focus:ring-red-500/20 focus:border-red-500" 
-                      : "border-gray-200 hover:border-gray-300"
+                      ? "border-red-500 bg-red-50/50 focus:ring-red-500/20 focus:border-red-500 dark:bg-red-900/20 dark:border-red-600" 
+                      : "border-gray-200 hover:border-gray-300 dark:border-gray-600 dark:hover:border-gray-500"
                   }`}
                   disabled={isLoadingData}
                 >
@@ -628,10 +628,10 @@ const AnimalProcurement = () => {
                     </option>
                   ))}
                 </select>
-                <User className="absolute left-3 top-3.5 text-gray-400" size={18} />
+                <User className="absolute left-3 top-3.5 text-gray-400 dark:text-gray-500" size={18} />
               </div>
               {errors.procurementOfficer && touchedFields.procurementOfficer && (
-                <p className="text-red-500 text-xs mt-1 flex items-center gap-1 animate-fadeIn">
+                <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-fadeIn">
                   <AlertCircle size={12} />
                   {errors.procurementOfficer}
                 </p>
@@ -640,7 +640,7 @@ const AnimalProcurement = () => {
 
             {/* Broker Dropdown */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Broker <span className="text-red-500">*</span>
               </label>
               <div className="relative">
@@ -649,10 +649,10 @@ const AnimalProcurement = () => {
                   value={formData.broker || ''}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`w-full px-4 py-3 pl-10 border rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none ${
+                  className={`w-full px-4 py-3 pl-10 border rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-800 dark:text-white dark:border-gray-600 ${
                     errors.broker && touchedFields.broker 
-                      ? "border-red-500 bg-red-50/50 focus:ring-red-500/20 focus:border-red-500" 
-                      : "border-gray-200 hover:border-gray-300"
+                      ? "border-red-500 bg-red-50/50 focus:ring-red-500/20 focus:border-red-500 dark:bg-red-900/20 dark:border-red-600" 
+                      : "border-gray-200 hover:border-gray-300 dark:border-gray-600 dark:hover:border-gray-500"
                   }`}
                   disabled={isLoadingData}
                 >
@@ -663,10 +663,10 @@ const AnimalProcurement = () => {
                     </option>
                   ))}
                 </select>
-                <User className="absolute left-3 top-3.5 text-gray-400" size={18} />
+                <User className="absolute left-3 top-3.5 text-gray-400 dark:text-gray-500" size={18} />
               </div>
               {errors.broker && touchedFields.broker && (
-                <p className="text-red-500 text-xs mt-1 flex items-center gap-1 animate-fadeIn">
+                <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-fadeIn">
                   <AlertCircle size={12} />
                   {errors.broker}
                 </p>
@@ -675,12 +675,12 @@ const AnimalProcurement = () => {
 
             {/* Source Type Radio Buttons */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Source Type <span className="text-red-500">*</span>
               </label>
               <div className="flex gap-4 mt-2">
                 {sourceTypeOptions.map(option => (
-                  <label key={option.value} className="flex items-center gap-2 cursor-pointer p-2 hover:bg-gray-50 rounded-lg transition-colors">
+                  <label key={option.value} className="flex items-center gap-2 cursor-pointer p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
                     <input
                       type="radio"
                       name="sourceType"
@@ -688,14 +688,14 @@ const AnimalProcurement = () => {
                       checked={formData.sourceType === option.value}
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      className="w-4 h-4 text-primary-600"
+                      className="w-4 h-4 text-primary-600 dark:text-primary-400"
                     />
-                    <span className="text-sm">{option.label}</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">{option.label}</span>
                   </label>
                 ))}
               </div>
               {errors.sourceType && touchedFields.sourceType && (
-                <p className="text-red-500 text-xs mt-1 flex items-center gap-1 animate-fadeIn">
+                <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-fadeIn">
                   <AlertCircle size={12} />
                   {errors.sourceType}
                 </p>
@@ -729,21 +729,21 @@ const AnimalProcurement = () => {
 
   const renderStep2 = () => (
     <div className="space-y-6 animate-fadeIn">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="bg-gray-50 px-6 py-4 border-b border-gray-100">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-colors duration-300">
+        <div className="bg-gray-50 dark:bg-gray-700/50 px-6 py-4 border-b border-gray-100 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-50 rounded-lg">
-                <Users className="text-green-600" size={20} />
+              <div className="p-2 bg-green-50 dark:bg-green-900/30 rounded-lg">
+                <Users className="text-green-600 dark:text-green-400" size={20} />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">Animal Details</h2>
-                <p className="text-sm text-gray-500">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Animal Details</h2>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   Total Animals: {formData.animals.length}
                 </p>
               </div>
             </div>
-            <div className="px-3 py-1 bg-primary-50 text-primary-600 rounded-full text-xs font-medium">
+            <div className="px-3 py-1 bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded-full text-xs font-medium">
               All fields required
             </div>
           </div>
@@ -752,18 +752,18 @@ const AnimalProcurement = () => {
         <div className="p-6">
           <div className="space-y-6">
             {formData.animals.map((animal, index) => (
-              <div key={index} className="border border-gray-200 rounded-xl p-6 hover:border-primary-300 transition-all duration-300">
+              <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:border-primary-300 dark:hover:border-primary-600 transition-all duration-300">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                    <span className="text-primary-600 font-semibold">{index + 1}</span>
+                  <div className="w-8 h-8 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center">
+                    <span className="text-primary-600 dark:text-primary-400 font-semibold">{index + 1}</span>
                   </div>
-                  <h3 className="font-medium text-gray-700">Animal #{index + 1}</h3>
+                  <h3 className="font-medium text-gray-700 dark:text-gray-300">Animal #{index + 1}</h3>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   {/* Ear Tag ID */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Ear Tag ID <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
@@ -772,17 +772,17 @@ const AnimalProcurement = () => {
                         value={animal.earTagId}
                         onChange={(e) => handleAnimalChange(index, 'earTagId', e.target.value)}
                         onBlur={(e) => handleAnimalBlur(index, 'earTagId', e.target.value)}
-                        className={`w-full px-4 py-3 pl-10 border rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none ${
+                        className={`w-full px-4 py-3 pl-10 border rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${
                           errors[`animal_${index}_earTagId`] 
-                            ? "border-red-500 bg-red-50/50 focus:ring-red-500/20 focus:border-red-500" 
-                            : "border-gray-200 hover:border-gray-300"
+                            ? "border-red-500 bg-red-50/50 focus:ring-red-500/20 focus:border-red-500 dark:bg-red-900/20 dark:border-red-600" 
+                            : "border-gray-200 hover:border-gray-300 dark:border-gray-600 dark:hover:border-gray-500"
                         }`}
                         placeholder="Enter ear tag ID"
                       />
-                      <Tag className="absolute left-3 top-3.5 text-gray-400" size={18} />
+                      <Tag className="absolute left-3 top-3.5 text-gray-400 dark:text-gray-500" size={18} />
                     </div>
                     {errors[`animal_${index}_earTagId`] && (
-                      <p className="text-red-500 text-xs mt-1 flex items-center gap-1 animate-fadeIn">
+                      <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-fadeIn">
                         <AlertCircle size={12} />
                         {errors[`animal_${index}_earTagId`]}
                       </p>
@@ -791,17 +791,17 @@ const AnimalProcurement = () => {
 
                   {/* Breed Dropdown */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Breed <span className="text-red-500">*</span>
                     </label>
                     <select
                       value={animal.breed}
                       onChange={(e) => handleAnimalChange(index, 'breed', e.target.value)}
                       onBlur={(e) => handleAnimalBlur(index, 'breed', e.target.value)}
-                      className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none ${
+                      className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-800 dark:text-white dark:border-gray-600 ${
                         errors[`animal_${index}_breed`] 
-                          ? "border-red-500 bg-red-50/50 focus:ring-red-500/20 focus:border-red-500" 
-                          : "border-gray-200 hover:border-gray-300"
+                          ? "border-red-500 bg-red-50/50 focus:ring-red-500/20 focus:border-red-500 dark:bg-red-900/20 dark:border-red-600" 
+                          : "border-gray-200 hover:border-gray-300 dark:border-gray-600 dark:hover:border-gray-500"
                       }`}
                     >
                       {breedOptions.map(opt => (
@@ -811,7 +811,7 @@ const AnimalProcurement = () => {
                       ))}
                     </select>
                     {errors[`animal_${index}_breed`] && (
-                      <p className="text-red-500 text-xs mt-1 flex items-center gap-1 animate-fadeIn">
+                      <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-fadeIn">
                         <AlertCircle size={12} />
                         {errors[`animal_${index}_breed`]}
                       </p>
@@ -820,17 +820,17 @@ const AnimalProcurement = () => {
 
                   {/* Calving Status Dropdown */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Calving Status <span className="text-red-500">*</span>
                     </label>
                     <select
                       value={animal.calvingStatus}
                       onChange={(e) => handleAnimalChange(index, 'calvingStatus', e.target.value)}
                       onBlur={(e) => handleAnimalBlur(index, 'calvingStatus', e.target.value)}
-                      className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none ${
+                      className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-800 dark:text-white dark:border-gray-600 ${
                         errors[`animal_${index}_calvingStatus`] 
-                          ? "border-red-500 bg-red-50/50 focus:ring-red-500/20 focus:border-red-500" 
-                          : "border-gray-200 hover:border-gray-300"
+                          ? "border-red-500 bg-red-50/50 focus:ring-red-500/20 focus:border-red-500 dark:bg-red-900/20 dark:border-red-600" 
+                          : "border-gray-200 hover:border-gray-300 dark:border-gray-600 dark:hover:border-gray-500"
                       }`}
                     >
                       {calvingStatusOptions.map(opt => (
@@ -840,7 +840,7 @@ const AnimalProcurement = () => {
                       ))}
                     </select>
                     {errors[`animal_${index}_calvingStatus`] && (
-                      <p className="text-red-500 text-xs mt-1 flex items-center gap-1 animate-fadeIn">
+                      <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-fadeIn">
                         <AlertCircle size={12} />
                         {errors[`animal_${index}_calvingStatus`]}
                       </p>
@@ -849,17 +849,17 @@ const AnimalProcurement = () => {
 
                   {/* Gender Dropdown - Defaulted to Female */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Gender <span className="text-red-500">*</span>
                     </label>
                     <select
                       value={animal.gender}
                       onChange={(e) => handleAnimalChange(index, 'gender', e.target.value)}
                       onBlur={(e) => handleAnimalBlur(index, 'gender', e.target.value)}
-                      className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none ${
+                      className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-800 dark:text-white dark:border-gray-600 ${
                         errors[`animal_${index}_gender`] 
-                          ? "border-red-500 bg-red-50/50 focus:ring-red-500/20 focus:border-red-500" 
-                          : "border-gray-200 hover:border-gray-300"
+                          ? "border-red-500 bg-red-50/50 focus:ring-red-500/20 focus:border-red-500 dark:bg-red-900/20 dark:border-red-600" 
+                          : "border-gray-200 hover:border-gray-300 dark:border-gray-600 dark:hover:border-gray-500"
                       }`}
                     >
                       {genderOptions.map(opt => (
@@ -869,7 +869,7 @@ const AnimalProcurement = () => {
                       ))}
                     </select>
                     {errors[`animal_${index}_gender`] && (
-                      <p className="text-red-500 text-xs mt-1 flex items-center gap-1 animate-fadeIn">
+                      <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-fadeIn">
                         <AlertCircle size={12} />
                         {errors[`animal_${index}_gender`]}
                       </p>
@@ -880,9 +880,9 @@ const AnimalProcurement = () => {
             ))}
 
             {formData.animals.length === 0 && (
-              <div className="text-center py-12 bg-gray-50 rounded-xl">
-                <Users size={48} className="mx-auto text-gray-300 mb-3" />
-                <p className="text-gray-500">Enter batch size in previous step to add animals</p>
+              <div className="text-center py-12 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                <Users size={48} className="mx-auto text-gray-300 dark:text-gray-600 mb-3" />
+                <p className="text-gray-500 dark:text-gray-400">Enter batch size in previous step to add animals</p>
               </div>
             )}
           </div>
@@ -893,13 +893,13 @@ const AnimalProcurement = () => {
 
   const renderStep3 = () => (
     <div className="space-y-6 animate-fadeIn">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="bg-gray-50 px-6 py-4 border-b border-gray-100">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden transition-colors duration-300">
+        <div className="bg-gray-50 dark:bg-gray-700/50 px-6 py-4 border-b border-gray-100 dark:border-gray-700">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-orange-50 rounded-lg">
-              <Truck className="text-orange-600" size={20} />
+            <div className="p-2 bg-orange-50 dark:bg-orange-900/30 rounded-lg">
+              <Truck className="text-orange-600 dark:text-orange-400" size={20} />
             </div>
-            <h2 className="text-lg font-semibold text-gray-900">Transport Details</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Transport Details</h2>
           </div>
         </div>
 
@@ -907,7 +907,7 @@ const AnimalProcurement = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Vehicle Number Dropdown */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Vehicle No. <span className="text-red-500">*</span>
               </label>
               <div className="relative">
@@ -916,10 +916,10 @@ const AnimalProcurement = () => {
                   value={formData.vehicleNo || ''}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`w-full px-4 py-3 pl-10 border rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none ${
+                  className={`w-full px-4 py-3 pl-10 border rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-800 dark:text-white dark:border-gray-600 ${
                     errors.vehicleNo && touchedFields.vehicleNo 
-                      ? "border-red-500 bg-red-50/50 focus:ring-red-500/20 focus:border-red-500" 
-                      : "border-gray-200 hover:border-gray-300"
+                      ? "border-red-500 bg-red-50/50 focus:ring-red-500/20 focus:border-red-500 dark:bg-red-900/20 dark:border-red-600" 
+                      : "border-gray-200 hover:border-gray-300 dark:border-gray-600 dark:hover:border-gray-500"
                   }`}
                   disabled={isLoadingData}
                 >
@@ -930,10 +930,10 @@ const AnimalProcurement = () => {
                     </option>
                   ))}
                 </select>
-                <Truck className="absolute left-3 top-3.5 text-gray-400" size={18} />
+                <Truck className="absolute left-3 top-3.5 text-gray-400 dark:text-gray-500" size={18} />
               </div>
               {errors.vehicleNo && touchedFields.vehicleNo && (
-                <p className="text-red-500 text-xs mt-1 flex items-center gap-1 animate-fadeIn">
+                <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-fadeIn">
                   <AlertCircle size={12} />
                   {errors.vehicleNo}
                 </p>
@@ -942,7 +942,7 @@ const AnimalProcurement = () => {
 
             {/* Select Holding Station Dropdown */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Select Holding Station <span className="text-red-500">*</span>
               </label>
               <div className="relative">
@@ -951,10 +951,10 @@ const AnimalProcurement = () => {
                   value={formData.holdingStation || ''}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`w-full px-4 py-3 pl-10 border rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none ${
+                  className={`w-full px-4 py-3 pl-10 border rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-800 dark:text-white dark:border-gray-600 ${
                     errors.holdingStation && touchedFields.holdingStation 
-                      ? "border-red-500 bg-red-50/50 focus:ring-red-500/20 focus:border-red-500" 
-                      : "border-gray-200 hover:border-gray-300"
+                      ? "border-red-500 bg-red-50/50 focus:ring-red-500/20 focus:border-red-500 dark:bg-red-900/20 dark:border-red-600" 
+                      : "border-gray-200 hover:border-gray-300 dark:border-gray-600 dark:hover:border-gray-500"
                   }`}
                   disabled={isLoadingData}
                 >
@@ -965,10 +965,10 @@ const AnimalProcurement = () => {
                     </option>
                   ))}
                 </select>
-                <Home className="absolute left-3 top-3.5 text-gray-400" size={18} />
+                <Home className="absolute left-3 top-3.5 text-gray-400 dark:text-gray-500" size={18} />
               </div>
               {errors.holdingStation && touchedFields.holdingStation && (
-                <p className="text-red-500 text-xs mt-1 flex items-center gap-1 animate-fadeIn">
+                <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-fadeIn">
                   <AlertCircle size={12} />
                   {errors.holdingStation}
                 </p>
@@ -977,7 +977,7 @@ const AnimalProcurement = () => {
 
             {/* Place of Shifting - From */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Place of Shifting - From <span className="text-red-500">*</span>
               </label>
               <div className="relative">
@@ -987,17 +987,17 @@ const AnimalProcurement = () => {
                   value={formData.placeFrom || ''}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`w-full px-4 py-3 pl-10 border rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none ${
+                  className={`w-full px-4 py-3 pl-10 border rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${
                     errors.placeFrom && touchedFields.placeFrom 
-                      ? "border-red-500 bg-red-50/50 focus:ring-red-500/20 focus:border-red-500" 
-                      : "border-gray-200 hover:border-gray-300"
+                      ? "border-red-500 bg-red-50/50 focus:ring-red-500/20 focus:border-red-500 dark:bg-red-900/20 dark:border-red-600" 
+                      : "border-gray-200 hover:border-gray-300 dark:border-gray-600 dark:hover:border-gray-500"
                   }`}
                   placeholder="Enter source location"
                 />
-                <MapPin className="absolute left-3 top-3.5 text-gray-400" size={18} />
+                <MapPin className="absolute left-3 top-3.5 text-gray-400 dark:text-gray-500" size={18} />
               </div>
               {errors.placeFrom && touchedFields.placeFrom && (
-                <p className="text-red-500 text-xs mt-1 flex items-center gap-1 animate-fadeIn">
+                <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-fadeIn">
                   <AlertCircle size={12} />
                   {errors.placeFrom}
                 </p>
@@ -1006,7 +1006,7 @@ const AnimalProcurement = () => {
 
             {/* Place of Shifting - To */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Place of Shifting - To <span className="text-red-500">*</span>
               </label>
               <div className="relative">
@@ -1016,17 +1016,17 @@ const AnimalProcurement = () => {
                   value={formData.placeTo || ''}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className={`w-full px-4 py-3 pl-10 border rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none ${
+                  className={`w-full px-4 py-3 pl-10 border rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${
                     errors.placeTo && touchedFields.placeTo 
-                      ? "border-red-500 bg-red-50/50 focus:ring-red-500/20 focus:border-red-500" 
-                      : "border-gray-200 hover:border-gray-300"
+                      ? "border-red-500 bg-red-50/50 focus:ring-red-500/20 focus:border-red-500 dark:bg-red-900/20 dark:border-red-600" 
+                      : "border-gray-200 hover:border-gray-300 dark:border-gray-600 dark:hover:border-gray-500"
                   }`}
                   placeholder="Enter destination location"
                 />
-                <MapPin className="absolute left-3 top-3.5 text-gray-400" size={18} />
+                <MapPin className="absolute left-3 top-3.5 text-gray-400 dark:text-gray-500" size={18} />
               </div>
               {errors.placeTo && touchedFields.placeTo && (
-                <p className="text-red-500 text-xs mt-1 flex items-center gap-1 animate-fadeIn">
+                <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center gap-1 animate-fadeIn">
                   <AlertCircle size={12} />
                   {errors.placeTo}
                 </p>
@@ -1039,7 +1039,7 @@ const AnimalProcurement = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       <style jsx>{`
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(-10px); }
@@ -1057,24 +1057,28 @@ const AnimalProcurement = () => {
         }
       `}</style>
 
-      <Toaster/>
+        <Toaster
+            toastOptions={{
+                className: 'dark:bg-gray-800 dark:text-white dark:border-gray-700',
+            }}
+        />
 
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8 animate-slideIn">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                 Animal Procurement
               </h1>
-              <p className="text-gray-500 mt-2 flex items-center gap-2">
+              <p className="text-gray-500 dark:text-gray-400 mt-2 flex items-center gap-2">
                 <ClipboardList size={16} />
                 Create a new animal procurement record
               </p>
             </div>
-            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl shadow-sm">
-              <BadgeCheck className="text-primary-500" size={20} />
-              <span className="text-sm font-medium text-gray-700">
+            <div className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+              <BadgeCheck className="text-primary-500 dark:text-primary-400" size={20} />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 {currentStep}/3 Steps
               </span>
             </div>
@@ -1089,11 +1093,11 @@ const AnimalProcurement = () => {
           {currentStep === 3 && renderStep3()}
 
           {/* Form Actions */}
-          <div className="flex items-center justify-between pt-8 border-t border-gray-200 bg-white rounded-2xl p-6 shadow-sm animate-slideIn">
+          <div className="flex items-center justify-between pt-8 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm animate-slideIn transition-colors duration-300">
             <button
               type="button"
               onClick={handleCancel}
-              className="px-6 py-3 border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 flex items-center gap-2 font-medium"
+              className="px-6 py-3 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-300 flex items-center gap-2 font-medium"
               disabled={isSubmitting}
             >
               <X size={18} />
@@ -1105,7 +1109,7 @@ const AnimalProcurement = () => {
                 <button
                   type="button"
                   onClick={handlePrevious}
-                  className="px-6 py-3 border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 flex items-center gap-2 font-medium"
+                  className="px-6 py-3 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-500 transition-all duration-300 flex items-center gap-2 font-medium"
                   disabled={isSubmitting}
                 >
                   <ChevronLeft size={18} />

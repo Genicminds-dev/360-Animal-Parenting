@@ -141,7 +141,10 @@ const Header = ({ toggleSidebar, sidebarOpen }) => {
                 sidebarOpen ? 'lg:hidden' : 'lg:hidden'
               }`}
             >
-              {sidebarOpen ? <X size={20} className="text-gray-700 dark:text-gray-300" /> : <Menu size={20} className="text-gray-700 dark:text-gray-300" />}
+              {sidebarOpen ? 
+                <X size={20} className="text-gray-700 dark:text-gray-300" /> : 
+                <Menu size={20} className="text-gray-700 dark:text-gray-300" />
+              }
             </button>
 
             {/* Search Bar - Desktop */}
@@ -150,7 +153,7 @@ const Header = ({ toggleSidebar, sidebarOpen }) => {
               <input
                 type="search"
                 placeholder="Search animals, farmers, reports..."
-                className="input-field pl-10"
+                className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-transparent text-sm bg-gray-50/50 dark:bg-gray-700/50 dark:text-white dark:placeholder-gray-400 transition-colors duration-300"
               />
             </div>
           </div>
@@ -164,7 +167,7 @@ const Header = ({ toggleSidebar, sidebarOpen }) => {
               aria-label="Toggle theme"
             >
               {darkMode ? (
-                <FiSun size={20} className="text-yellow-500" />
+                <FiSun size={20} className="text-yellow-500 dark:text-yellow-400" />
               ) : (
                 <FiMoon size={20} className="text-gray-700 dark:text-gray-300" />
               )}
@@ -203,12 +206,17 @@ const Header = ({ toggleSidebar, sidebarOpen }) => {
                     {loading ? '' : getRoleDisplay()}
                   </p>
                 </div>
-                <div className="w-8 h-8 sm:w-9 sm:h-9 bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-300 rounded-full flex items-center justify-center font-semibold flex-shrink-0 text-sm sm:text-base">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300 rounded-full flex items-center justify-center font-semibold flex-shrink-0 text-sm sm:text-base overflow-hidden">
                   {getProfileImage() ? (
                     <img 
                       src={getProfileImage()} 
                       alt={getDisplayName()}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.style.display = 'none';
+                        e.target.parentElement.innerHTML = getInitials();
+                      }}
                     />
                   ) : (
                     getInitials()
@@ -216,6 +224,30 @@ const Header = ({ toggleSidebar, sidebarOpen }) => {
                 </div>
               </button>
 
+              {/* User Menu Dropdown - Uncomment if needed */}
+              {/* <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
+                <Link to={PATHROUTES.profile} className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                  <User size={16} className="mr-2" />
+                  Profile
+                </Link>
+                <Link to={PATHROUTES.settings} className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                  <Settings size={16} className="mr-2" />
+                  Settings
+                </Link>
+                <Link to={PATHROUTES.help} className="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                  <HelpCircle size={16} className="mr-2" />
+                  Help
+                </Link>
+                <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                <button
+                  onClick={handleLogout}
+                  disabled={loggingOut}
+                  className="flex items-center w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                >
+                  <LogOut size={16} className="mr-2" />
+                  {loggingOut ? 'Logging out...' : 'Logout'}
+                </button>
+              </div> */}
             </div>
           </div>
         </div>
@@ -228,7 +260,7 @@ const Header = ({ toggleSidebar, sidebarOpen }) => {
               <input
                 type="search"
                 placeholder="Search animals, farmers, reports..."
-                className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent w-full text-sm transition-colors"
+                className="w-full pl-10 pr-10 py-2 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-transparent text-sm bg-gray-50/50 dark:bg-gray-700/50 dark:text-white dark:placeholder-gray-400 transition-colors duration-300"
                 autoFocus
               />
               <button 

@@ -1,7 +1,7 @@
 // pages/animals/EditAnimal.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { toast } from "react-hot-toast";
+import { toast, Toaster } from "react-hot-toast";
 import {
   Camera, X, ChevronDown, Save, ArrowLeft, Building2, Upload, Eye, File, Image as ImageIcon, Video
 } from 'lucide-react';
@@ -366,65 +366,69 @@ const EditAnimal = () => {
   // Loading state
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <h3 className="text-xl font-bold text-gray-700 mb-2">Loading Animal Details...</h3>
-          <p className="text-gray-500">Please wait while we fetch the animal information.</p>
+      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/30">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 dark:border-primary-400 mx-auto mb-4"></div>
+          <h3 className="text-xl font-bold text-gray-700 dark:text-gray-200 mb-2">Loading Animal Details...</h3>
+          <p className="text-gray-500 dark:text-gray-400">Please wait while we fetch the animal information.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
       {/* Header */}
       <div className="flex items-center gap-4">
         <button
           onClick={handleCancel}
-          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+          className="p-2 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-colors"
           disabled={isSubmitting}
         >
           <ArrowLeft size={20} />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Edit Animal</h1>
-          <p className="text-gray-600">Update animal information for <span className='text-primary-600 text-sm font-medium'>{formData.earTagId}</span></p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Edit Animal</h1>
+          <p className="text-gray-600 dark:text-gray-400">Update animal information for <span className='text-primary-600 dark:text-primary-400 text-sm font-medium'>{formData.earTagId}</span></p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Animal Details Card */}
-        <div className="card">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/30 border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-300">
           <div className="flex items-center space-x-3 mb-6">
-            <div className="p-2 bg-primary-50 rounded-lg">
-              <Building2 className="text-primary-600" size={20} />
+            <div className="p-2 bg-primary-50 dark:bg-primary-900/30 rounded-lg">
+              <Building2 className="text-primary-600 dark:text-primary-400" size={20} />
             </div>
-            <h2 className="text-lg font-semibold text-gray-900">Animal Details</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Animal Details</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Ear Tag ID */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Ear Tag ID <RequiredStar />
               </label>
               <input
                 type="text"
                 value={formData.earTagId}
                 onChange={(e) => handleInputChange('earTagId', e.target.value)}
-                className={`input-field ${errors.earTagId ? 'border-red-500' : ''}`}
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${
+                  errors.earTagId 
+                    ? 'border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600' 
+                    : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                }`}
                 placeholder="Enter Ear Tag ID"
                 disabled={isSubmitting}
               />
               {errors.earTagId && (
-                <p className="text-red-500 text-xs mt-1">{errors.earTagId}</p>
+                <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors.earTagId}</p>
               )}
             </div>
 
             {/* Breed */}
             <div className="relative" ref={breedRef}>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Breed <RequiredStar />
               </label>
               <div className="relative">
@@ -432,26 +436,30 @@ const EditAnimal = () => {
                   type="text"
                   value={formData.breed}
                   readOnly
-                  className={`input-field ${errors.breed ? 'border-red-500' : ''}`}
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${
+                    errors.breed 
+                      ? 'border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600' 
+                      : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                  }`}
                   placeholder="Select breed"
                   onClick={() => !isSubmitting && setBreedDropdownOpen(!breedDropdownOpen)}
                   disabled={isSubmitting}
                 />
                 <ChevronDown
-                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 ${!isSubmitting ? 'cursor-pointer' : 'opacity-50'}`}
+                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 ${!isSubmitting ? 'cursor-pointer' : 'opacity-50'}`}
                   size={20}
                   onClick={() => !isSubmitting && setBreedDropdownOpen(!breedDropdownOpen)}
                 />
 
                 {breedDropdownOpen && !isSubmitting && (
-                  <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-hidden">
-                    <div className="p-2 border-b border-gray-200">
+                  <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg dark:shadow-gray-900/30 max-h-60 overflow-hidden">
+                    <div className="p-2 border-b border-gray-200 dark:border-gray-700">
                       <input
                         type="text"
                         value={breedSearch}
                         onChange={(e) => setBreedSearch(e.target.value)}
                         placeholder="Search breed..."
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
                         autoFocus
                       />
                     </div>
@@ -460,7 +468,7 @@ const EditAnimal = () => {
                         filteredBreeds.map(breed => (
                           <div
                             key={breed}
-                            className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                            className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0 text-gray-900 dark:text-white"
                             onClick={() => {
                               handleInputChange('breed', breed);
                               setBreedDropdownOpen(false);
@@ -471,7 +479,7 @@ const EditAnimal = () => {
                           </div>
                         ))
                       ) : (
-                        <div className="px-4 py-3 text-gray-500 text-center">
+                        <div className="px-4 py-3 text-gray-500 dark:text-gray-400 text-center">
                           No breeds found
                         </div>
                       )}
@@ -480,13 +488,13 @@ const EditAnimal = () => {
                 )}
               </div>
               {errors.breed && (
-                <p className="text-red-500 text-xs mt-1">{errors.breed}</p>
+                <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors.breed}</p>
               )}
             </div>
 
             {/* Gender */}
             <div className="relative" ref={genderRef}>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Gender <RequiredStar />
               </label>
               <div className="relative">
@@ -494,23 +502,27 @@ const EditAnimal = () => {
                   type="text"
                   value={formData.gender}
                   readOnly
-                  className={`input-field ${errors.gender ? 'border-red-500' : ''}`}
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${
+                    errors.gender 
+                      ? 'border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600' 
+                      : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                  }`}
                   placeholder="Select gender"
                   onClick={() => !isSubmitting && setGenderDropdownOpen(!genderDropdownOpen)}
                   disabled={isSubmitting}
                 />
                 <ChevronDown
-                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 ${!isSubmitting ? 'cursor-pointer' : 'opacity-50'}`}
+                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 ${!isSubmitting ? 'cursor-pointer' : 'opacity-50'}`}
                   size={20}
                   onClick={() => !isSubmitting && setGenderDropdownOpen(!genderDropdownOpen)}
                 />
 
                 {genderDropdownOpen && !isSubmitting && (
-                  <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
+                  <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg dark:shadow-gray-900/30">
                     {genderOptions.map(gender => (
                       <div
                         key={gender}
-                        className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                        className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0 text-gray-900 dark:text-white"
                         onClick={() => {
                           handleInputChange('gender', gender);
                           setGenderDropdownOpen(false);
@@ -523,61 +535,69 @@ const EditAnimal = () => {
                 )}
               </div>
               {errors.gender && (
-                <p className="text-red-500 text-xs mt-1">{errors.gender}</p>
+                <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors.gender}</p>
               )}
             </div>
 
             {/* Lactation */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Lactation (Number)
               </label>
               <input
                 type="number"
                 value={formData.lactation}
                 onChange={(e) => handleInputChange('lactation', e.target.value)}
-                className={`input-field ${errors.lactation ? 'border-red-500' : ''}`}
+                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${
+                  errors.lactation 
+                    ? 'border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600' 
+                    : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                }`}
                 placeholder="Enter lactation number"
                 min="0"
                 max="20"
                 disabled={isSubmitting}
               />
               {errors.lactation && (
-                <p className="text-red-500 text-xs mt-1">{errors.lactation}</p>
+                <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors.lactation}</p>
               )}
             </div>
 
             {/* Age */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Age
               </label>
               <div className="flex space-x-2">
                 <select
                   value={formData.ageYears}
                   onChange={(e) => handleInputChange('ageYears', e.target.value)}
-                  className={`flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white ${errors.ageYears ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 ${
+                    errors.ageYears ? 'border-red-500 dark:border-red-600' : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                  }`}
                   disabled={isSubmitting}
                 >
-                  <option value="">Years</option>
+                  <option value="" className="dark:bg-gray-700">Years</option>
                   {ageYears.map(year => (
-                    <option key={year} value={year}>{year}</option>
+                    <option key={year} value={year} className="dark:bg-gray-700">{year}</option>
                   ))}
                 </select>
                 <select
                   value={formData.ageMonths}
                   onChange={(e) => handleInputChange('ageMonths', e.target.value)}
-                  className={`flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white ${errors.ageMonths ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 ${
+                    errors.ageMonths ? 'border-red-500 dark:border-red-600' : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                  }`}
                   disabled={isSubmitting}
                 >
-                  <option value="">Months</option>
+                  <option value="" className="dark:bg-gray-700">Months</option>
                   {ageMonths.map(month => (
-                    <option key={month} value={month}>{month}</option>
+                    <option key={month} value={month} className="dark:bg-gray-700">{month}</option>
                   ))}
                 </select>
               </div>
               {(errors.ageYears || errors.ageMonths) && (
-                <p className="text-red-500 text-xs mt-1">
+                <p className="text-red-500 dark:text-red-400 text-xs mt-1">
                   {errors.ageYears || errors.ageMonths}
                 </p>
               )}
@@ -585,7 +605,7 @@ const EditAnimal = () => {
 
             {/* Calving Status */}
             <div className="relative" ref={calvingStatusRef}>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Calving Status <RequiredStar />
               </label>
               <div className="relative">
@@ -593,23 +613,27 @@ const EditAnimal = () => {
                   type="text"
                   value={formData.calvingStatus}
                   readOnly
-                  className={`input-field ${errors.calvingStatus ? 'border-red-500' : ''}`}
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 capitalize ${
+                    errors.calvingStatus 
+                      ? 'border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600' 
+                      : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                  }`}
                   placeholder="Select calving status"
                   onClick={() => !isSubmitting && setCalvingStatusDropdownOpen(!calvingStatusDropdownOpen)}
                   disabled={isSubmitting}
                 />
                 <ChevronDown
-                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 ${!isSubmitting ? 'cursor-pointer' : 'opacity-50'}`}
+                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 ${!isSubmitting ? 'cursor-pointer' : 'opacity-50'}`}
                   size={20}
                   onClick={() => !isSubmitting && setCalvingStatusDropdownOpen(!calvingStatusDropdownOpen)}
                 />
 
                 {calvingStatusDropdownOpen && !isSubmitting && (
-                  <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
+                  <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg dark:shadow-gray-900/30">
                     {calvingStatusOptions.map(status => (
                       <div
                         key={status}
-                        className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0 capitalize"
+                        className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0 capitalize text-gray-900 dark:text-white"
                         onClick={() => {
                           handleInputChange('calvingStatus', status.toLowerCase());
                           setCalvingStatusDropdownOpen(false);
@@ -622,7 +646,7 @@ const EditAnimal = () => {
                 )}
               </div>
               {errors.calvingStatus && (
-                <p className="text-red-500 text-xs mt-1">{errors.calvingStatus}</p>
+                <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors.calvingStatus}</p>
               )}
             </div>
 
@@ -631,25 +655,29 @@ const EditAnimal = () => {
               <>
                 {/* Calf Tag ID */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Calf Tag ID <RequiredStar />
                   </label>
                   <input
                     type="text"
                     value={formData.calfTagId}
                     onChange={(e) => handleInputChange('calfTagId', e.target.value)}
-                    className={`input-field ${errors.calfTagId ? 'border-red-500' : ''}`}
+                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${
+                      errors.calfTagId 
+                        ? 'border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600' 
+                        : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                    }`}
                     placeholder="Enter Calf Tag ID"
                     disabled={isSubmitting}
                   />
                   {errors.calfTagId && (
-                    <p className="text-red-500 text-xs mt-1">{errors.calfTagId}</p>
+                    <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors.calfTagId}</p>
                   )}
                 </div>
 
                 {/* Calf Gender */}
                 <div className="relative" ref={calfGenderRef}>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Calf Gender <RequiredStar />
                   </label>
                   <div className="relative">
@@ -657,23 +685,27 @@ const EditAnimal = () => {
                       type="text"
                       value={formData.calfGender}
                       readOnly
-                      className={`input-field ${errors.calfGender ? 'border-red-500' : ''}`}
+                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${
+                        errors.calfGender 
+                          ? 'border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600' 
+                          : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                      }`}
                       placeholder="Select calf gender"
                       onClick={() => !isSubmitting && setCalfGenderDropdownOpen(!calfGenderDropdownOpen)}
                       disabled={isSubmitting}
                     />
                     <ChevronDown
-                      className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 ${!isSubmitting ? 'cursor-pointer' : 'opacity-50'}`}
+                      className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 ${!isSubmitting ? 'cursor-pointer' : 'opacity-50'}`}
                       size={20}
                       onClick={() => !isSubmitting && setCalfGenderDropdownOpen(!calfGenderDropdownOpen)}
                     />
 
                     {calfGenderDropdownOpen && !isSubmitting && (
-                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
+                      <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg dark:shadow-gray-900/30">
                         {genderOptions.map(gender => (
                           <div
                             key={gender}
-                            className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                            className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0 text-gray-900 dark:text-white"
                             onClick={() => {
                               handleInputChange('calfGender', gender);
                               setCalfGenderDropdownOpen(false);
@@ -686,7 +718,7 @@ const EditAnimal = () => {
                     )}
                   </div>
                   {errors.calfGender && (
-                    <p className="text-red-500 text-xs mt-1">{errors.calfGender}</p>
+                    <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors.calfGender}</p>
                   )}
                 </div>
               </>
@@ -694,42 +726,42 @@ const EditAnimal = () => {
 
             {/* Calving Date */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Calving Date
               </label>
               <input
                 type="date"
                 value={formData.calvingDate}
                 onChange={(e) => handleInputChange('calvingDate', e.target.value)}
-                className="input-field"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white"
                 disabled={isSubmitting}
               />
             </div>
 
             {/* Exam Date */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Exam Date
               </label>
               <input
                 type="date"
                 value={formData.examDate}
                 onChange={(e) => handleInputChange('examDate', e.target.value)}
-                className="input-field"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white"
                 disabled={isSubmitting}
               />
             </div>
 
             {/* Examine By */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Examine By
               </label>
               <input
                 type="text"
                 value={formData.examineBy}
                 onChange={(e) => handleInputChange('examineBy', e.target.value)}
-                className="input-field"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white"
                 placeholder="Enter examiner name"
                 disabled={isSubmitting}
               />
@@ -737,28 +769,28 @@ const EditAnimal = () => {
 
             {/* Receiving Date */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Receiving Date
               </label>
               <input
                 type="date"
                 value={formData.receivingDate}
                 onChange={(e) => handleInputChange('receivingDate', e.target.value)}
-                className="input-field"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white"
                 disabled={isSubmitting}
               />
             </div>
 
             {/* Remark */}
             <div className="md:col-span-2 lg:col-span-3">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Remark
               </label>
               <textarea
                 value={formData.remark}
                 onChange={(e) => handleInputChange('remark', e.target.value)}
                 rows="3"
-                className="input-field"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white"
                 placeholder="Enter any remarks..."
                 disabled={isSubmitting}
               />
@@ -767,12 +799,12 @@ const EditAnimal = () => {
         </div>
 
         {/* Media Section */}
-        <div className="card">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/30 border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-300">
           <div className="flex items-center space-x-3 mb-6">
-            <div className="p-2 bg-green-50 rounded-lg">
-              <Camera className="text-green-600" size={20} />
+            <div className="p-2 bg-green-50 dark:bg-green-900/30 rounded-lg">
+              <Camera className="text-green-600 dark:text-green-400" size={20} />
             </div>
-            <h2 className="text-lg font-semibold text-gray-900">Animal Media</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Animal Media</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
@@ -835,12 +867,12 @@ const EditAnimal = () => {
         </div>
 
         {/* Form Actions */}
-        <div className="flex items-center justify-end pt-6 border-t border-gray-200">
+        <div className="flex items-center justify-end pt-6 border-t border-gray-200 dark:border-gray-700">
           <div className="flex space-x-4">
             <button
               type="button"
               onClick={handleCancel}
-              className={`px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
               disabled={isSubmitting}
             >
               Cancel
@@ -848,7 +880,7 @@ const EditAnimal = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`px-6 py-2 bg-primary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center min-w-[140px] ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`px-6 py-2 bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center min-w-[140px] ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {isSubmitting ? (
                 <>
@@ -868,6 +900,12 @@ const EditAnimal = () => {
           </div>
         </div>
       </form>
+
+      <Toaster
+        toastOptions={{
+          className: 'dark:bg-gray-800 dark:text-white dark:border-gray-700',
+        }}
+      />
     </div>
   );
 };
@@ -896,23 +934,27 @@ const MediaUploadBox = ({
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-4">
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
         {label}
       </label>
       <div className="flex flex-col items-center justify-center">
         <div className="w-full">
           {file ? (
-            <div className="border-2 border-gray-300 rounded-lg p-6">
+            <div className="border-2 border-gray-300 dark:border-gray-600 rounded-lg p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-3">
-                  <div className={`p-3 rounded-lg ${type === 'photo' ? 'bg-primary-100 text-primary-600' : 'bg-red-100 text-red-600'}`}>
+                  <div className={`p-3 rounded-lg ${
+                    type === 'photo' 
+                      ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400' 
+                      : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
+                  }`}>
                     {type === 'photo' ? <ImageIcon size={24} /> : <Video size={24} />}
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">
+                    <p className="font-medium text-gray-900 dark:text-white break-all max-w-xs">
                       {getDisplayFileName(file, label.toLowerCase().replace(' ', '_'))}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       {typeof file === 'object' && file.size ? `${Math.round(file.size / 1024)} KB` : 'Existing file'}
                     </p>
                   </div>
@@ -921,7 +963,11 @@ const MediaUploadBox = ({
                   <button
                     type="button"
                     onClick={() => onOpen(type, preview)}
-                    className={`p-2 ${type === 'photo' ? 'bg-primary-100 text-primary-600 hover:bg-primary-200' : 'bg-red-100 text-red-600 hover:bg-red-200'} rounded-lg transition-colors`}
+                    className={`p-2 rounded-lg transition-colors ${
+                      type === 'photo' 
+                        ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 hover:bg-primary-200 dark:hover:bg-primary-800/50' 
+                        : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-800/50'
+                    }`}
                     title={`Preview ${label}`}
                     disabled={isSubmitting}
                   >
@@ -930,7 +976,7 @@ const MediaUploadBox = ({
                   <button
                     type="button"
                     onClick={() => onRemove(field)}
-                    className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+                    className="p-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                     title="Remove"
                     disabled={isSubmitting}
                   >
@@ -940,11 +986,11 @@ const MediaUploadBox = ({
               </div>
 
               {preview && (
-                <div className="mt-4 border border-gray-200 rounded-lg overflow-hidden">
-                  <div className="p-2 bg-gray-50 border-b border-gray-200">
-                    <p className="text-sm font-medium text-gray-700">{label} Preview</p>
+                <div className="mt-4 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                  <div className="p-2 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{label} Preview</p>
                   </div>
-                  <div className="p-4 flex items-center justify-center bg-gray-50">
+                  <div className="p-4 flex items-center justify-center bg-gray-50 dark:bg-gray-800">
                     {type === 'photo' ? (
                       <img
                         src={preview}
@@ -965,19 +1011,19 @@ const MediaUploadBox = ({
               )}
             </div>
           ) : (
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary-500 transition-colors">
+            <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-primary-500 dark:hover:border-primary-400 transition-colors">
               <div className="flex flex-col items-center justify-center">
-                <Upload className="text-gray-400 mb-3" size={32} />
-                <p className="text-sm text-gray-700 mb-2 font-medium">
+                <Upload className="text-gray-400 dark:text-gray-500 mb-3" size={32} />
+                <p className="text-sm text-gray-700 dark:text-gray-300 mb-2 font-medium">
                   Upload {label}
                 </p>
-                <p className="text-xs text-gray-500 mb-3">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
                   {type === 'photo' ? 'Click to upload image' : 'Click to upload video'}
                 </p>
 
                 <label
                   htmlFor={inputId}
-                  className={`px-4 py-2 bg-primary-600 text-white rounded-lg cursor-pointer hover:bg-primary-700 transition-colors text-sm ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`px-4 py-2 bg-primary-600 dark:bg-primary-500 text-white rounded-lg cursor-pointer hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors text-sm ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   Browse File
                 </label>
