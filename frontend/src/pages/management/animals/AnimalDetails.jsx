@@ -1,4 +1,3 @@
-// pages/animals/ViewAnimal.jsx (with navigation to HealthCheckupForm)
 import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { toast, Toaster } from "react-hot-toast";
@@ -929,12 +928,12 @@ const AnimalDetails = () => {
   const getVetApprovalBadge = (status) => {
     switch(status) {
       case 'approved':
-        return { color: 'bg-green-100 text-green-800', icon: CheckCircle, label: 'Approved' };
+        return { color: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300', icon: CheckCircle, label: 'Approved' };
       case 'rejected':
-        return { color: 'bg-red-100 text-red-800', icon: X, label: 'Rejected' };
+        return { color: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300', icon: X, label: 'Rejected' };
       case 'pending':
       default:
-        return { color: 'bg-yellow-100 text-yellow-800', icon: Clock, label: 'Pending' };
+        return { color: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300', icon: Clock, label: 'Pending' };
     }
   };
 
@@ -947,11 +946,11 @@ const AnimalDetails = () => {
   // Loading state
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-50 via-white to-gray-50">
-        <div className="text-center p-8 bg-white rounded-xl shadow-md">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <h3 className="text-xl font-bold text-gray-700 mb-2">Loading Animal Details...</h3>
-          <p className="text-gray-500">Please wait while we fetch the animal information.</p>
+      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/30">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 dark:border-primary-400 mx-auto mb-4"></div>
+          <h3 className="text-xl font-bold text-gray-700 dark:text-gray-200 mb-2">Loading Animal Details...</h3>
+          <p className="text-gray-500 dark:text-gray-400">Please wait while we fetch the animal information.</p>
         </div>
       </div>
     );
@@ -959,16 +958,16 @@ const AnimalDetails = () => {
 
   if (!animal) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-50 via-white to-gray-50">
-        <div className="text-center p-8 bg-white rounded-xl shadow-md">
-          <div className="p-4 bg-primary-100 rounded-full mb-4 inline-block">
-            <GiCow className="w-12 h-12 text-primary-600" />
+      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/30">
+          <div className="p-4 bg-primary-100 dark:bg-primary-900/30 rounded-full mb-4 inline-block">
+            <GiCow className="w-12 h-12 text-primary-600 dark:text-primary-400" />
           </div>
-          <h3 className="text-lg font-bold text-gray-700 mb-2">Animal Not Found</h3>
-          <p className="text-gray-500 mb-6">No animal data found in the system.</p>
+          <h3 className="text-xl font-bold text-gray-700 dark:text-gray-200 mb-2">Animal Not Found</h3>
+          <p className="text-gray-500 dark:text-gray-400 mb-6">No animal data found in the system.</p>
           <button
             onClick={() => navigate("/management/animals")}
-            className="px-5 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 mx-auto"
+            className="px-5 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 dark:from-primary-500 dark:to-primary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 mx-auto"
           >
             <ArrowLeft size={16} />
             Back to Animals
@@ -979,52 +978,52 @@ const AnimalDetails = () => {
   }
 
   return (
-    <div className="space-y-6 bg-gradient-to-r from-gray-50 via-white to-gray-50">
+    <div className="space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
       {/* Header Section */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate("/management/animals")}
-            className="p-2 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+            className="p-2 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-colors"
           >
             <ArrowLeft size={20} />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Animal Details</h1>
-            <p className="text-gray-600">View complete animal information</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Animal Details</h1>
+            <p className="text-gray-600 dark:text-gray-400">View complete animal information</p>
           </div>
         </div>
       </div>
 
       {/* Profile Header - Using Ear Tag ID as primary identifier */}
-      <div className="bg-white rounded-xl shadow-md p-3">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/30 p-3 transition-colors duration-300">
         <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
           <div className="flex-shrink-0">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary-100 to-primary-200 border-4 border-white shadow-lg flex items-center justify-center">
-              <GiCow className="text-primary-600" size={40} />
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900/50 dark:to-primary-800/50 border-4 border-white dark:border-gray-700 shadow-lg flex items-center justify-center">
+              <GiCow className="text-primary-600 dark:text-primary-400" size={40} />
             </div>
           </div>
 
           <div className="flex-1">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
               <div>
-                <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                  <Tag className="text-primary-500" size={20} />
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Tag className="text-primary-500 dark:text-primary-400" size={20} />
                   {animal.earTagId}
                 </h3>
-                <p className="text-gray-600 text-sm font-medium mt-1 flex items-center gap-3 flex-wrap">
+                <p className="text-gray-600 dark:text-gray-400 text-sm font-medium mt-1 flex items-center gap-3 flex-wrap">
                   <span className="flex items-center gap-1">
-                    <GiCow size={16} className="text-gray-400" />
+                    <GiCow size={16} className="text-gray-400 dark:text-gray-500" />
                     {animal.breed}
                   </span>
-                  <span className="text-gray-300">•</span>
+                  <span className="text-gray-300 dark:text-gray-600">•</span>
                   <span className="flex items-center gap-1 capitalize">
-                    <User size={16} className="text-gray-400" />
+                    <User size={16} className="text-gray-400 dark:text-gray-500" />
                     {animal.gender}
                   </span>
-                  <span className="text-gray-300">•</span>
+                  <span className="text-gray-300 dark:text-gray-600">•</span>
                   <span className="flex items-center gap-1">
-                    <Calendar size={16} className="text-gray-400" />
+                    <Calendar size={16} className="text-gray-400 dark:text-gray-500" />
                     Age: {animal.ageYears}Y {animal.ageMonths}M
                   </span>
                 </p>
@@ -1032,9 +1031,9 @@ const AnimalDetails = () => {
               
               <div className="mt-4 md:mt-0">
                 <span className={`px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 ${
-                  animal.calvingStatus === 'milking' ? "bg-primary-100 text-primary-800" :
-                  animal.calvingStatus === 'pregnant' ? "bg-pink-100 text-pink-800" :
-                  "bg-gray-100 text-gray-800"
+                  animal.calvingStatus === 'milking' ? "bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300" :
+                  animal.calvingStatus === 'pregnant' ? "bg-pink-100 dark:bg-pink-900/30 text-pink-800 dark:text-pink-300" :
+                  "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300"
                 }`}>
                   {animal.calvingStatus === 'milking' && <Milk size={16} />}
                   {animal.calvingStatus === 'pregnant' && <HeartPulse size={16} />}
@@ -1047,14 +1046,14 @@ const AnimalDetails = () => {
       </div>
 
       {/* Tabs Navigation */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-gray-200 dark:border-gray-700">
         <nav className="flex space-x-2 overflow-x-auto">
           <button
             onClick={() => setActiveTab("details")}
             className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
               activeTab === "details"
-                ? "border-primary-600 text-primary-700"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                ? "border-primary-600 dark:border-primary-400 text-primary-700 dark:text-primary-400"
+                : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600"
             }`}
           >
             <div className="flex items-center gap-2">
@@ -1066,8 +1065,8 @@ const AnimalDetails = () => {
             onClick={() => setActiveTab("beneficiary")}
             className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
               activeTab === "beneficiary"
-                ? "border-primary-600 text-primary-700"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                ? "border-primary-600 dark:border-primary-400 text-primary-700 dark:text-primary-400"
+                : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600"
             }`}
           >
             <div className="flex items-center gap-2">
@@ -1079,15 +1078,15 @@ const AnimalDetails = () => {
             onClick={() => setActiveTab("healthCheckups")}
             className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
               activeTab === "healthCheckups"
-                ? "border-primary-600 text-primary-700"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                ? "border-primary-600 dark:border-primary-400 text-primary-700 dark:text-primary-400"
+                : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600"
             }`}
           >
             <div className="flex items-center gap-2">
               <HeartPulse size={18} />
               Health Checkups
               {healthCheckups.length > 0 && (
-                <span className="bg-primary-100 text-primary-800 text-xs px-2 py-0.5 rounded-full">
+                <span className="bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 text-xs px-2 py-0.5 rounded-full">
                   {healthCheckups.length}
                 </span>
               )}
@@ -1097,15 +1096,15 @@ const AnimalDetails = () => {
             onClick={() => setActiveTab("insurance")}
             className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
               activeTab === "insurance"
-                ? "border-primary-600 text-primary-700"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                ? "border-primary-600 dark:border-primary-400 text-primary-700 dark:text-primary-400"
+                : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600"
             }`}
           >
             <div className="flex items-center gap-2">
               <Shield size={18} />
               Insurance
               {insurances.length > 0 && (
-                <span className="bg-primary-100 text-primary-800 text-xs px-2 py-0.5 rounded-full">
+                <span className="bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-300 text-xs px-2 py-0.5 rounded-full">
                   {insurances.length}
                 </span>
               )}
@@ -1160,7 +1159,7 @@ const AnimalDetails = () => {
                 <div className="space-y-6">
                   {/* Animal Photos */}
                   <div>
-                    <h4 className="text-md font-medium text-gray-700 mb-3">Animal Photos</h4>
+                    <h4 className="text-md font-medium text-gray-700 dark:text-gray-300 mb-3">Animal Photos</h4>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       {[
                         { label: "Front Image", field: "frontImage", data: animal.frontImage },
@@ -1168,13 +1167,13 @@ const AnimalDetails = () => {
                         { label: "Rear Image", field: "rearImage", data: animal.rearImage },
                       ].map((img, i) => (
                         <div key={i} className="text-center">
-                          <p className="text-xs text-gray-500 mb-1">{img.label}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{img.label}</p>
                           {img.data?.preview ? (
                             <div className="relative group">
                               <img
                                 src={img.data.preview}
                                 alt={img.label}
-                                className="h-32 w-full object-cover rounded-lg border border-gray-200 hover:scale-105 transition-transform cursor-pointer"
+                                className="h-32 w-full object-cover rounded-lg border border-gray-200 dark:border-gray-700 hover:scale-105 transition-transform cursor-pointer"
                                 onClick={() => window.open(img.data.preview, '_blank')}
                                 onError={(e) => {
                                   e.target.onerror = null;
@@ -1182,12 +1181,12 @@ const AnimalDetails = () => {
                                 }}
                               />
                               {img.data.name && (
-                                <p className="text-xs text-gray-500 mt-1 truncate">{img.data.name}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">{img.data.name}</p>
                               )}
                             </div>
                           ) : (
-                            <div className="h-32 flex items-center justify-center text-gray-400 border-2 border-dashed border-gray-200 rounded-lg bg-gray-50">
-                              <Camera className="text-gray-300" size={20} />
+                            <div className="h-32 flex items-center justify-center text-gray-400 dark:text-gray-600 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
+                              <Camera className="text-gray-300 dark:text-gray-600" size={20} />
                               <span className="ml-1 text-xs">No image</span>
                             </div>
                           )}
@@ -1198,24 +1197,24 @@ const AnimalDetails = () => {
 
                   {/* Animal Video */}
                   <div>
-                    <h4 className="text-md font-medium text-gray-700 mb-2">Animal 360° Video</h4>
+                    <h4 className="text-md font-medium text-gray-700 dark:text-gray-300 mb-2">Animal 360° Video</h4>
                     {animal.video?.preview ? (
                       <div>
                         <video 
                           controls 
                           src={animal.video.preview} 
-                          className="rounded-lg w-full border border-gray-200 max-h-48"
+                          className="rounded-lg w-full border border-gray-200 dark:border-gray-700 max-h-48"
                         />
                         {animal.video.instructions && (
-                          <p className="text-xs text-gray-500 mt-2 italic">📋 {animal.video.instructions}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 italic">📋 {animal.video.instructions}</p>
                         )}
                         {animal.video.name && (
-                          <p className="text-xs text-gray-500 mt-1">{animal.video.name} ({animal.video.size})</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{animal.video.name} ({animal.video.size})</p>
                         )}
                       </div>
                     ) : (
-                      <div className="h-32 flex items-center justify-center text-gray-400 border-2 border-dashed border-gray-200 rounded-lg bg-gray-50">
-                        <Video className="text-gray-300" size={24} />
+                      <div className="h-32 flex items-center justify-center text-gray-400 dark:text-gray-600 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800">
+                        <Video className="text-gray-300 dark:text-gray-600" size={24} />
                         <span className="ml-2 text-sm">No video available</span>
                       </div>
                     )}
@@ -1230,44 +1229,44 @@ const AnimalDetails = () => {
       {/* BENEFICIARY TAB - UPDATED with Beneficiary ID, DO Number, Name, Mobile, and Action */}
       {activeTab === "beneficiary" && (
         <div className="space-y-6">
-          <div className="bg-white rounded-xl shadow-md overflow-hidden">
-            <div className="p-5 border-b border-gray-200">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/30 overflow-hidden transition-colors duration-300">
+            <div className="p-5 border-b border-gray-200 dark:border-gray-700">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Beneficiary Details</h3>
-                <p className="text-gray-600 mt-1">Beneficiary information for this animal</p>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Beneficiary Details</h3>
+                <p className="text-gray-600 dark:text-gray-400 mt-1">Beneficiary information for this animal</p>
               </div>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead className="bg-gray-50 dark:bg-gray-700">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Beneficiary ID</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DO Number</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mobile Number</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Beneficiary ID</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">DO Number</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Mobile Number</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Action</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                   {animal.beneficiaryName ? (
-                    <tr className="hover:bg-gray-50 transition-colors">
+                    <tr className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm font-medium text-gray-900">{animal.beneficiaryId || "Not provided"}</span>
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">{animal.beneficiaryId || "Not provided"}</span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm font-medium text-gray-900">{animal.doNumber || "Not provided"}</span>
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">{animal.doNumber || "Not provided"}</span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm font-medium text-gray-900">{animal.beneficiaryName}</span>
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">{animal.beneficiaryName}</span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm text-gray-900">{animal.beneficiaryMobile || "Not provided"}</span>
+                        <span className="text-sm text-gray-900 dark:text-white">{animal.beneficiaryMobile || "Not provided"}</span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <button
                           onClick={navigateToBeneficiaryDetails}
-                          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 text-sm"
+                          className="px-4 py-2 bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 text-sm"
                         >
                           <Eye size={16} /> View Details
                         </button>
@@ -1277,11 +1276,11 @@ const AnimalDetails = () => {
                     <tr>
                       <td colSpan="5" className="px-6 py-12 text-center">
                         <div className="flex flex-col items-center justify-center">
-                          <div className="p-4 bg-primary-100 rounded-full mb-4">
-                            <Building className="w-12 h-12 text-primary-600" />
+                          <div className="p-4 bg-primary-100 dark:bg-primary-900/30 rounded-full mb-4">
+                            <Building className="w-12 h-12 text-primary-600 dark:text-primary-400" />
                           </div>
-                          <h3 className="text-lg font-medium text-gray-500 mb-2">No beneficiary information</h3>
-                          <p className="text-gray-400 text-sm mb-6">Beneficiary information is not available for this animal.</p>
+                          <h3 className="text-lg font-medium text-gray-500 dark:text-gray-400 mb-2">No beneficiary information</h3>
+                          <p className="text-gray-400 dark:text-gray-500 text-sm mb-6">Beneficiary information is not available for this animal.</p>
                         </div>
                       </td>
                     </tr>
@@ -1296,17 +1295,16 @@ const AnimalDetails = () => {
       {/* HEALTH CHECKUPS TAB - Keep existing health checkups code */}
       {activeTab === "healthCheckups" && (
         <div className="space-y-6">
-          {/* ... existing health checkups code ... */}
           <div className="flex justify-between items-center">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">Routine Health Checkups</h2>
-              <p className="text-sm text-gray-600 mt-1">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Routine Health Checkups</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                 Complete history of veterinary examinations
               </p>
             </div>
             <button
               onClick={navigateToHealthCheckForm}
-              className="px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:opacity-90 transition-opacity font-medium flex items-center gap-2 shadow-md"
+              className="px-4 py-2.5 bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:opacity-90 transition-opacity font-medium flex items-center gap-2 shadow-md"
             >
               <Plus size={16} />
               Add Health Checkup
@@ -1314,20 +1312,20 @@ const AnimalDetails = () => {
           </div>
 
           {healthCheckups.length === 0 ? (
-            <div className="bg-white rounded-xl shadow-md p-12 text-center">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/30 p-12 text-center transition-colors duration-300">
               <div className="flex flex-col items-center justify-center">
-                <div className="p-4 bg-primary-100 rounded-full mb-4">
-                  <HeartPulse className="w-12 h-12 text-secondary-600" />
+                <div className="p-4 bg-primary-100 dark:bg-primary-900/30 rounded-full mb-4">
+                  <HeartPulse className="w-12 h-12 text-secondary-600 dark:text-secondary-400" />
                 </div>
-                <h3 className="text-lg font-medium text-gray-500 mb-2">
+                <h3 className="text-lg font-medium text-gray-500 dark:text-gray-400 mb-2">
                   No Health Checkup Records Found
                 </h3>
-                <p className="text-gray-400 text-sm mb-6">
+                <p className="text-gray-400 dark:text-gray-500 text-sm mb-6">
                   This animal hasn't had any health checkups yet
                 </p>
                 <button
                   onClick={navigateToHealthCheckForm}
-                  className="px-4 py-2.5 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium"
+                  className="px-4 py-2.5 bg-gradient-to-r from-primary-600 to-secondary-600 dark:from-primary-500 dark:to-secondary-500 text-white rounded-lg hover:opacity-90 transition-opacity text-sm font-medium"
                 >
                   Add First Health Checkup
                 </button>
@@ -1344,19 +1342,19 @@ const AnimalDetails = () => {
                   return (
                     <div
                       key={checkup.id}
-                      className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm hover:shadow-md transition-shadow"
+                      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800 shadow-sm dark:shadow-gray-900/30 hover:shadow-md transition-shadow"
                     >
                       {/* Header Row */}
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <h4 className="text-base font-semibold text-gray-900">
+                          <h4 className="text-base font-semibold text-gray-900 dark:text-white">
                             {formatDate(checkup.checkDate)}
                           </h4>
                           <span className={`px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1 ${approvalBadge.color}`}>
                             <ApprovalIcon size={10} />
                             {approvalBadge.label}
                           </span>
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
                             {getVetNameById(checkup.vetOfficer)}
                           </span>
                         </div>
@@ -1365,51 +1363,51 @@ const AnimalDetails = () => {
                       {/* Vital Signs */}
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
                         {checkup.temperature && (
-                          <div className="flex items-center gap-2 p-2 bg-gradient-to-br from-orange-50 to-amber-50 rounded-lg border border-orange-100">
-                            <div className="p-1.5 bg-white rounded-full shadow-sm">
-                              <Thermometer size={14} className="text-orange-500" />
+                          <div className="flex items-center gap-2 p-2 bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-lg border border-orange-100 dark:border-orange-800">
+                            <div className="p-1.5 bg-white dark:bg-gray-800 rounded-full shadow-sm">
+                              <Thermometer size={14} className="text-orange-500 dark:text-orange-400" />
                             </div>
                             <div>
-                              <span className="text-[10px] font-medium text-orange-600 uppercase tracking-wider">Temp</span>
-                              <p className="text-sm font-bold text-gray-800 leading-tight">{checkup.temperature}°C</p>
+                              <span className="text-[10px] font-medium text-orange-600 dark:text-orange-400 uppercase tracking-wider">Temp</span>
+                              <p className="text-sm font-bold text-gray-800 dark:text-gray-200 leading-tight">{checkup.temperature}°C</p>
                             </div>
                           </div>
                         )}
                         
                         {checkup.heartRate && (
-                          <div className="flex items-center gap-2 p-2 bg-gradient-to-br from-red-50 to-rose-50 rounded-lg border border-red-100">
-                            <div className="p-1.5 bg-white rounded-full shadow-sm">
-                              <Heart size={14} className="text-red-500" />
+                          <div className="flex items-center gap-2 p-2 bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 rounded-lg border border-red-100 dark:border-red-800">
+                            <div className="p-1.5 bg-white dark:bg-gray-800 rounded-full shadow-sm">
+                              <Heart size={14} className="text-red-500 dark:text-red-400" />
                             </div>
                             <div>
-                              <span className="text-[10px] font-medium text-red-600 uppercase tracking-wider">Heart Rate</span>
-                              <p className="text-sm font-bold text-gray-800 leading-tight">{checkup.heartRate} <span className="text-xs font-normal text-gray-500">BPM</span></p>
+                              <span className="text-[10px] font-medium text-red-600 dark:text-red-400 uppercase tracking-wider">Heart Rate</span>
+                              <p className="text-sm font-bold text-gray-800 dark:text-gray-200 leading-tight">{checkup.heartRate} <span className="text-xs font-normal text-gray-500 dark:text-gray-400">BPM</span></p>
                             </div>
                           </div>
                         )}
                         
                         {checkup.generalCondition && (
                           <div className={`flex items-center gap-2 p-2 rounded-lg border ${
-                            checkup.generalCondition === 'Excellent' ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-200' :
-                            checkup.generalCondition === 'Good' ? 'bg-gradient-to-br from-primary-50 to-cyan-50 border-primary-200' :
-                            checkup.generalCondition === 'Fair' ? 'bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200' :
-                            'bg-gradient-to-br from-red-50 to-rose-50 border-red-200'
+                            checkup.generalCondition === 'Excellent' ? 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800' :
+                            checkup.generalCondition === 'Good' ? 'bg-gradient-to-br from-primary-50 to-cyan-50 dark:from-primary-900/20 dark:to-cyan-900/20 border-primary-200 dark:border-primary-800' :
+                            checkup.generalCondition === 'Fair' ? 'bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border-yellow-200 dark:border-yellow-800' :
+                            'bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 border-red-200 dark:border-red-800'
                           }`}>
-                            <div className={`p-1.5 bg-white rounded-full shadow-sm ${
-                              checkup.generalCondition === 'Excellent' ? 'text-green-600' :
-                              checkup.generalCondition === 'Good' ? 'text-primary-600' :
-                              checkup.generalCondition === 'Fair' ? 'text-yellow-600' :
-                              'text-red-600'
+                            <div className={`p-1.5 bg-white dark:bg-gray-800 rounded-full shadow-sm ${
+                              checkup.generalCondition === 'Excellent' ? 'text-green-600 dark:text-green-400' :
+                              checkup.generalCondition === 'Good' ? 'text-primary-600 dark:text-primary-400' :
+                              checkup.generalCondition === 'Fair' ? 'text-yellow-600 dark:text-yellow-400' :
+                              'text-red-600 dark:text-red-400'
                             }`}>
                               <Stethoscope size={14} />
                             </div>
                             <div>
-                              <span className="text-[10px] font-medium text-gray-600 uppercase tracking-wider">Condition</span>
+                              <span className="text-[10px] font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Condition</span>
                               <p className={`text-sm font-bold leading-tight ${
-                                checkup.generalCondition === 'Excellent' ? 'text-green-700' :
-                                checkup.generalCondition === 'Good' ? 'text-primary-700' :
-                                checkup.generalCondition === 'Fair' ? 'text-yellow-700' :
-                                'text-red-700'
+                                checkup.generalCondition === 'Excellent' ? 'text-green-700 dark:text-green-300' :
+                                checkup.generalCondition === 'Good' ? 'text-primary-700 dark:text-primary-300' :
+                                checkup.generalCondition === 'Fair' ? 'text-yellow-700 dark:text-yellow-300' :
+                                'text-red-700 dark:text-red-300'
                               }`}>
                                 {checkup.generalCondition}
                               </p>
@@ -1419,28 +1417,28 @@ const AnimalDetails = () => {
                         
                         {checkup.mobility && (
                           <div className={`flex items-center gap-2 p-2 rounded-lg border ${
-                            checkup.mobility === 'Normal' ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-200' :
-                            checkup.mobility === 'Slightly Lame' ? 'bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200' :
-                            checkup.mobility === 'Severely Lame' ? 'bg-gradient-to-br from-orange-50 to-red-50 border-orange-200' :
-                            'bg-gradient-to-br from-red-50 to-rose-50 border-red-200'
+                            checkup.mobility === 'Normal' ? 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800' :
+                            checkup.mobility === 'Slightly Lame' ? 'bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border-yellow-200 dark:border-yellow-800' :
+                            checkup.mobility === 'Severely Lame' ? 'bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-orange-200 dark:border-orange-800' :
+                            'bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 border-red-200 dark:border-red-800'
                           }`}>
-                            <div className={`p-1.5 bg-white rounded-full shadow-sm ${
-                              checkup.mobility === 'Normal' ? 'text-green-600' :
-                              checkup.mobility === 'Slightly Lame' ? 'text-yellow-600' :
-                              checkup.mobility === 'Severely Lame' ? 'text-orange-600' :
-                              'text-red-600'
+                            <div className={`p-1.5 bg-white dark:bg-gray-800 rounded-full shadow-sm ${
+                              checkup.mobility === 'Normal' ? 'text-green-600 dark:text-green-400' :
+                              checkup.mobility === 'Slightly Lame' ? 'text-yellow-600 dark:text-yellow-400' :
+                              checkup.mobility === 'Severely Lame' ? 'text-orange-600 dark:text-orange-400' :
+                              'text-red-600 dark:text-red-400'
                             }`}>
                               {checkup.mobility === 'Normal' ? <Activity size={14} /> : 
                               checkup.mobility === 'Unable to Move' ? <XCircle size={14} /> : 
                               <AlertCircle size={14} />}
                             </div>
                             <div>
-                              <span className="text-[10px] font-medium text-gray-600 uppercase tracking-wider">Mobility</span>
+                              <span className="text-[10px] font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Mobility</span>
                               <p className={`text-sm font-bold leading-tight ${
-                                checkup.mobility === 'Normal' ? 'text-green-700' :
-                                checkup.mobility === 'Slightly Lame' ? 'text-yellow-700' :
-                                checkup.mobility === 'Severely Lame' ? 'text-orange-700' :
-                                'text-red-700'
+                                checkup.mobility === 'Normal' ? 'text-green-700 dark:text-green-300' :
+                                checkup.mobility === 'Slightly Lame' ? 'text-yellow-700 dark:text-yellow-300' :
+                                checkup.mobility === 'Severely Lame' ? 'text-orange-700 dark:text-orange-300' :
+                                'text-red-700 dark:text-red-300'
                               }`}>
                                 {checkup.mobility}
                               </p>
@@ -1452,24 +1450,24 @@ const AnimalDetails = () => {
                       {/* Vaccination Records */}
                       {checkup.vaccinations?.length > 0 && (
                         <div className="mb-3">
-                          <p className="text-xs font-medium text-gray-700 mb-1 flex items-center gap-1">
+                          <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 flex items-center gap-1">
                             <FileText size={12} />
                             Vaccinations ({checkup.vaccinations.length})
                           </p>
                           <div className="max-h-24 overflow-y-auto pr-1 space-y-1.5">
                             {checkup.vaccinations.map((vaccination) => (
-                              <div key={vaccination.id} className="bg-gray-50 p-2 rounded border border-gray-100 text-xs">
+                              <div key={vaccination.id} className="bg-gray-50 dark:bg-gray-700 p-2 rounded border border-gray-100 dark:border-gray-600 text-xs">
                                 <div className="flex flex-wrap gap-x-3 gap-y-1">
-                                  <span className="text-gray-600">
+                                  <span className="text-gray-600 dark:text-gray-300">
                                     <span className="font-medium">Type:</span> {vaccination.vaccinationType}
                                   </span>
-                                  <span className="text-gray-600">
+                                  <span className="text-gray-600 dark:text-gray-300">
                                     <span className="font-medium">Name:</span> {vaccination.vaccinationName}
                                   </span>
-                                  <span className="text-gray-600">
+                                  <span className="text-gray-600 dark:text-gray-300">
                                     <span className="font-medium">Date:</span> {vaccination.vaccinationDate}
                                   </span>
-                                  <span className="text-gray-600">
+                                  <span className="text-gray-600 dark:text-gray-300">
                                     <span className="font-medium">Batch:</span> {vaccination.batchNo}
                                   </span>
                                 </div>
@@ -1482,35 +1480,35 @@ const AnimalDetails = () => {
                       {/* Remark */}
                       {checkup.remark && (
                         <div className="mb-2">
-                          <p className="text-xs font-medium text-gray-700 mb-1">Remark:</p>
-                          <div className="bg-yellow-50 p-2 rounded-lg border border-yellow-100 max-h-16 overflow-y-auto text-xs text-gray-700">
+                          <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Remark:</p>
+                          <div className="bg-yellow-50 dark:bg-yellow-900/20 p-2 rounded-lg border border-yellow-100 dark:border-yellow-800 max-h-16 overflow-y-auto text-xs text-gray-700 dark:text-gray-300">
                             {checkup.remark}
                           </div>
                         </div>
                       )}
 
                       {/* Footer */}
-                      <div className="flex flex-wrap items-center justify-between gap-2 mt-2 pt-2 border-t border-gray-100 text-xs text-gray-500">
+                      <div className="flex flex-wrap items-center justify-between gap-2 mt-2 pt-2 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400">
                         <div className="flex items-center gap-3">
                           {checkup.vaccinated === 'yes' ? (
-                            <span className="flex items-center gap-1 text-green-600">
+                            <span className="flex items-center gap-1 text-green-600 dark:text-green-400">
                               <CheckCircle size={12} />
                               Vaccinated
                             </span>
                           ) : (
-                            <span className="flex items-center gap-1 text-gray-500">
+                            <span className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
                               <X size={12} />
                               Not Vaccinated
                             </span>
                           )}
                           {checkup.healthCertificateName && (
-                            <span className="flex items-center gap-1 text-primary-600">
+                            <span className="flex items-center gap-1 text-primary-600 dark:text-primary-400">
                               <FileText size={12} />
                               Certificate
                             </span>
                           )}
                         </div>
-                        <span className="text-gray-400">
+                        <span className="text-gray-400 dark:text-gray-500">
                           {formatDateTime(checkup.submittedAt || checkup.checkDate)}
                         </span>
                       </div>
@@ -1534,7 +1532,7 @@ const AnimalDetails = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Certificate No *
                       </label>
                       <input
@@ -1542,14 +1540,14 @@ const AnimalDetails = () => {
                         name="certificateNo"
                         value={insuranceForm.certificateNo}
                         onChange={handleInsuranceInputChange}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                         placeholder="Enter certificate number"
                         required
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Issue Date *
                       </label>
                       <input
@@ -1557,13 +1555,13 @@ const AnimalDetails = () => {
                         name="issueDate"
                         value={insuranceForm.issueDate}
                         onChange={handleInsuranceInputChange}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                         required
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Policy Number *
                       </label>
                       <input
@@ -1571,14 +1569,14 @@ const AnimalDetails = () => {
                         name="policyNumber"
                         value={insuranceForm.policyNumber}
                         onChange={handleInsuranceInputChange}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                         placeholder="Enter policy number"
                         required
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Owner Name
                       </label>
                       <input
@@ -1586,7 +1584,7 @@ const AnimalDetails = () => {
                         name="ownerName"
                         value={insuranceForm.ownerName}
                         onChange={handleInsuranceInputChange}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                         placeholder="Enter owner name"
                       />
                     </div>
@@ -1594,7 +1592,7 @@ const AnimalDetails = () => {
 
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Animal Name
                       </label>
                       <input
@@ -1602,13 +1600,13 @@ const AnimalDetails = () => {
                         name="animalName"
                         value={insuranceForm.animalName}
                         onChange={handleInsuranceInputChange}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                         placeholder="Enter animal name"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Species
                       </label>
                       <input
@@ -1616,13 +1614,13 @@ const AnimalDetails = () => {
                         name="species"
                         value={insuranceForm.species}
                         onChange={handleInsuranceInputChange}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                         placeholder="Enter species"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Animal Ear Tag ID
                       </label>
                       <input
@@ -1630,17 +1628,17 @@ const AnimalDetails = () => {
                         name="animalEarTagId"
                         value={insuranceForm.animalEarTagId || animal?.earTagId || ""}
                         onChange={handleInsuranceInputChange}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-gray-50"
+                        className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400 bg-gray-50 dark:bg-gray-600 text-gray-900 dark:text-white"
                         placeholder="Animal Ear Tag ID"
                         readOnly
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Upload Medical Insurance Certificate
                       </label>
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary-300 transition-colors">
+                      <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center hover:border-primary-300 dark:hover:border-primary-500 transition-colors">
                         <input
                           type="file"
                           accept=".pdf,.jpg,.jpeg,.png"
@@ -1652,12 +1650,12 @@ const AnimalDetails = () => {
                           htmlFor="insuranceFile"
                           className="cursor-pointer flex flex-col items-center gap-3"
                         >
-                          <FileCheck className="text-3xl text-primary-600" />
+                          <FileCheck className="text-3xl text-primary-600 dark:text-primary-400" />
                           <div>
-                            <span className="block text-sm font-medium text-gray-700">
+                            <span className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                               {insuranceForm.fileName || "Click to upload certificate"}
                             </span>
-                            <span className="text-xs text-gray-500 mt-1">
+                            <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                               PDF, JPG, PNG up to 10MB
                             </span>
                           </div>
@@ -1667,17 +1665,17 @@ const AnimalDetails = () => {
                   </div>
                 </div>
 
-                <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                   <button
                     onClick={handleCancelInsuranceForm}
-                    className="px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
+                    className="px-4 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
                   >
                     <X size={16} />
                     Cancel
                   </button>
                   <button
                     onClick={handleSaveInsurance}
-                    className="px-4 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2"
+                    className="px-4 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 dark:from-primary-500 dark:to-primary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2"
                   >
                     <Check size={16} />
                     {editingInsuranceId ? "Update Insurance" : "Save Insurance"}
@@ -1688,10 +1686,10 @@ const AnimalDetails = () => {
           ) : (
             <>
               <div className="flex justify-between items-center">
-                <h2 className="text-lg font-semibold text-gray-900">Medical Insurance</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Medical Insurance</h2>
                 <button
                   onClick={() => setShowInsuranceForm(true)}
-                  className="px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2"
+                  className="px-4 py-2.5 bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2"
                 >
                   <Plus size={16} />
                   Add Insurance
@@ -1699,13 +1697,13 @@ const AnimalDetails = () => {
               </div>
 
               {insurances.length === 0 ? (
-                <div className="bg-white rounded-xl shadow-md p-12 text-center">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/30 p-12 text-center transition-colors duration-300">
                   <div className="flex flex-col items-center justify-center">
-                    <div className="p-4 bg-primary-100 rounded-full mb-4">
-                      <FileCheck className="w-12 h-12 text-primary-600" />
+                    <div className="p-4 bg-primary-100 dark:bg-primary-900/30 rounded-full mb-4">
+                      <FileCheck className="w-12 h-12 text-primary-600 dark:text-primary-400" />
                     </div>
-                    <h3 className="text-lg font-medium text-gray-500 mb-2">No Insurance Records Found</h3>
-                    <p className="text-gray-400 text-sm mb-6">Add medical insurance information for this animal</p>
+                    <h3 className="text-lg font-medium text-gray-500 dark:text-gray-400 mb-2">No Insurance Records Found</h3>
+                    <p className="text-gray-400 dark:text-gray-500 text-sm mb-6">Add medical insurance information for this animal</p>
                   </div>
                 </div>
               ) : (
@@ -1713,28 +1711,28 @@ const AnimalDetails = () => {
                   {insurances.map((insurance) => (
                     <div
                       key={insurance.id}
-                      className="border border-gray-200 rounded-xl p-6 bg-white shadow-sm hover:shadow-md transition-shadow"
+                      className="border border-gray-200 dark:border-gray-700 rounded-xl p-6 bg-white dark:bg-gray-800 shadow-sm dark:shadow-gray-900/30 hover:shadow-md transition-shadow"
                     >
                       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
                         <div className="min-w-0">
-                          <h4 className="text-lg font-semibold text-gray-900 break-words">
+                          <h4 className="text-lg font-semibold text-gray-900 dark:text-white break-words">
                             Certificate #{insurance.certificateNo}
                           </h4>
-                          <p className="text-sm text-gray-500 break-words mt-1">
+                          <p className="text-sm text-gray-500 dark:text-gray-400 break-words mt-1">
                             Policy: {insurance.policyNumber} • Issued: {formatDate(insurance.issueDate)}
                           </p>
                         </div>
                         <div className="flex gap-2 flex-shrink-0">
                           <button
                             onClick={() => handleEditInsurance(insurance)}
-                            className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+                            className="p-2 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-colors"
                             title="Edit"
                           >
                             <Pencil size={16} />
                           </button>
                           <button
                             onClick={() => confirmDeleteInsurance(insurance.id)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
                             title="Delete"
                           >
                             <Trash2 size={16} />
@@ -1755,15 +1753,15 @@ const AnimalDetails = () => {
 
                       {insurance.medicalInsuranceCertificate && (
                         <div className="mt-4">
-                          <p className="text-sm text-gray-600 mb-2">Certificate Preview:</p>
-                          <div className="border rounded-lg p-4 bg-gray-50">
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Certificate Preview:</p>
+                          <div className="border dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-700">
                             {isPDFFile(insurance.fileName) ? (
                               <div className="space-y-3">
-                                <div className="flex items-center gap-3 p-3 bg-white rounded-lg border">
-                                  <File className="text-red-500 text-2xl flex-shrink-0" />
+                                <div className="flex items-center gap-3 p-3 bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700">
+                                  <File className="text-red-500 dark:text-red-400 text-2xl flex-shrink-0" />
                                   <div className="min-w-0">
-                                    <p className="font-medium text-base truncate">{insurance.fileName}</p>
-                                    <p className="text-sm text-gray-500">PDF Document</p>
+                                    <p className="font-medium text-base text-gray-900 dark:text-white truncate">{insurance.fileName}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">PDF Document</p>
                                   </div>
                                 </div>
                                 <div className="flex gap-2">
@@ -1771,14 +1769,14 @@ const AnimalDetails = () => {
                                     to={insurance.medicalInsuranceCertificate}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600"
                                   >
                                     <Eye size={16} /> View PDF
                                   </Link>
                                   <Link
                                     to={insurance.medicalInsuranceCertificate}
                                     download={insurance.fileName}
-                                    className="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 dark:bg-gray-500 text-white rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600"
                                   >
                                     <Download size={16} /> Download
                                   </Link>
@@ -1789,21 +1787,21 @@ const AnimalDetails = () => {
                                 <img
                                   src={insurance.medicalInsuranceCertificate}
                                   alt="Insurance Certificate"
-                                  className="w-full max-w-md rounded-lg border mx-auto"
+                                  className="w-full max-w-md rounded-lg border dark:border-gray-700 mx-auto"
                                 />
                                 <div className="flex gap-2">
                                   <Link
                                     to={insurance.medicalInsuranceCertificate}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600"
                                   >
                                     <Eye size={16} /> View Full Size
                                   </Link>
                                   <Link
                                     to={insurance.medicalInsuranceCertificate}
                                     download={insurance.fileName}
-                                    className="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 dark:bg-gray-500 text-white rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600"
                                   >
                                     <Download size={16} /> Download
                                   </Link>
@@ -1824,29 +1822,29 @@ const AnimalDetails = () => {
 
       {/* Delete Confirmation Modal */}
       {deleteModal.show && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6">
+        <div className="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-70 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg max-w-md w-full p-6">
             <div className="text-center">
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
-                <Trash2 className="h-6 w-6 text-red-600" />
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/30 mb-4">
+                <Trash2 className="h-6 w-6 text-red-600 dark:text-red-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 Delete {deleteModal.type === 'insurance' ? 'Insurance Record' : 'Health Checkup Record'}
               </h3>
-              <p className="text-gray-500 mb-6">
+              <p className="text-gray-500 dark:text-gray-400 mb-6">
                 Are you sure you want to delete this {deleteModal.type === 'insurance' ? 'insurance' : 'health checkup'} record? This
                 action cannot be undone.
               </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setDeleteModal({ show: false, id: null, type: null })}
-                  className="px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors flex-1"
+                  className="px-4 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex-1"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDelete}
-                  className="px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex-1"
+                  className="px-4 py-2.5 bg-red-600 dark:bg-red-500 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-600 transition-colors flex-1"
                 >
                   Delete
                 </button>
@@ -1855,19 +1853,25 @@ const AnimalDetails = () => {
           </div>
         </div>
       )}
+      
+      <Toaster 
+        toastOptions={{
+          className: 'dark:bg-gray-800 dark:text-white dark:border-gray-700',
+        }}
+      />
     </div>
   );
 };
 
 // Reusable Components
 const DetailSection = ({ title, icon, children }) => (
-  <div className="bg-white rounded-xl shadow-md overflow-hidden">
-    <div className="px-5 py-4 border-b border-gray-200">
+  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/30 overflow-hidden transition-colors duration-300">
+    <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-700">
       <div className="flex items-center gap-3">
-        <div className="p-2 bg-primary-50 rounded-lg">
-          <span className="text-primary-600">{icon}</span>
+        <div className="p-2 bg-primary-50 dark:bg-primary-900/30 rounded-lg">
+          <span className="text-primary-600 dark:text-primary-400">{icon}</span>
         </div>
-        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
       </div>
     </div>
     <div className="p-5">{children}</div>
@@ -1876,10 +1880,10 @@ const DetailSection = ({ title, icon, children }) => (
 
 const DetailRow = ({ label, value, fullWidth = false }) => (
   <div className={fullWidth ? "col-span-2" : ""}>
-    <label className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-1">
+    <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider block mb-1">
       {label}
     </label>
-    <div className="p-3 bg-gray-50 rounded-lg border border-gray-200 text-sm text-gray-800 break-words">
+    <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-700 text-sm text-gray-800 dark:text-gray-200 break-words">
       {value || "Not provided"}
     </div>
   </div>
