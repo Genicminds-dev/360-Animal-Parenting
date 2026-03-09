@@ -459,13 +459,13 @@ const BatchLists = () => {
     const getSortIcon = useCallback(
         (key) => {
             if (sortConfig.key !== key || !sortConfig.direction) {
-                return <Minus className="ml-1 text-gray-400" size={16} />;
+                return <Minus className="ml-1 text-gray-400 dark:text-gray-500" size={16} />;
             }
 
             if (sortConfig.direction === "asc") {
-                return <ChevronUp className="ml-1 text-gray-600" size={16} />;
+                return <ChevronUp className="ml-1 text-gray-600 dark:text-gray-300" size={16} />;
             } else {
-                return <ChevronDown className="ml-1 text-gray-600" size={16} />;
+                return <ChevronDown className="ml-1 text-gray-600 dark:text-gray-300" size={16} />;
             }
         },
         [sortConfig]
@@ -485,7 +485,7 @@ const BatchLists = () => {
             onSort: () => requestSort('batchId'),
             sortIcon: getSortIcon('batchId'),
             render: (item) => (
-                <div className="font-medium text-primary-600">{item.batchId}</div>
+                <div className="font-medium text-primary-600 dark:text-primary-400">{item.batchId}</div>
             )
         },
         {
@@ -495,8 +495,8 @@ const BatchLists = () => {
             onSort: () => requestSort('batchSize'),
             sortIcon: getSortIcon('batchSize'),
             render: (item) => (
-                <div className="font-medium text-gray-800">
-                    <span className="items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                <div className="font-medium text-gray-800 dark:text-gray-200">
+                    <span className="items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">
                         {item.batchSize} Animals
                     </span>
                 </div>
@@ -507,7 +507,7 @@ const BatchLists = () => {
             label: "Ear Tag IDs",
             sortable: false,
             render: (item) => (
-                <div className="font-medium text-gray-800 text-sm break-words whitespace-normal line-clamp-3">
+                <div className="font-medium text-gray-800 dark:text-gray-200 text-sm break-words whitespace-normal line-clamp-3">
                     {getEarTagIds(item.animals)}
                 </div>
             )
@@ -519,7 +519,7 @@ const BatchLists = () => {
             onSort: () => requestSort('createdAt'),
             sortIcon: getSortIcon('createdAt'),
             render: (item) => (
-                <div className="font-medium text-gray-800 text-sm">
+                <div className="font-medium text-gray-800 dark:text-gray-300 text-sm">
                     {formatDate(item.createdAt)}
                 </div>
             )
@@ -701,17 +701,17 @@ const BatchLists = () => {
 
     return (
         <>
-            <div className="space-y-6">
+            <div className="space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
                 {/* Header Section */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Animal Batch List</h1>
-                        <p className="text-gray-600">View and manage all animal batches</p>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Animal Batch List</h1>
+                        <p className="text-gray-600 dark:text-gray-400">View and manage all animal batches</p>
                     </div>
                     <div className="flex items-center space-x-4">
                         <button
                             onClick={handleRefresh}
-                            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium flex items-center space-x-2"
+                            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                             disabled={loading}
                         >
                             <span>Refresh</span>
@@ -723,67 +723,67 @@ const BatchLists = () => {
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Total Batches */}
-                    <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300 border border-gray-200 dark:border-gray-700">
                         <div className="flex items-start justify-between">
-                            <div className="p-3 bg-primary-100 rounded-lg">
-                                <Package className="text-primary-600" size={24} />
+                            <div className="p-3 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
+                                <Package className="text-primary-600 dark:text-primary-400" size={24} />
                             </div>
                             <div className="text-right">
-                                <h3 className="text-2xl font-bold text-gray-900">{stats.totalBatches}</h3>
-                                <p className="text-gray-600">Total Batches</p>
+                                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalBatches}</h3>
+                                <p className="text-gray-600 dark:text-gray-400">Total Batches</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Total Animals */}
-                    <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300 border border-gray-200 dark:border-gray-700">
                         <div className="flex items-start justify-between">
-                            <div className="p-3 bg-green-100 rounded-lg">
-                                <GiCow className="text-green-600" size={24} />
+                            <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                                <GiCow className="text-green-600 dark:text-green-400" size={24} />
                             </div>
                             <div className="text-right">
-                                <h3 className="text-2xl font-bold text-gray-900">{stats.totalAnimals}</h3>
-                                <p className="text-gray-600">Total Animals</p>
+                                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalAnimals}</h3>
+                                <p className="text-gray-600 dark:text-gray-400">Total Animals</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Last Batch Creation Date */}
-                    <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300 border border-gray-200 dark:border-gray-700">
                         <div className="flex items-start justify-between">
-                            <div className="p-3 bg-purple-100 rounded-lg">
-                                <CalendarClock className="text-purple-600" size={24} />
+                            <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                                <CalendarClock className="text-purple-600 dark:text-purple-400" size={24} />
                             </div>
                             <div className="text-right">
-                                <h3 className="text-xl font-bold text-gray-900">
+                                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                                     {stats.lastBatchDate ? formatDate(stats.lastBatchDate) : 'No batches'}
                                 </h3>
-                                <p className="text-gray-600">Last Batch Created</p>
+                                <p className="text-gray-600 dark:text-gray-400">Last Batch Created</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Search and Action Menu */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 transition-colors duration-300">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         {/* Left Side: Search and Filter Toggle */}
                         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                             {/* Search Input */}
                             <div className="relative w-full sm:w-80">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <BiSearch className="w-4 h-4 text-gray-400" />
+                                    <BiSearch className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                                 </div>
                                 <input
                                     type="text"
                                     placeholder="Search by Batch ID, Officer, Location, Ear Tag..."
-                                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-transparent text-sm bg-gray-50/50"
+                                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-transparent text-sm bg-gray-50/50 dark:bg-gray-700/50 dark:text-white dark:placeholder-gray-400 transition-colors duration-300"
                                     value={searchInput}
                                     onChange={handleSearchChange}
                                 />
                                 {searchTerm && (
                                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                                        <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
                                             {filteredBatches.length} found
                                         </span>
                                     </div>
@@ -793,15 +793,16 @@ const BatchLists = () => {
                             {/* Filter Toggle Button */}
                             <button
                                 onClick={() => setShowFilters(!showFilters)}
-                                className={`px-4 py-2.5 border rounded-lg flex items-center gap-2 text-sm transition-all justify-center md:justify-start ${showFilters
-                                    ? "bg-gradient-to-br from-primary-500 to-primary-600 text-white border-transparent"
-                                    : "border-gray-300 hover:bg-gray-50 text-gray-700"
+                                className={`px-4 py-2.5 border rounded-lg flex items-center gap-2 text-sm transition-all justify-center md:justify-start ${
+                                    showFilters
+                                        ? "bg-gradient-to-br from-primary-500 to-primary-600 text-white border-transparent"
+                                        : "border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
                                     }`}
                             >
                                 <Filter className="w-4 h-4" />
                                 Filters
                                 {isFilterApplied && (
-                                    <span className="ml-1 px-1.5 py-0.5 bg-primary-200 text-primary-800 rounded-full text-xs">
+                                    <span className="ml-1 px-1.5 py-0.5 bg-primary-200 dark:bg-primary-700 text-primary-800 dark:text-primary-300 rounded-full text-xs">
                                         •
                                     </span>
                                 )}
@@ -825,15 +826,15 @@ const BatchLists = () => {
 
                     {/* Filters Panel */}
                     {showFilters && (
-                        <div className="mt-4 p-5 bg-primary-50/50 rounded-xl border border-primary-100">
+                        <div className="mt-4 p-5 bg-primary-50/50 dark:bg-primary-900/20 rounded-xl border border-primary-100 dark:border-primary-800 transition-colors duration-300">
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                 {/* Source Type Filter */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                         Source Type
                                     </label>
                                     <select
-                                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
+                                        className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm transition-colors duration-300"
                                         value={tempFilters.sourceType || ""}
                                         onChange={(e) => handleFilterChange("sourceType", e.target.value)}
                                     >
@@ -846,13 +847,13 @@ const BatchLists = () => {
 
                                 {/* Holding Station Filter */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                         Holding Station
                                     </label>
                                     <input
                                         type="text"
                                         placeholder="Search station..."
-                                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
+                                        className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm transition-colors duration-300"
                                         value={tempFilters.holdingStation || ""}
                                         onChange={(e) => handleFilterChange("holdingStation", e.target.value)}
                                     />
@@ -860,14 +861,14 @@ const BatchLists = () => {
 
                                 {/* Date Range Filters */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                         From Date
                                     </label>
                                     <div className="relative">
-                                        <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                        <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
                                         <input
                                             type="date"
-                                            className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
+                                            className="w-full pl-10 pr-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm transition-colors duration-300"
                                             value={tempFilters.fromDate || ""}
                                             max={getCurrentDate()}
                                             onChange={(e) => handleFilterChange("fromDate", e.target.value)}
@@ -876,14 +877,14 @@ const BatchLists = () => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                         To Date
                                     </label>
                                     <div className="relative">
-                                        <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                        <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
                                         <input
                                             type="date"
-                                            className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
+                                            className="w-full pl-10 pr-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm transition-colors duration-300"
                                             value={tempFilters.toDate || ""}
                                             max={getCurrentDate()}
                                             min={tempFilters.fromDate || undefined}
@@ -894,14 +895,14 @@ const BatchLists = () => {
                             </div>
 
                             <div className="mt-6 flex flex-col xs:flex-row justify-between items-start xs:items-center gap-4">
-                                <div className="text-sm text-gray-600 w-full xs:w-auto">
+                                <div className="text-sm text-gray-600 dark:text-gray-400 w-full xs:w-auto">
                                     {isFilterApplied && (
-                                        <div className="flex flex-wrap items-center gap-2 bg-gradient-to-r from-primary-100 to-primary-50 px-3 py-2 rounded-lg border border-primary-200">
+                                        <div className="flex flex-wrap items-center gap-2 bg-gradient-to-r from-primary-100 to-primary-50 dark:from-primary-900/40 dark:to-primary-800/20 px-3 py-2 rounded-lg border border-primary-200 dark:border-primary-700">
                                             <span className="inline-flex items-center px-2 py-1 rounded-md bg-gradient-to-r from-primary-500 to-primary-600 text-white text-xs">
                                                 <Filter className="w-3 h-3 mr-1" />
                                                 Filters Applied
                                             </span>
-                                            <span className="text-primary-700 text-xs">
+                                            <span className="text-primary-700 dark:text-primary-300 text-xs">
                                                 {Object.keys(appliedFilters).length > 0 &&
                                                     Object.keys(appliedFilters).filter(k => appliedFilters[k]).map(key => {
                                                         if (key === 'fromDate' || key === 'toDate') {
@@ -917,14 +918,14 @@ const BatchLists = () => {
                                 <div className="flex flex-wrap gap-2 w-full xs:w-auto justify-start xs:justify-end">
                                     <button
                                         onClick={handleClearFilters}
-                                        className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors border border-gray-300 whitespace-nowrap"
+                                        className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors border border-gray-300 dark:border-gray-600 whitespace-nowrap"
                                     >
                                         <X size={14} className="inline mr-1" />
                                         Clear All
                                     </button>
                                     <button
                                         onClick={handleCancelFilters}
-                                        className="px-4 py-2 text-sm text-primary-600 hover:text-primary-800 hover:bg-primary-50 rounded-lg transition-colors border border-primary-300 whitespace-nowrap"
+                                        className="px-4 py-2 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-colors border border-primary-300 dark:border-primary-600 whitespace-nowrap"
                                     >
                                         Cancel
                                     </button>
@@ -976,21 +977,21 @@ const BatchLists = () => {
             {/* Delete Confirmation Modal */}
             {showDeleteModal && (
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 overflow-y-auto"
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 dark:bg-opacity-70 overflow-y-auto transition-colors duration-300"
                     style={{ top: 0, left: 0, right: 0, bottom: 0 }}
                 >
-                    <div className="relative w-full max-w-md bg-white rounded-md shadow-xl mx-2">
+                    <div className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-md shadow-xl mx-2 transition-colors duration-300">
                         <div className="flex justify-center mb-4 mt-4">
-                            <div className="p-3 bg-red-50 rounded-full">
-                                <HiOutlineTrash className="w-10 h-10 text-red-500" />
+                            <div className="p-3 bg-red-50 dark:bg-red-900/30 rounded-full">
+                                <HiOutlineTrash className="w-10 h-10 text-red-500 dark:text-red-400" />
                             </div>
                         </div>
 
                         <div className="text-center mb-6">
-                            <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-2">
+                            <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-white mb-2">
                                 Confirm Deletion
                             </h3>
-                            <p className="text-gray-500 text-sm sm:text-base leading-relaxed p-3">
+                            <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base leading-relaxed p-3">
                                 {deleteTarget === "selected"
                                     ? `You're about to delete ${deleteId?.length || 0} selected batch(es). This action cannot be undone.`
                                     : "You're about to delete this batch. This action cannot be undone."}
@@ -1005,7 +1006,7 @@ const BatchLists = () => {
                                     setDeleteId(null);
                                     setIsDeleting(false);
                                 }}
-                                className="flex-1 px-2 sm:px-5 py-1 border sm:py-2 border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors duration-150 text-sm font-medium focus:outline-none"
+                                className="flex-1 px-2 sm:px-5 py-1 border sm:py-2 border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150 text-sm font-medium focus:outline-none"
                                 disabled={isDeleting}
                             >
                                 Cancel

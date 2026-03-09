@@ -1,7 +1,7 @@
 // pages/holding-station/HoldingStationRegistration.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-hot-toast";
+import { toast, Toaster } from "react-hot-toast";
 import {
     Camera, X, ChevronDown, Save, ArrowLeft, MapPin, Building2, Upload, Eye, File, Image as ImageIcon, Video
 } from 'lucide-react';
@@ -78,7 +78,8 @@ const AddHoldingStation = () => {
             setFilteredCities([]);
         }
     }, [formData.stateId]);
-        // Clean up preview URLs
+    
+    // Clean up preview URLs
     useEffect(() => {
         return () => {
             if (photoPreview) {
@@ -114,7 +115,7 @@ const AddHoldingStation = () => {
             toast.error("Failed to load states. Please refresh the page.");
             
             // Empty states array instead of fallback to ensure user knows there's an issue
-                        setStates([]);
+            setStates([]);
             setFilteredStates([]);
         } finally {
             setLoading(false);
@@ -164,7 +165,7 @@ const AddHoldingStation = () => {
     const handleChange = (e) => {
         const { name, value, files } = e.target;
 
-                // Add length restriction for pin code
+        // Add length restriction for pin code
         if (name === 'pinCode' && value.length > 6) {
             return; // Don't update if exceeds 6 digits
         }
@@ -416,37 +417,36 @@ const AddHoldingStation = () => {
     const RequiredStar = () => <span className="text-red-500 ml-1">*</span>;
 
     return (
-        <div className="space-y-6">
-
+        <div className="space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
             {/* Header */}
             <div className="flex items-center gap-4">
                 <button
                     onClick={handleCancel}
-                    className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    className="p-2 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-colors"
                     disabled={isSubmitting}
                 >
                     <ArrowLeft size={20} />
                 </button>
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Holding Station Registration</h1>
-                    <p className="text-gray-600">Register new holding station for animal care</p>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Holding Station Registration</h1>
+                    <p className="text-gray-600 dark:text-gray-400">Register new holding station for animal care</p>
                 </div>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-8">
                 {/* Holding Station Details Card */}
-                <div className="card">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/30 border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-300">
                     <div className="flex items-center space-x-3 mb-6">
-                        <div className="p-2 bg-primary-50 rounded-lg">
-                            <Building2 className="text-primary-600" size={20} />
+                        <div className="p-2 bg-primary-50 dark:bg-primary-900/30 rounded-lg">
+                            <Building2 className="text-primary-600 dark:text-primary-400" size={20} />
                         </div>
-                        <h2 className="text-lg font-semibold text-gray-900">Station Details</h2>
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Station Details</h2>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Name */}
                         <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Holding Station Name <RequiredStar />
                             </label>
                             <input
@@ -454,18 +454,22 @@ const AddHoldingStation = () => {
                                 name="name"
                                 value={formData.name}
                                 onChange={handleChange}
-                                className={`input-field ${errors.name ? 'border-red-500' : ''}`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${
+                                    errors.name 
+                                        ? 'border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600' 
+                                        : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                                }`}
                                 placeholder="Enter holding station name"
                                 disabled={isSubmitting}
                             />
                             {errors.name && (
-                                <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+                                <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors.name}</p>
                             )}
                         </div>
 
                         {/* State */}
                         <div className="relative" ref={stateRef}>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 State <RequiredStar />
                             </label>
                             <div className="relative">
@@ -474,46 +478,50 @@ const AddHoldingStation = () => {
                                     name="state"
                                     value={formData.state}
                                     readOnly
-                                    className={`input-field ${errors.state ? 'border-red-500' : ''}`}
+                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${
+                                        errors.state 
+                                            ? 'border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600' 
+                                            : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                                    }`}
                                     placeholder="Select state"
                                     onClick={() => !isSubmitting && setStateDropdownOpen(!stateDropdownOpen)}
                                     disabled={isSubmitting}
                                 />
                                 <ChevronDown
-                                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 ${!isSubmitting ? 'cursor-pointer' : 'opacity-50'}`}
+                                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 ${!isSubmitting ? 'cursor-pointer' : 'opacity-50'}`}
                                     size={20}
                                     onClick={() => !isSubmitting && setStateDropdownOpen(!stateDropdownOpen)}
                                 />
 
                                 {stateDropdownOpen && !isSubmitting && (
-                                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-hidden">
-                                        <div className="p-2 border-b border-gray-200">
+                                    <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg dark:shadow-gray-900/30 max-h-60 overflow-hidden">
+                                        <div className="p-2 border-b border-gray-200 dark:border-gray-700">
                                             <input
                                                 type="text"
                                                 value={stateSearch}
                                                 onChange={(e) => setStateSearch(e.target.value)}
                                                 placeholder="Search state..."
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
                                                 autoFocus
                                             />
                                         </div>
                                         <div className="max-h-48 overflow-y-auto">
                                             {loading ? (
-                                                <div className="px-4 py-3 text-gray-500 text-center">
+                                                <div className="px-4 py-3 text-gray-500 dark:text-gray-400 text-center">
                                                     Loading states...
                                                 </div>
                                             ) : filteredStates.length > 0 ? (
                                                 filteredStates.map(state => (
                                                     <div
                                                         key={state.id}
-                                                        className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                                        className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0 text-gray-900 dark:text-white"
                                                         onClick={() => handleStateSelect(state)}
                                                     >
                                                         {state.name}
                                                     </div>
                                                 ))
                                             ) : (
-                                                <div className="px-4 py-3 text-gray-500 text-center">
+                                                <div className="px-4 py-3 text-gray-500 dark:text-gray-400 text-center">
                                                     No states found
                                                 </div>
                                             )}
@@ -522,13 +530,13 @@ const AddHoldingStation = () => {
                                 )}
                             </div>
                             {errors.state && (
-                                <p className="text-red-500 text-xs mt-1">{errors.state}</p>
+                                <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors.state}</p>
                             )}
                         </div>
 
                         {/* City */}
                         <div className="relative" ref={cityRef}>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 City <RequiredStar />
                             </label>
                             <div className="relative">
@@ -537,7 +545,11 @@ const AddHoldingStation = () => {
                                     name="city"
                                     value={formData.city}
                                     readOnly
-                                    className={`input-field ${errors.city ? 'border-red-500' : ''} ${!formData.state ? 'bg-gray-100' : ''}`}
+                                    className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${
+                                        errors.city 
+                                            ? 'border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600' 
+                                            : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                                    } ${!formData.state ? 'bg-gray-100 dark:bg-gray-600/50' : ''}`}
                                     placeholder={formData.state ? "Select city" : "Select state first"}
                                     onClick={() => {
                                         if (formData.state && !isSubmitting) {
@@ -547,7 +559,7 @@ const AddHoldingStation = () => {
                                     disabled={!formData.state || isSubmitting}
                                 />
                                 <ChevronDown
-                                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 ${!formData.state || isSubmitting ? 'opacity-50' : 'cursor-pointer'}`}
+                                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 ${!formData.state || isSubmitting ? 'opacity-50' : 'cursor-pointer'}`}
                                     size={20}
                                     onClick={() => {
                                         if (formData.state && !isSubmitting) {
@@ -557,34 +569,34 @@ const AddHoldingStation = () => {
                                 />
 
                                 {cityDropdownOpen && formData.state && !isSubmitting && (
-                                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-hidden">
-                                        <div className="p-2 border-b border-gray-200">
+                                    <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg dark:shadow-gray-900/30 max-h-60 overflow-hidden">
+                                        <div className="p-2 border-b border-gray-200 dark:border-gray-700">
                                             <input
                                                 type="text"
                                                 value={citySearch}
                                                 onChange={(e) => setCitySearch(e.target.value)}
                                                 placeholder="Search city..."
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
                                                 autoFocus
                                             />
                                         </div>
                                         <div className="max-h-48 overflow-y-auto">
                                             {loading ? (
-                                                <div className="px-4 py-3 text-gray-500 text-center">
+                                                <div className="px-4 py-3 text-gray-500 dark:text-gray-400 text-center">
                                                     Loading cities...
                                                 </div>
                                             ) : filteredCities.length > 0 ? (
                                                 filteredCities.map(city => (
                                                     <div
                                                         key={city.id}
-                                                        className="px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                                                        className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-b-0 text-gray-900 dark:text-white"
                                                         onClick={() => handleCitySelect(city)}
                                                     >
                                                         {city.name}
                                                     </div>
                                                 ))
                                             ) : (
-                                                <div className="px-4 py-3 text-gray-500 text-center">
+                                                <div className="px-4 py-3 text-gray-500 dark:text-gray-400 text-center">
                                                     No cities found
                                                 </div>
                                             )}
@@ -593,13 +605,13 @@ const AddHoldingStation = () => {
                                 )}
                             </div>
                             {errors.city && (
-                                <p className="text-red-500 text-xs mt-1">{errors.city}</p>
+                                <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors.city}</p>
                             )}
                         </div>
 
                         {/* Pin Code */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Pin Code <RequiredStar />
                             </label>
                             <input
@@ -608,18 +620,22 @@ const AddHoldingStation = () => {
                                 value={formData.pinCode}
                                 onChange={handleChange}
                                 maxLength={6}
-                                className={`input-field ${errors.pinCode ? 'border-red-500' : ''}`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${
+                                    errors.pinCode 
+                                        ? 'border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600' 
+                                        : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                                }`}
                                 placeholder="Enter 6-digit pin code"
                                 disabled={isSubmitting}
                             />
                             {errors.pinCode && (
-                                <p className="text-red-500 text-xs mt-1">{errors.pinCode}</p>
+                                <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors.pinCode}</p>
                             )}
                         </div>
 
                         {/* Address */}
                         <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Address <RequiredStar />
                             </label>
                             <textarea
@@ -627,46 +643,50 @@ const AddHoldingStation = () => {
                                 value={formData.address}
                                 onChange={handleChange}
                                 rows="4"
-                                className={`input-field ${errors.address ? 'border-red-500' : ''}`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${
+                                    errors.address 
+                                        ? 'border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600' 
+                                        : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                                }`}
                                 placeholder="Enter complete address with landmark, area, etc."
                                 disabled={isSubmitting}
                             />
                             {errors.address && (
-                                <p className="text-red-500 text-xs mt-1">{errors.address}</p>
+                                <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors.address}</p>
                             )}
                         </div>
                     </div>
                 </div>
 
                 {/* Media Section */}
-                <div className="card">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/30 border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-300">
                     <div className="flex items-center space-x-3 mb-6">
-                        <div className="p-2 bg-green-50 rounded-lg">
-                            <Camera className="text-green-600" size={20} />
+                        <div className="p-2 bg-green-50 dark:bg-green-900/30 rounded-lg">
+                            <Camera className="text-green-600 dark:text-green-400" size={20} />
                         </div>
-                        <h2 className="text-lg font-semibold text-gray-900">Station Media</h2>
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Station Media</h2>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Photo Upload */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-4">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
                                 Station Photo
                             </label>
                             <div className="flex flex-col items-center justify-center">
                                 <div className="w-full">
                                     {formData.photo ? (
-                                        <div className="border-2 border-gray-300 rounded-lg p-6">
+                                        <div className="border-2 border-gray-300 dark:border-gray-600 rounded-lg p-6">
                                             <div className="flex items-center justify-between mb-4">
                                                 <div className="flex items-center space-x-3">
-                                                    <div className="p-3 rounded-lg bg-primary-100 text-primary-600">
+                                                    <div className="p-3 rounded-lg bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400">
                                                         <ImageIcon size={24} />
                                                     </div>
                                                     <div>
-                                                        <p className="font-medium text-gray-900">
+                                                        <p className="font-medium text-gray-900 dark:text-white break-all max-w-xs">
                                                             {getDisplayFileName(formData.photo, 'photo')}
                                                         </p>
-                                                        <p className="text-sm text-gray-500">
+                                                        <p className="text-sm text-gray-500 dark:text-gray-400">
                                                             {Math.round(formData.photo.size / 1024)} KB
                                                         </p>
                                                     </div>
@@ -675,7 +695,7 @@ const AddHoldingStation = () => {
                                                     <button
                                                         type="button"
                                                         onClick={() => openMedia('photo')}
-                                                        className="p-2 bg-primary-100 text-primary-600 rounded-lg hover:bg-primary-200 transition-colors"
+                                                        className="p-2 bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded-lg hover:bg-primary-200 dark:hover:bg-primary-800/50 transition-colors"
                                                         title="Preview Image"
                                                         disabled={isSubmitting}
                                                     >
@@ -684,7 +704,7 @@ const AddHoldingStation = () => {
                                                     <button
                                                         type="button"
                                                         onClick={() => removeMedia('photo')}
-                                                        className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+                                                        className="p-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                                                         title="Remove"
                                                         disabled={isSubmitting}
                                                     >
@@ -694,11 +714,11 @@ const AddHoldingStation = () => {
                                             </div>
 
                                             {photoPreview && (
-                                                <div className="mt-4 border border-gray-200 rounded-lg overflow-hidden">
-                                                    <div className="p-2 bg-gray-50 border-b border-gray-200">
-                                                        <p className="text-sm font-medium text-gray-700">Photo Preview</p>
+                                                <div className="mt-4 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                                                    <div className="p-2 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
+                                                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Photo Preview</p>
                                                     </div>
-                                                    <div className="p-4 flex items-center justify-center bg-gray-50">
+                                                    <div className="p-4 flex items-center justify-center bg-gray-50 dark:bg-gray-800">
                                                         <img
                                                             src={photoPreview}
                                                             alt="Station Preview"
@@ -709,19 +729,19 @@ const AddHoldingStation = () => {
                                             )}
                                         </div>
                                     ) : (
-                                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary-500 transition-colors">
+                                        <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-primary-500 dark:hover:border-primary-400 transition-colors">
                                             <div className="flex flex-col items-center justify-center">
-                                                <Upload className="text-gray-400 mb-3" size={40} />
-                                                <p className="text-sm text-gray-700 mb-2 font-medium">
+                                                <Upload className="text-gray-400 dark:text-gray-500 mb-3" size={40} />
+                                                <p className="text-sm text-gray-700 dark:text-gray-300 mb-2 font-medium">
                                                     Upload Station Photo
                                                 </p>
-                                                <p className="text-xs text-gray-500 mb-4">
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
                                                     Upload photo of the holding station
                                                 </p>
 
                                                 <label
                                                     htmlFor="photoUpload"
-                                                    className={`px-4 py-2 bg-primary-600 text-white rounded-lg cursor-pointer hover:bg-primary-700 transition-colors text-sm ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                    className={`px-4 py-2 bg-primary-600 dark:bg-primary-500 text-white rounded-lg cursor-pointer hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors text-sm ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                 >
                                                     Browse File
                                                 </label>
@@ -744,23 +764,23 @@ const AddHoldingStation = () => {
 
                         {/* Video Upload */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-4">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
                                 Station Video
                             </label>
                             <div className="flex flex-col items-center justify-center">
                                 <div className="w-full">
                                     {formData.video ? (
-                                        <div className="border-2 border-gray-300 rounded-lg p-6">
+                                        <div className="border-2 border-gray-300 dark:border-gray-600 rounded-lg p-6">
                                             <div className="flex items-center justify-between mb-4">
                                                 <div className="flex items-center space-x-3">
-                                                    <div className="p-3 rounded-lg bg-red-100 text-red-600">
+                                                    <div className="p-3 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400">
                                                         <Video size={24} />
                                                     </div>
                                                     <div>
-                                                        <p className="font-medium text-gray-900">
+                                                        <p className="font-medium text-gray-900 dark:text-white break-all max-w-xs">
                                                             {getDisplayFileName(formData.video, 'video')}
                                                         </p>
-                                                        <p className="text-sm text-gray-500">
+                                                        <p className="text-sm text-gray-500 dark:text-gray-400">
                                                             {Math.round(formData.video.size / 1024)} KB
                                                         </p>
                                                     </div>
@@ -769,7 +789,7 @@ const AddHoldingStation = () => {
                                                     <button
                                                         type="button"
                                                         onClick={() => openMedia('video')}
-                                                        className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
+                                                        className="p-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-800/50 transition-colors"
                                                         title="Play Video"
                                                         disabled={isSubmitting}
                                                     >
@@ -778,7 +798,7 @@ const AddHoldingStation = () => {
                                                     <button
                                                         type="button"
                                                         onClick={() => removeMedia('video')}
-                                                        className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+                                                        className="p-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                                                         title="Remove"
                                                         disabled={isSubmitting}
                                                     >
@@ -788,11 +808,11 @@ const AddHoldingStation = () => {
                                             </div>
 
                                             {videoPreview && (
-                                                <div className="mt-4 border border-gray-200 rounded-lg overflow-hidden">
-                                                    <div className="p-2 bg-gray-50 border-b border-gray-200">
-                                                        <p className="text-sm font-medium text-gray-700">Video Preview</p>
+                                                <div className="mt-4 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                                                    <div className="p-2 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
+                                                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Video Preview</p>
                                                     </div>
-                                                    <div className="p-4 flex items-center justify-center bg-gray-50">
+                                                    <div className="p-4 flex items-center justify-center bg-gray-50 dark:bg-gray-800">
                                                         <video
                                                             src={videoPreview}
                                                             controls
@@ -805,19 +825,19 @@ const AddHoldingStation = () => {
                                             )}
                                         </div>
                                     ) : (
-                                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary-500 transition-colors">
+                                        <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-primary-500 dark:hover:border-primary-400 transition-colors">
                                             <div className="flex flex-col items-center justify-center">
-                                                <Upload className="text-gray-400 mb-3" size={40} />
-                                                <p className="text-sm text-gray-700 mb-2 font-medium">
+                                                <Upload className="text-gray-400 dark:text-gray-500 mb-3" size={40} />
+                                                <p className="text-sm text-gray-700 dark:text-gray-300 mb-2 font-medium">
                                                     Upload Station Video
                                                 </p>
-                                                <p className="text-xs text-gray-500 mb-4">
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
                                                     Show the facility from all angles
                                                 </p>
 
                                                 <label
                                                     htmlFor="videoUpload"
-                                                    className={`px-4 py-2 bg-primary-600 text-white rounded-lg cursor-pointer hover:bg-primary-700 transition-colors text-sm ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                    className={`px-4 py-2 bg-primary-600 dark:bg-primary-500 text-white rounded-lg cursor-pointer hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors text-sm ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                 >
                                                     Browse File
                                                 </label>
@@ -841,12 +861,12 @@ const AddHoldingStation = () => {
                 </div>
 
                 {/* Form Actions */}
-                <div className="flex items-center justify-end pt-6 border-t border-gray-200">
+                <div className="flex items-center justify-end pt-6 border-t border-gray-200 dark:border-gray-700">
                     <div className="flex space-x-4">
                         <button
                             type="button"
                             onClick={handleCancel}
-                            className={`px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                             disabled={isSubmitting}
                         >
                             Cancel
@@ -854,7 +874,7 @@ const AddHoldingStation = () => {
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className={`px-6 py-2 bg-primary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center min-w-[140px] ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`px-6 py-2 bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center min-w-[140px] ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             {isSubmitting ? (
                                 <>
@@ -874,6 +894,12 @@ const AddHoldingStation = () => {
                     </div>
                 </div>
             </form>
+
+            <Toaster
+                toastOptions={{
+                    className: 'dark:bg-gray-800 dark:text-white dark:border-gray-700',
+                }}
+            />
         </div>
     );
 };

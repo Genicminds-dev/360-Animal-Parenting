@@ -343,57 +343,65 @@ const ManageUsersForm = () => {
     }
   };
 
-  return (
-    <div className="space-y-6">
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          style: { background: "#363636", color: "#fff" },
-          success: { style: { background: "#10b981" } },
-          error: { style: { background: "#ef4444" } },
-          duration: 3000,
-        }}
-      />
+  const handleCancel = () => {
+    navigate(PATHROUTES.userList);
+  };
 
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">
-          {isEditMode ? "Edit User Details" : "Add New User"}
-        </h1>
-        <p className="text-gray-600">
-          {isEditMode ? "Update user information" : "Register new user for the system"}
-        </p>
+  return (
+    <div className="space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
+
+      {/* Header with back button */}
+      <div className="flex items-center gap-4">
+        <button
+          onClick={handleCancel}
+          className="p-2 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-colors"
+          disabled={isSubmitting}
+        >
+          <RiArrowLeftLine size={20} />
+        </button>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            {isEditMode ? "Edit User Details" : "Add New User"}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            {isEditMode ? "Update user information" : "Register new user for the system"}
+          </p>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Personal Details Section */}
-        <div className="card">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/30 border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-300">
           <div className="flex items-center space-x-3 mb-6">
-            <div className="p-2 bg-primary-50 rounded-lg">
-              <FaUser className="text-primary-600" size={20} />
+            <div className="p-2 bg-primary-50 dark:bg-primary-900/30 rounded-lg">
+              <FaUser className="text-primary-600 dark:text-primary-400" size={20} />
             </div>
-            <h2 className="text-lg font-semibold text-gray-900">Personal Details</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Personal Details</h2>
           </div>
 
           {/* Personal Details Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 First Name <span className="text-red-500">*</span>
               </label>
               <div className="relative">
-                <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
                 <input
                   type="text"
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleChange}
-                  className={`input-field pl-10 ${errors.firstName ? "border-red-500" : ""}`}
+                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${errors.firstName
+                      ? "border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600"
+                      : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
+                    }`}
                   placeholder="Enter first name"
                   disabled={isSubmitting}
                 />
               </div>
               {errors.firstName && (
-                <p className="text-red-500 text-xs mt-1 flex items-center">
+                <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center">
                   <RiErrorWarningLine className="mr-1" />
                   {errors.firstName}
                 </p>
@@ -401,23 +409,26 @@ const ManageUsersForm = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Last Name <span className="text-red-500">*</span>
               </label>
               <div className="relative">
-                <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
                 <input
                   type="text"
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleChange}
-                  className={`input-field pl-10 ${errors.lastName ? "border-red-500" : ""}`}
+                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${errors.lastName
+                      ? "border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600"
+                      : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
+                    }`}
                   placeholder="Enter last name"
                   disabled={isSubmitting}
                 />
               </div>
               {errors.lastName && (
-                <p className="text-red-500 text-xs mt-1 flex items-center">
+                <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center">
                   <RiErrorWarningLine className="mr-1" />
                   {errors.lastName}
                 </p>
@@ -425,23 +436,26 @@ const ManageUsersForm = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Mobile Number <span className="text-red-500">*</span>
               </label>
               <div className="relative">
-                <FaPhone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <FaPhone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
                 <input
                   type="tel"
                   name="mobile"
                   value={formData.mobile}
                   onChange={handleChange}
-                  className={`input-field pl-10 ${errors.mobile ? "border-red-500" : ""}`}
+                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${errors.mobile
+                      ? "border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600"
+                      : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
+                    }`}
                   placeholder="10-digit number starting with 6-9"
                   disabled={isSubmitting}
                 />
               </div>
               {errors.mobile && (
-                <p className="text-red-500 text-xs mt-1 flex items-center">
+                <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center">
                   <RiErrorWarningLine className="mr-1" />
                   {errors.mobile}
                 </p>
@@ -449,23 +463,26 @@ const ManageUsersForm = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Email <span className="text-red-500">*</span>
               </label>
               <div className="relative">
-                <FaEnvelope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <FaEnvelope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`input-field pl-10 ${errors.email ? "border-red-500" : ""}`}
+                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${errors.email
+                      ? "border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600"
+                      : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
+                    }`}
                   placeholder="Enter email address"
                   disabled={isSubmitting}
                 />
               </div>
               {errors.email && (
-                <p className="text-red-500 text-xs mt-1 flex items-center">
+                <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center">
                   <RiErrorWarningLine className="mr-1" />
                   {errors.email}
                 </p>
@@ -473,33 +490,34 @@ const ManageUsersForm = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 User Role <span className="text-red-500">*</span>
               </label>
               <div className="relative">
-                <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
                 <select
                   name="roleId"
                   value={formData.roleId}
                   onChange={handleChange}
-                  className={`input-field pl-10 appearance-none ${
-                    errors.roleId ? "border-red-500" : ""
-                  } ${!formData.roleId ? "text-gray-500" : "text-gray-900"}`}
+                  className={`w-full pl-10 pr-10 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none appearance-none dark:bg-gray-700 dark:text-white dark:border-gray-600 ${errors.roleId
+                      ? "border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600"
+                      : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
+                    } ${!formData.roleId ? "text-gray-500 dark:text-gray-400" : "text-gray-900 dark:text-white"}`}
                   disabled={isSubmitting || loadingRoles}
                 >
-                  <option value="" disabled>
+                  <option value="" disabled className="dark:bg-gray-700">
                     {loadingRoles ? "Loading roles..." : "Select User Role"}
                   </option>
                   {roles.map((role) => (
-                    <option key={role.roleId} value={role.roleId}>
+                    <option key={role.roleId} value={role.roleId} className="dark:bg-gray-700">
                       {role.name}
                     </option>
                   ))}
                 </select>
-                <RiArrowDownSLine className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={20} />
+                <RiArrowDownSLine className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none" size={20} />
               </div>
               {errors.roleId && (
-                <p className="text-red-500 text-xs mt-1 flex items-center">
+                <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center">
                   <RiErrorWarningLine className="mr-1" />
                   {errors.roleId}
                 </p>
@@ -507,31 +525,31 @@ const ManageUsersForm = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Status <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
                   {formData.status === "active" ? (
-                    <FaCheckCircle className="text-green-500" size={18} />
+                    <FaCheckCircle className="text-green-500 dark:text-green-400" size={18} />
                   ) : (
-                    <FaTimesCircle className="text-red-500" size={18} />
+                    <FaTimesCircle className="text-red-500 dark:text-red-400" size={18} />
                   )}
                 </div>
                 <select
                   name="status"
                   value={formData.status}
                   onChange={handleChange}
-                  className="input-field pl-10 appearance-none text-gray-900"
+                  className="w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none appearance-none dark:bg-gray-700 dark:text-white"
                   disabled={isSubmitting}
                 >
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
+                  <option value="active" className="dark:bg-gray-700">Active</option>
+                  <option value="inactive" className="dark:bg-gray-700">Inactive</option>
                 </select>
-                <RiArrowDownSLine className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={20} />
+                <RiArrowDownSLine className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 pointer-events-none" size={20} />
               </div>
               {errors.status && (
-                <p className="text-red-500 text-xs mt-1 flex items-center">
+                <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center">
                   <RiErrorWarningLine className="mr-1" />
                   {errors.status}
                 </p>
@@ -542,15 +560,15 @@ const ManageUsersForm = () => {
 
         {/* Security Information Section */}
         {(!isEditMode || formData.password) && (
-          <div className="card">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/30 border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-300">
             <div className="flex items-center space-x-3 mb-6">
-              <div className="p-2 bg-green-50 rounded-lg">
-                <FaLock className="text-green-600" size={20} />
+              <div className="p-2 bg-green-50 dark:bg-green-900/30 rounded-lg">
+                <FaLock className="text-green-600 dark:text-green-400" size={20} />
               </div>
-              <h2 className="text-lg font-semibold text-gray-900">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Security Information
                 {isEditMode && formData.password === "" && (
-                  <span className="text-xs font-normal text-gray-500 ml-2">
+                  <span className="text-xs font-normal text-gray-500 dark:text-gray-400 ml-2">
                     (Leave blank to keep current password)
                   </span>
                 )}
@@ -559,19 +577,20 @@ const ManageUsersForm = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Password {!isEditMode && <span className="text-red-500">*</span>}
                 </label>
                 <div className="relative">
-                  <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                  <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
                   <input
                     type={showPassword ? "text" : "password"}
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className={`input-field pl-10 pr-10 ${
-                      errors.password ? "border-red-500" : ""
-                    }`}
+                    className={`w-full pl-10 pr-10 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${errors.password
+                        ? "border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600"
+                        : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
+                      }`}
                     placeholder={
                       isEditMode
                         ? "Enter new password (optional)"
@@ -582,96 +601,86 @@ const ManageUsersForm = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                   >
                     {showPassword ? <RiEyeOffLine size={18} /> : <RiEyeLine size={18} />}
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="text-red-500 text-xs mt-1 flex items-center">
+                  <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center">
                     <RiErrorWarningLine className="mr-1" />
                     {errors.password}
                   </p>
                 )}
 
                 {formData.password && (
-                  <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <p className="text-sm font-medium text-gray-700 mb-2">
+                  <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Password must contain:
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <div className="flex items-center space-x-2">
                         <div
-                          className={`w-2 h-2 rounded-full ${
-                            passwordValidation.length ? "bg-green-500" : "bg-gray-300"
-                          }`}
+                          className={`w-2 h-2 rounded-full ${passwordValidation.length ? "bg-green-500 dark:bg-green-400" : "bg-gray-300 dark:bg-gray-600"
+                            }`}
                         ></div>
                         <span
-                          className={`text-xs ${
-                            passwordValidation.length ? "text-green-600" : "text-gray-500"
-                          }`}
+                          className={`text-xs ${passwordValidation.length ? "text-green-600 dark:text-green-400" : "text-gray-500 dark:text-gray-400"
+                            }`}
                         >
                           8-30 characters
                         </span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <div
-                          className={`w-2 h-2 rounded-full ${
-                            passwordValidation.uppercase ? "bg-green-500" : "bg-gray-300"
-                          }`}
+                          className={`w-2 h-2 rounded-full ${passwordValidation.uppercase ? "bg-green-500 dark:bg-green-400" : "bg-gray-300 dark:bg-gray-600"
+                            }`}
                         ></div>
                         <span
-                          className={`text-xs ${
-                            passwordValidation.uppercase
-                              ? "text-green-600"
-                              : "text-gray-500"
-                          }`}
+                          className={`text-xs ${passwordValidation.uppercase
+                              ? "text-green-600 dark:text-green-400"
+                              : "text-gray-500 dark:text-gray-400"
+                            }`}
                         >
                           At least one uppercase letter
                         </span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <div
-                          className={`w-2 h-2 rounded-full ${
-                            passwordValidation.lowercase ? "bg-green-500" : "bg-gray-300"
-                          }`}
+                          className={`w-2 h-2 rounded-full ${passwordValidation.lowercase ? "bg-green-500 dark:bg-green-400" : "bg-gray-300 dark:bg-gray-600"
+                            }`}
                         ></div>
                         <span
-                          className={`text-xs ${
-                            passwordValidation.lowercase
-                              ? "text-green-600"
-                              : "text-gray-500"
-                          }`}
+                          className={`text-xs ${passwordValidation.lowercase
+                              ? "text-green-600 dark:text-green-400"
+                              : "text-gray-500 dark:text-gray-400"
+                            }`}
                         >
                           At least one lowercase letter
                         </span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <div
-                          className={`w-2 h-2 rounded-full ${
-                            passwordValidation.number ? "bg-green-500" : "bg-gray-300"
-                          }`}
+                          className={`w-2 h-2 rounded-full ${passwordValidation.number ? "bg-green-500 dark:bg-green-400" : "bg-gray-300 dark:bg-gray-600"
+                            }`}
                         ></div>
                         <span
-                          className={`text-xs ${
-                            passwordValidation.number ? "text-green-600" : "text-gray-500"
-                          }`}
+                          className={`text-xs ${passwordValidation.number ? "text-green-600 dark:text-green-400" : "text-gray-500 dark:text-gray-400"
+                            }`}
                         >
                           At least one number
                         </span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <div
-                          className={`w-2 h-2 rounded-full ${
-                            passwordValidation.special ? "bg-green-500" : "bg-gray-300"
-                          }`}
+                          className={`w-2 h-2 rounded-full ${passwordValidation.special ? "bg-green-500 dark:bg-green-400" : "bg-gray-300 dark:bg-gray-600"
+                            }`}
                         ></div>
                         <span
-                          className={`text-xs ${
-                            passwordValidation.special
-                              ? "text-green-600"
-                              : "text-gray-500"
-                          }`}
+                          className={`text-xs ${passwordValidation.special
+                              ? "text-green-600 dark:text-green-400"
+                              : "text-gray-500 dark:text-gray-400"
+                            }`}
                         >
                           At least one special character
                         </span>
@@ -682,29 +691,30 @@ const ManageUsersForm = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Confirm Password{" "}
                   {(!isEditMode || formData.password) && (
                     <span className="text-red-500">*</span>
                   )}
                 </label>
                 <div className="relative">
-                  <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                  <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
                   <input
                     type={showConfirmPassword ? "text" : "password"}
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className={`input-field pl-10 pr-10 ${
-                      errors.confirmPassword ? "border-red-500" : ""
-                    }`}
+                    className={`w-full pl-10 pr-10 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${errors.confirmPassword
+                        ? "border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600"
+                        : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
+                      }`}
                     placeholder="Confirm password"
                     disabled={isSubmitting}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
                   >
                     {showConfirmPassword ? (
                       <RiEyeOffLine size={18} />
@@ -714,7 +724,7 @@ const ManageUsersForm = () => {
                   </button>
                 </div>
                 {errors.confirmPassword && (
-                  <p className="text-red-500 text-xs mt-1 flex items-center">
+                  <p className="text-red-500 dark:text-red-400 text-xs mt-1 flex items-center">
                     <RiErrorWarningLine className="mr-1" />
                     {errors.confirmPassword}
                   </p>
@@ -722,7 +732,7 @@ const ManageUsersForm = () => {
                 {formData.password &&
                   formData.confirmPassword &&
                   formData.password === formData.confirmPassword && (
-                    <div className="mt-2 flex items-center text-green-600 text-xs">
+                    <div className="mt-2 flex items-center text-green-600 dark:text-green-400 text-xs">
                       <FaCheck className="mr-1" size={12} /> Passwords match
                     </div>
                   )}
@@ -732,13 +742,12 @@ const ManageUsersForm = () => {
         )}
 
         {/* Form Actions */}
-        <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+        <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
           <button
             type="button"
-            onClick={() => navigate(PATHROUTES.manageUsers)}
-            className={`px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors ${
-              isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            onClick={handleCancel}
+            className={`px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             disabled={isSubmitting}
           >
             Cancel
@@ -747,7 +756,7 @@ const ManageUsersForm = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-6 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center min-w-[120px] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-2 bg-gradient-to-r from-primary-600 to-secondary-600 dark:from-primary-500 dark:to-secondary-500 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center min-w-[120px] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
               <>
@@ -782,6 +791,12 @@ const ManageUsersForm = () => {
           </button>
         </div>
       </form>
+      <Toaster
+        toastOptions={{
+          className: 'dark:bg-gray-800 dark:text-white dark:border-gray-700',
+        }}
+      />
+
     </div>
   );
 };

@@ -334,15 +334,15 @@ const BrokersList = () => {
   const getSortIcon = useCallback(
     (key) => {
       if (sortCycle.key !== key) {
-        return <Minus className="ml-1 text-gray-400" size={16} />;
+        return <Minus className="ml-1 text-gray-400 dark:text-gray-500" size={16} />;
       }
 
       if (sortCycle.step === 0) {
-        return <Minus className="ml-1 text-gray-400" size={16} />;
+        return <Minus className="ml-1 text-gray-400 dark:text-gray-500" size={16} />;
       } else if (sortCycle.step === 1) {
-        return <ChevronUp className="ml-1 text-gray-600" size={16} />;
+        return <ChevronUp className="ml-1 text-gray-600 dark:text-gray-300" size={16} />;
       } else {
-        return <ChevronDown className="ml-1 text-gray-600" size={16} />;
+        return <ChevronDown className="ml-1 text-gray-600 dark:text-gray-300" size={16} />;
       }
     },
     [sortCycle]
@@ -358,7 +358,7 @@ const BrokersList = () => {
       sortIcon: getSortIcon('uid'),
       render: (item) => (
         <div className="flex items-center gap-3">
-          <div className="font-medium text-primary-600">{item.uid}</div>
+          <div className="font-medium text-primary-600 dark:text-primary-400">{item.uid}</div>
         </div>
       )
     },
@@ -371,7 +371,7 @@ const BrokersList = () => {
       render: (item) => (
         <div className="flex items-center gap-3">
           <div>
-            <div className="font-medium text-gray-800">{item.fullName}</div>
+            <div className="font-medium text-gray-800 dark:text-gray-200">{item.fullName}</div>
           </div>
         </div>
       )
@@ -384,7 +384,7 @@ const BrokersList = () => {
       sortIcon: getSortIcon('mobile'),
       render: (item) => (
         <div className="flex items-center gap-2">
-          <div className="font-medium text-gray-800">{item.mobile}</div>
+          <div className="font-medium text-gray-800 dark:text-gray-200">{item.mobile}</div>
         </div>
       )
     },
@@ -401,11 +401,11 @@ const BrokersList = () => {
           <div className="flex items-center gap-2">
             <div>
               {hasAadhar ? (
-                <div className="font-medium text-gray-800">
+                <div className="font-medium text-gray-800 dark:text-gray-200">
                   {item.aadharNumber.replace(/(\d{4})(?=\d)/g, "$1 ")}
                 </div>
               ) : (
-                <div className="font-medium text-gray-400 italic">N/A</div>
+                <div className="font-medium text-gray-400 dark:text-gray-500 italic">N/A</div>
               )}
             </div>
           </div>
@@ -429,7 +429,7 @@ const BrokersList = () => {
         return (
           <div className="flex items-center gap-2">
             <div>
-              <div className="font-medium text-gray-800">{formattedDate}</div>
+              <div className="font-medium text-gray-800 dark:text-gray-200">{formattedDate}</div>
             </div>
           </div>
         );
@@ -570,17 +570,17 @@ const BrokersList = () => {
 
   return (
     <>
-      <div className="space-y-6">
+      <div className="space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
         {/* Header Section */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Broker</h1>
-            <p className="text-gray-600">Manage Brokers for animal procurement</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Broker</h1>
+            <p className="text-gray-600 dark:text-gray-400">Manage Brokers for animal procurement</p>
           </div>
           <div className="flex items-center space-x-4">
             <button
               onClick={handleRefresh}
-              className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium flex items-center space-x-2"
+              className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={loading}
             >
               <span>Refresh</span>
@@ -597,25 +597,25 @@ const BrokersList = () => {
         </div>
 
         {/* Search and Action Menu */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5 transition-colors duration-300">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             {/* Left Side: Search and Filter Toggle */}
             <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
               {/* Search Input */}
               <div className="relative w-full sm:w-80">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <BiSearch className="w-4 h-4 text-gray-400" />
+                  <BiSearch className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                 </div>
                 <input
                   type="text"
                   placeholder="Search by Broker ID, Name, Mobile, Aadhar..."
-                  className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-transparent text-sm bg-gray-50/50"
+                  className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-transparent text-sm bg-gray-50/50 dark:bg-gray-700/50 dark:text-white dark:placeholder-gray-400 transition-colors duration-300"
                   value={searchInput}
                   onChange={handleSearchChange}
                 />
                 {searchTerm && (
                   <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                    <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                    <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
                       {filteredBrokers.length} found
                     </span>
                   </div>
@@ -625,15 +625,16 @@ const BrokersList = () => {
               {/* Filter Toggle Button */}
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className={`px-4 py-2.5 border rounded-lg flex items-center gap-2 text-sm transition-all justify-center md:justify-start ${showFilters
+                className={`px-4 py-2.5 border rounded-lg flex items-center gap-2 text-sm transition-all justify-center md:justify-start ${
+                  showFilters
                     ? "bg-gradient-to-br from-primary-500 to-primary-600 text-white border-transparent"
-                    : "border-gray-300 hover:bg-gray-50 text-gray-700"
-                  }`}
+                    : "border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                }`}
               >
                 <Filter className="w-4 h-4" />
                 Filters
                 {isFilterApplied && (
-                  <span className="ml-1 px-1.5 py-0.5 bg-primary-200 text-primary-800 rounded-full text-xs">
+                  <span className="ml-1 px-1.5 py-0.5 bg-primary-200 dark:bg-primary-700 text-primary-800 dark:text-primary-300 rounded-full text-xs">
                     •
                   </span>
                 )}
@@ -657,15 +658,15 @@ const BrokersList = () => {
 
           {/* Filters Panel */}
           {showFilters && (
-            <div className="mt-4 p-5 bg-primary-50/50 rounded-xl border border-primary-100">
+            <div className="mt-4 p-5 bg-primary-50/50 dark:bg-primary-900/20 rounded-xl border border-primary-100 dark:border-primary-800 transition-colors duration-300">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Aadhar Status Filter */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Aadhar Status
                   </label>
                   <select
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
+                    className="w-full px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm transition-colors duration-300"
                     value={tempFilters.aadharStatus || ""}
                     onChange={(e) => handleFilterChange("aadharStatus", e.target.value)}
                   >
@@ -677,14 +678,14 @@ const BrokersList = () => {
 
                 {/* Date Range Filters */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     From Date
                   </label>
                   <div className="relative">
-                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
                     <input
                       type="date"
-                      className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
+                      className="w-full pl-10 pr-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm transition-colors duration-300"
                       value={tempFilters.fromDate || ""}
                       max={getCurrentDate()}
                       onChange={(e) => handleFilterChange("fromDate", e.target.value)}
@@ -693,14 +694,14 @@ const BrokersList = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     To Date
                   </label>
                   <div className="relative">
-                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
                     <input
                       type="date"
-                      className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm"
+                      className="w-full pl-10 pr-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm transition-colors duration-300"
                       value={tempFilters.toDate || ""}
                       max={getCurrentDate()}
                       min={tempFilters.fromDate || undefined}
@@ -711,14 +712,14 @@ const BrokersList = () => {
               </div>
 
               <div className="mt-6 flex flex-col xs:flex-row justify-between items-start xs:items-center gap-4">
-                <div className="text-sm text-gray-600 w-full xs:w-auto">
+                <div className="text-sm text-gray-600 dark:text-gray-400 w-full xs:w-auto">
                   {isFilterApplied && (
-                    <div className="flex flex-wrap items-center gap-2 bg-gradient-to-r from-primary-100 to-primary-50 px-3 py-2 rounded-lg border border-primary-200">
+                    <div className="flex flex-wrap items-center gap-2 bg-gradient-to-r from-primary-100 to-primary-50 dark:from-primary-900/40 dark:to-primary-800/20 px-3 py-2 rounded-lg border border-primary-200 dark:border-primary-700">
                       <span className="inline-flex items-center px-2 py-1 rounded-md bg-gradient-to-r from-primary-500 to-primary-600 text-white text-xs">
                         <Filter className="w-3 h-3 mr-1" />
                         Filters Applied
                       </span>
-                      <span className="text-primary-700 text-xs">
+                      <span className="text-primary-700 dark:text-primary-300 text-xs">
                         {Object.keys(appliedFilters).length > 0 &&
                           Object.keys(appliedFilters).filter(k => appliedFilters[k]).map(key => {
                             if (key === 'fromDate' || key === 'toDate') {
@@ -737,14 +738,14 @@ const BrokersList = () => {
                 <div className="flex flex-wrap gap-2 w-full xs:w-auto justify-start xs:justify-end">
                   <button
                     onClick={handleClearFilters}
-                    className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors border border-gray-300 whitespace-nowrap"
+                    className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors border border-gray-300 dark:border-gray-600 whitespace-nowrap"
                   >
                     <X size={14} className="inline mr-1" />
                     Clear All
                   </button>
                   <button
                     onClick={handleCancelFilters}
-                    className="px-4 py-2 text-sm text-primary-600 hover:text-primary-800 hover:bg-primary-50 rounded-lg transition-colors border border-primary-300 whitespace-nowrap"
+                    className="px-4 py-2 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-colors border border-primary-300 dark:border-primary-600 whitespace-nowrap"
                   >
                     Cancel
                   </button>
@@ -789,24 +790,25 @@ const BrokersList = () => {
           disableInternalDeleteModal={true}
         />
       </div>
+
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 overflow-y-auto"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 dark:bg-opacity-70 overflow-y-auto transition-colors duration-300"
           style={{ top: 0, left: 0, right: 0, bottom: 0 }}
         >
-          <div className="relative w-full max-w-md bg-white rounded-md shadow-xl mx-2">
+          <div className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-md shadow-xl mx-2 transition-colors duration-300">
             <div className="flex justify-center mb-4 mt-4">
-              <div className="p-3 bg-red-50 rounded-full">
-                <HiOutlineTrash className="w-10 h-10 text-red-500" />
+              <div className="p-3 bg-red-50 dark:bg-red-900/30 rounded-full">
+                <HiOutlineTrash className="w-10 h-10 text-red-500 dark:text-red-400" />
               </div>
             </div>
 
             <div className="text-center mb-6">
-              <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-2">
+              <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-white mb-2">
                 Confirm Deletion
               </h3>
-              <p className="text-gray-500 text-sm sm:text-base leading-relaxed p-3">
+              <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base leading-relaxed p-3">
                 {deleteTarget === "selected"
                   ? `You're about to delete ${selectedBrokers.size} selected broker(s). This action cannot be undone.`
                   : "You're about to delete this broker. This action cannot be undone."}
@@ -821,7 +823,7 @@ const BrokersList = () => {
                   setDeleteId(null);
                   setIsDeleting(false);
                 }}
-                className="flex-1 px-2 sm:px-5 py-1 border sm:py-2 border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors duration-150 text-sm font-medium focus:outline-none"
+                className="flex-1 px-2 sm:px-5 py-1 border sm:py-2 border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150 text-sm font-medium focus:outline-none"
                 disabled={isDeleting}
               >
                 Cancel

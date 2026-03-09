@@ -214,70 +214,70 @@ const AddBroker = () => {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">Broker Registration</h1>
-                <p className="text-gray-600">Register new broker for animal procurement</p>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Broker Registration</h1>
+                <p className="text-gray-600 dark:text-gray-400">Register new broker for animal procurement</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-8">
-                <div className="card">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-300">
                     <div className="flex items-center space-x-3 mb-6">
-                        <div className="p-2 bg-primary-50 rounded-lg">
-                            <User className="text-primary-600" size={20} />
+                        <div className="p-2 bg-primary-50 dark:bg-primary-900/30 rounded-lg">
+                            <User className="text-primary-600 dark:text-primary-400" size={20} />
                         </div>
-                        <h2 className="text-lg font-semibold text-gray-900">Personal Details</h2>
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Personal Details</h2>
                     </div>
 
-                <div className="mb-8 flex flex-col items-center justify-center">
-                    <div className="relative w-32 h-32 mb-4">
-                        <div className="w-full h-full rounded-full border-4 border-gray-200 overflow-hidden bg-gray-100 flex items-center justify-center">
+                    <div className="mb-8 flex flex-col items-center justify-center">
+                        <div className="relative w-32 h-32 mb-4">
+                            <div className="w-full h-full rounded-full border-4 border-gray-200 dark:border-gray-700 overflow-hidden bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                                {formData.profilePhoto ? (
+                                    <img 
+                                        src={URL.createObjectURL(formData.profilePhoto)} 
+                                        alt="Profile" 
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center p-4">
+                                        <User className="text-gray-400 dark:text-gray-500" size={40} />
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">Add Photo</p>
+                                    </div>
+                                )}
+                            </div>
+                            <label 
+                                htmlFor="profilePhoto"
+                                className={`absolute bottom-0 right-0 bg-primary-600 text-white p-2 rounded-full cursor-pointer hover:bg-primary-700 transition-colors shadow-lg ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            >
+                                <Camera size={18} />
+                            </label>
+                        </div>
+                        
+                        <div className="text-center">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Profile Photo
+                            </label>
+                            <input
+                                type="file"
+                                name="profilePhoto"
+                                onChange={handleChange}
+                                className="hidden"
+                                id="profilePhoto"
+                                accept=".jpg,.jpeg,.png"
+                                disabled={isSubmitting}
+                            />
+                            
                             {formData.profilePhoto ? (
-                                <img 
-                                    src={URL.createObjectURL(formData.profilePhoto)} 
-                                    alt="Profile" 
-                                    className="w-full h-full object-cover"
-                                />
+                                <p className="text-xs text-green-600 dark:text-green-400 mt-2">✓ {formData.profilePhoto.name}</p>
                             ) : (
-                                <div className="flex flex-col items-center justify-center p-4">
-                                    <User className="text-gray-400" size={40} />
-                                    <p className="text-xs text-gray-500 mt-2 text-center">Add Photo</p>
-                                </div>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">Upload profile photo</p>
                             )}
                         </div>
-                        <label 
-                            htmlFor="profilePhoto"
-                            className={`absolute bottom-0 right-0 bg-primary-600 text-white p-2 rounded-full cursor-pointer hover:bg-primary-700 transition-colors shadow-lg ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        >
-                            <Camera size={18} />
-                        </label>
                     </div>
-                    
-                    <div className="text-center">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Profile Photo
-                        </label>
-                        <input
-                            type="file"
-                            name="profilePhoto"
-                            onChange={handleChange}
-                            className="hidden"
-                            id="profilePhoto"
-                            accept=".jpg,.jpeg,.png"
-                            disabled={isSubmitting}
-                        />
-                        
-                        {formData.profilePhoto ? (
-                            <p className="text-xs text-green-600 mt-2">✓ {formData.profilePhoto.name}</p>
-                        ) : (
-                            <p className="text-xs text-gray-500 mt-2">Upload profile photo</p>
-                        )}
-                    </div>
-                </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Full Name <span className="text-red-500">*</span>
                             </label>
                             <input
@@ -285,42 +285,50 @@ const AddBroker = () => {
                                 name="fullName"
                                 value={formData.fullName}
                                 onChange={handleChange}
-                                className={`input-field ${errors.fullName ? 'border-red-500' : ''}`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${
+                                    errors.fullName 
+                                        ? 'border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600' 
+                                        : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                                }`}
                                 placeholder="Enter full name"
                                 disabled={isSubmitting}
                             />
                             {errors.fullName && (
-                                <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>
+                                <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors.fullName}</p>
                             )}
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Mobile Number <span className="text-red-500">*</span>
                             </label>
                             <div className="relative">
-                                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" size={18} />
                                 <input
                                     type="tel"
                                     name="mobile"
                                     value={formData.mobile}
                                     onChange={handleChange}
                                     maxLength={10}
-                                    className={`input-field pl-10 ${errors.mobile ? 'border-red-500' : ''}`}
+                                    className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${
+                                        errors.mobile 
+                                            ? 'border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600' 
+                                            : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                                    }`}
                                     placeholder="Enter 10-digit mobile number"
                                     disabled={isSubmitting}
                                 />
                             </div>
                             {errors.mobile && (
-                                <p className="text-red-500 text-xs mt-1">{errors.mobile}</p>
+                                <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors.mobile}</p>
                             )}
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                 {formData.mobile.length}/10 digits
                             </p>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Aadhar Number
                             </label>
                             <input
@@ -329,38 +337,42 @@ const AddBroker = () => {
                                 value={formData.aadharNumber}
                                 onChange={handleChange}
                                 maxLength={12}
-                                className={`input-field ${errors.aadharNumber ? 'border-red-500' : ''}`}
+                                className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200 outline-none dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:placeholder-gray-400 ${
+                                    errors.aadharNumber 
+                                        ? 'border-red-500 bg-red-50/50 dark:bg-red-900/20 dark:border-red-600' 
+                                        : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                                }`}
                                 placeholder="Enter 12-digit Aadhar number"
                                 disabled={isSubmitting}
                             />
                             {errors.aadharNumber && (
-                                <p className="text-red-500 text-xs mt-1">{errors.aadharNumber}</p>
+                                <p className="text-red-500 dark:text-red-400 text-xs mt-1">{errors.aadharNumber}</p>
                             )}
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                 {formData.aadharNumber.length}/12 digits
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <div className="card">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 transition-colors duration-300">
                     <div className="flex items-center space-x-3 mb-6">
-                        <div className="p-2 bg-green-50 rounded-lg">
-                            <FileText className="text-green-600" size={20} />
+                        <div className="p-2 bg-green-50 dark:bg-green-900/30 rounded-lg">
+                            <FileText className="text-green-600 dark:text-green-400" size={20} />
                         </div>
-                        <h2 className="text-lg font-semibold text-gray-900">Aadhar Document</h2>
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Aadhar Document</h2>
                     </div>
 
                     <div className="flex flex-col items-center justify-center">
                         <div className="w-full max-w-2xl">
                             {formData.aadharDocument ? (
-                                <div className="border-2 border-gray-300 rounded-lg p-6">
+                                <div className="border-2 border-gray-300 dark:border-gray-600 rounded-lg p-6">
                                     <div className="flex items-center justify-between mb-4">
                                         <div className="flex items-center space-x-3">
                                             <div className={`p-3 rounded-lg ${
                                                 isPDF(formData.aadharDocument) 
-                                                    ? 'bg-red-100 text-red-600' 
-                                                    : 'bg-primary-100 text-primary-600'
+                                                    ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' 
+                                                    : 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
                                             }`}>
                                                 {isPDF(formData.aadharDocument) ? (
                                                     <File size={24} />
@@ -369,10 +381,10 @@ const AddBroker = () => {
                                                 )}
                                             </div>
                                             <div>
-                                                <p className="font-medium text-gray-900">
+                                                <p className="font-medium text-gray-900 dark:text-white">
                                                     {getDisplayFileName(formData.aadharDocument)}
                                                 </p>
-                                                <p className="text-sm text-gray-500">
+                                                <p className="text-sm text-gray-500 dark:text-gray-400">
                                                     {isPDF(formData.aadharDocument) 
                                                         ? 'PDF Document' 
                                                         : `${Math.round(formData.aadharDocument.size / 1024)} KB`}
@@ -385,8 +397,8 @@ const AddBroker = () => {
                                                 onClick={openDocument}
                                                 className={`p-2 rounded-lg hover:opacity-90 transition-opacity ${
                                                     isPDF(formData.aadharDocument)
-                                                        ? 'bg-red-100 text-red-600 hover:bg-red-200'
-                                                        : 'bg-primary-100 text-primary-600 hover:bg-primary-200'
+                                                        ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-800/50'
+                                                        : 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 hover:bg-primary-200 dark:hover:bg-primary-800/50'
                                                 }`}
                                                 title={isPDF(formData.aadharDocument) ? "Open PDF" : "Preview Image"}
                                                 disabled={isSubmitting}
@@ -396,7 +408,7 @@ const AddBroker = () => {
                                             <button
                                                 type="button"
                                                 onClick={removeAadharDocument}
-                                                className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
+                                                className="p-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                                                 title="Remove"
                                                 disabled={isSubmitting}
                                             >
@@ -406,11 +418,11 @@ const AddBroker = () => {
                                     </div>
                                     
                                     {isImage(formData.aadharDocument) && previewUrl && (
-                                        <div className="mt-4 border border-gray-200 rounded-lg overflow-hidden">
-                                            <div className="p-2 bg-gray-50 border-b border-gray-200">
-                                                <p className="text-sm font-medium text-gray-700">Document Preview</p>
+                                        <div className="mt-4 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                                            <div className="p-2 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
+                                                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Document Preview</p>
                                             </div>
-                                            <div className="p-4 flex items-center justify-center bg-gray-50">
+                                            <div className="p-4 flex items-center justify-center bg-gray-50 dark:bg-gray-800">
                                                 <img 
                                                     src={previewUrl} 
                                                     alt="Aadhar Preview" 
@@ -421,18 +433,18 @@ const AddBroker = () => {
                                     )}
                                     
                                     {isPDF(formData.aadharDocument) && (
-                                        <div className="mt-4 text-center p-6 border border-gray-200 rounded-lg bg-gray-50">
-                                            <File className="mx-auto text-red-400 mb-3" size={48} />
-                                            <p className="text-sm text-gray-700 font-medium mb-2">
+                                        <div className="mt-4 text-center p-6 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                                            <File className="mx-auto text-red-400 dark:text-red-500 mb-3" size={48} />
+                                            <p className="text-sm text-gray-700 dark:text-gray-300 font-medium mb-2">
                                                 {getDisplayFileName(formData.aadharDocument)}
                                             </p>
-                                            <p className="text-sm text-gray-600 mb-4">
+                                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                                                 Click the eye icon above to open this PDF document
                                             </p>
                                             <button
                                                 type="button"
                                                 onClick={openDocument}
-                                                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+                                                className="px-4 py-2 bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white rounded-lg transition-colors text-sm"
                                                 disabled={isSubmitting}
                                             >
                                                 Open {getDisplayFileName(formData.aadharDocument)}
@@ -441,19 +453,19 @@ const AddBroker = () => {
                                     )}
                                 </div>
                             ) : (
-                                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary-500 transition-colors">
+                                <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-primary-500 dark:hover:border-primary-400 transition-colors">
                                     <div className="flex flex-col items-center justify-center">
-                                        <Upload className="text-gray-400 mb-3" size={40} />
-                                        <p className="text-sm text-gray-700 mb-2 font-medium">
+                                        <Upload className="text-gray-400 dark:text-gray-500 mb-3" size={40} />
+                                        <p className="text-sm text-gray-700 dark:text-gray-300 mb-2 font-medium">
                                             Upload Aadhar Document
                                         </p>
-                                        <p className="text-xs text-gray-500 mb-4">
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
                                             Upload photo or PDF of Aadhar card
                                         </p>
                                         
                                         <label 
                                             htmlFor="aadharDocument"
-                                            className={`px-4 py-2 bg-primary-600 text-white rounded-lg cursor-pointer hover:bg-primary-700 transition-colors text-sm ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            className={`px-4 py-2 bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-white rounded-lg cursor-pointer transition-colors text-sm ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         >
                                             Browse File
                                         </label>
@@ -474,11 +486,11 @@ const AddBroker = () => {
                     </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+                <div className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-gray-700">
                     <button
                         type="button"
                         onClick={() => window.history.back()}
-                        className={`px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        className={`px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                         disabled={isSubmitting}
                     >
                         Cancel
@@ -486,7 +498,7 @@ const AddBroker = () => {
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className={`px-6 py-2 bg-primary-600 text-white rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center min-w-[120px] ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        className={`px-6 py-2 bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-white rounded-lg transition-colors flex items-center justify-center min-w-[140px] ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                         {isSubmitting ? (
                             <>
@@ -502,6 +514,12 @@ const AddBroker = () => {
                     </button>
                 </div>
             </form>
+
+            <Toaster
+                toastOptions={{
+                    className: 'dark:bg-gray-800 dark:text-white dark:border-gray-700',
+                }}
+            />
         </div>
     );
 };

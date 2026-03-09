@@ -18,15 +18,13 @@ const SettingsPage = ({ userRole = 'user', onLogout }) => {
   const visibleTabs = tabs.filter(tab => tab.roles.includes(userRole));
 
   return (
-    <div className="min-h-screen bg-gray-50 transition-colors duration-300 ">
-      {/* Header with Dark Mode Toggle */}
-      <div className="mb-8 flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Settings</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Manage your account settings and preferences
-          </p>
-        </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Settings</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-2">
+          Manage your account settings and preferences
+        </p>
       </div>
 
       {/* Tab Navigation */}
@@ -38,7 +36,7 @@ const SettingsPage = ({ userRole = 'user', onLogout }) => {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`
-                  px-6 py-4 text-sm font-medium border-b-2 transition-colors
+                  px-6 py-4 text-sm font-medium border-b-2 transition-colors duration-200
                   ${activeTab === tab.id
                     ? 'border-primary-500 text-primary-600 dark:border-primary-400 dark:text-primary-400'
                     : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
