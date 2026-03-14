@@ -12,14 +12,16 @@ import sanitizeInput from '../middlewares/sanitizeInput';
 // Controllers
 import { getAllRoles } from '../controllers/admin/roleController';
 import { getAllUsers, getUserById, createUser, updateUser, deleteUser, updateUserProfile, changePassword, editPassword } from '../controllers/admin/userController';
-import { getCommissionAgents, getCommissionAgentByUid, getCommissionAgentList, createCommissionAgent, updateCommissionAgent, deleteCommissionAgent } from '../controllers/admin/commissionAgentController';
+import { getBrokers, getBrokerByUid, getBrokerList, createBroker, updateBroker, deleteBroker } from '../controllers/admin/brokerController';
+import { createBeneficiary, deleteBeneficiary, getBeneficiaries, getBeneficiaryByUid, getBeneficiaryList, updateBeneficiary } from '../controllers/admin/beneficiaryController';
 import { getSellers, getSellerByUid, getSellerList, createSeller, updateSeller, deleteSeller } from '../controllers/admin/sellerController';
 import { getAnimals, getAnimalByUid, createAnimal, updateAnimal, deleteAnimal } from '../controllers/admin/animalController';
 import { getProcuredAnimals, getProcuredAnimalbyUid, getProcurementOfficers, createProcurement, updateProcurement, deleteProcuredAnimal } from '../controllers/admin/procuredAnimalController';
 
 // Validation Schema
 import { createUserSchema, updateUserProfileSchema, updateUserSchema, changePasswordSchema, editPasswordSchema } from '../validations/userValidation';
-import { CreateCommissionAgentSchema, UpdateCommissionAgentSchema } from '../validations/commissionAgentValidation';
+import { CreateBrokerSchema, UpdateBrokerSchema } from '../validations/brokerValidation';
+import { CreateBeneficiarySchema, UpdateBeneficiarySchema } from '../validations/beneficiaryValidation';
 import { CreateSellerSchema, UpdateSellerSchema } from '../validations/sellerValidation';
 import { CreateProcuredAnimalSchema, UpdateProcuredAnimalSchema } from '../validations/procuredAnimalValidation';
 
@@ -36,13 +38,21 @@ router.put('/update-user', verifyToken, checkRole([1, 2, 3]), upload.fields([{ n
 router.put('/change-password', verifyToken, checkRole([1, 2, 3]), validate(changePasswordSchema), sanitizeInput, changePassword);
 router.put('/edit-password/:id', verifyToken, checkRole([1]), validate(editPasswordSchema), sanitizeInput, editPassword);
 
-// Commissioner Agent Routes
-router.get('/commission-agent', verifyToken, checkRole([1, 2, 3]), getCommissionAgents);
-router.get('/commission-agent/:uid', verifyToken, checkRole([1, 2, 3]), getCommissionAgentByUid);
-router.get("/commission-agent-list", verifyToken, checkRole([1, 2, 3]), getCommissionAgentList);
-router.post("/commission-agent", verifyToken, checkRole([1, 2, 3]), upload.fields([{ name: "profileImg", maxCount: 1 }, { name: "aadhaarFile", maxCount: 1 }]), handleMulterError, validate(CreateCommissionAgentSchema), sanitizeInput, setAudit, createCommissionAgent);
-router.put("/commission-agent/:uid", verifyToken, checkRole([1, 2, 3]), upload.fields([{ name: "profileImg", maxCount: 1 }, { name: "aadhaarFile", maxCount: 1 }]), handleMulterError, validate(UpdateCommissionAgentSchema), sanitizeInput, setAudit, updateCommissionAgent);
-router.delete("/commission-agent/:uid", verifyToken, checkRole([1, 2, 3]), deleteCommissionAgent);
+// Broker Routes
+router.get('/broker', verifyToken, checkRole([1, 2, 3]), getBrokers);
+router.get('/broker/:uid', verifyToken, checkRole([1, 2, 3]), getBrokerByUid);
+router.get("/broker-list", verifyToken, checkRole([1, 2, 3]), getBrokerList);
+router.post("/broker", verifyToken, checkRole([1, 2, 3]), upload.fields([{ name: "profilePhoto", maxCount: 1 }, { name: "aadhaarFile", maxCount: 1 }]), handleMulterError, validate(CreateBrokerSchema), sanitizeInput, setAudit, createBroker);
+router.put("/broker/:uid", verifyToken, checkRole([1, 2, 3]), upload.fields([{ name: "profilePhoto", maxCount: 1 }, { name: "aadhaarFile", maxCount: 1 }]), handleMulterError, validate(UpdateBrokerSchema), sanitizeInput, setAudit, updateBroker);
+router.delete("/broker/:uid", verifyToken, checkRole([1, 2, 3]), deleteBroker);
+
+// Beneficiary Routes
+router.get('/beneficiary', verifyToken, checkRole([1, 2, 3]), getBeneficiaries);
+router.get('/beneficiary/:uid', verifyToken, checkRole([1, 2, 3]), getBeneficiaryByUid);
+router.get("/beneficiary-list", verifyToken, checkRole([1, 2, 3]), getBeneficiaryList);
+router.post("/beneficiary", verifyToken, checkRole([1, 2, 3]), validate(CreateBeneficiarySchema), sanitizeInput, setAudit, createBeneficiary);
+router.put("/beneficiary/:uid", verifyToken, checkRole([1, 2, 3]), validate(UpdateBeneficiarySchema), sanitizeInput, setAudit, updateBeneficiary);
+router.delete("/beneficiary/:uid", verifyToken, checkRole([1, 2, 3]), deleteBeneficiary);
 
 // Seller Routes
 router.get('/seller', verifyToken, checkRole([1, 2, 3]), getSellers);

@@ -25,6 +25,7 @@ export const generateUID = async ({
     });
 
     let nextNumber = start;
+    const year = new Date().getFullYear();
 
     if (lastRecord?.uid) {
         const parts = lastRecord.uid.split("-");
@@ -39,5 +40,5 @@ export const generateUID = async ({
         throw new Error(`${prefix} UID limit exceeded`);
     }
 
-    return `${prefix}-${nextNumber}`;
+    return `${prefix}-${year}-${nextNumber}`;
 };

@@ -1,15 +1,19 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../config/database";
 
-interface CommissionAgentAttributes {
+interface BeneficiaryAttributes {
     id: number;
     uid: string;
 
     name: string;
-    phone: string;
-    aadhaarNumber?: string | null;
-    profileImg?: string | null;
-    aadhaarFile?: string | null;
+    gender: string;
+    mobile: string;
+    dob: Date;
+
+    address: string;
+    state: string;
+    city: string;
+    pincode: string;
 
     createdBy: number;
     updatedBy: number;
@@ -18,32 +22,25 @@ interface CommissionAgentAttributes {
     updatedAt?: Date;
 }
 
-interface CommissionAgentCreationAttributes
-    extends Optional<
-        CommissionAgentAttributes,
-        | "id"
-        | "aadhaarNumber"
-        | "profileImg"
-        | "aadhaarFile"
-        | "createdAt"
-        | "updatedAt"
-    > { }
+interface BeneficiaryCreationAttributes
+    extends Optional<BeneficiaryAttributes, "id" | "createdAt" | "updatedAt"> { }
 
-class CommissionAgent
-    extends Model<
-        CommissionAgentAttributes,
-        CommissionAgentCreationAttributes
-    >
-    implements CommissionAgentAttributes {
+class Beneficiary
+    extends Model<BeneficiaryAttributes, BeneficiaryCreationAttributes>
+    implements BeneficiaryAttributes {
 
     public id!: number;
     public uid!: string;
 
     public name!: string;
-    public phone!: string;
-    public aadhaarNumber!: string | null;
-    public profileImg!: string | null;
-    public aadhaarFile!: string | null;
+    public gender!: string;
+    public mobile!: string;
+    public dob!: Date;
+
+    public address!: string;
+    public state!: string;
+    public city!: string;
+    public pincode!: string;
 
     public createdBy!: number;
     public updatedBy!: number;
@@ -52,7 +49,7 @@ class CommissionAgent
     public readonly updatedAt!: Date;
 }
 
-CommissionAgent.init(
+Beneficiary.init(
     {
         id: {
             type: DataTypes.INTEGER.UNSIGNED,
@@ -67,20 +64,32 @@ CommissionAgent.init(
             type: DataTypes.STRING,
             allowNull: false,
         },
-        phone: {
+        gender: {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        aadhaarNumber: {
+        mobile: {
             type: DataTypes.STRING,
-            allowNull: true,
+            allowNull: false,
         },
-        profileImg: {
-            type: DataTypes.TEXT,
-            allowNull: true,
+        dob: {
+            type: DataTypes.DATEONLY,
+            allowNull: false,
         },
-        aadhaarFile: {
+        address: {
             type: DataTypes.TEXT,
+            allowNull: false,
+        },
+        state: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        city: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        pincode: {
+            type: DataTypes.STRING,
             allowNull: true,
         },
         createdBy: {
@@ -94,10 +103,10 @@ CommissionAgent.init(
     },
     {
         sequelize,
-        tableName: "commission_agent",
+        tableName: "beneficiary",
         timestamps: true,
         paranoid: true,
     }
 );
 
-export default CommissionAgent;
+export default Beneficiary;

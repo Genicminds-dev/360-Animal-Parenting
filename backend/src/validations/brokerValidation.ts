@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-export const CreateCommissionAgentSchema = Joi.object({
+export const CreateBrokerSchema = Joi.object({
     name: Joi.string()
         .trim()
         .pattern(/^[A-Za-z]+(?:\s[A-Za-z]+)*$/)
@@ -16,13 +16,13 @@ export const CreateCommissionAgentSchema = Joi.object({
             "any.required": "Name is required",
         }),
 
-    phone: Joi.string()
+    mobile: Joi.string()
         .pattern(/^[6-9][0-9]{9}$/)
         .required()
         .messages({
-            "string.pattern.base": "Phone number must be a valid 10-digit Indian mobile number",
-            "string.empty": "Phone number is required",
-            "any.required": "Phone number is required",
+            "string.pattern.base": "Mobile number must be a valid 10-digit Indian mobile number",
+            "string.empty": "Mobile number is required",
+            "any.required": "Mobile number is required",
         }),
 
     aadhaarNumber: Joi.string()
@@ -33,11 +33,11 @@ export const CreateCommissionAgentSchema = Joi.object({
                 "Aadhaar number must be a valid 12-digit Indian Aadhaar number",
         }),
 
-    profileImg: Joi.string()
+    profilePhoto: Joi.string()
         .optional()
         .allow("", null)
         .messages({
-            "string.base": "Profile image must be a string",
+            "string.base": "Profile photo must be a string",
         }),
 
     aadhaarFile: Joi.string()
@@ -51,7 +51,7 @@ export const CreateCommissionAgentSchema = Joi.object({
 });
 
 
-export const UpdateCommissionAgentSchema = Joi.object({
+export const UpdateBrokerSchema = Joi.object({
     name: Joi.string()
         .trim()
         .pattern(/^[A-Za-z]+(?:\s[A-Za-z]+)*$/)
@@ -66,13 +66,13 @@ export const UpdateCommissionAgentSchema = Joi.object({
                 "Name must contain only alphabets and single spaces",
         }),
 
-    phone: Joi.string()
+    mobile: Joi.string()
         .pattern(/^[6-9][0-9]{9}$/)
         .optional()
         .messages({
             "string.pattern.base":
-                "Phone number must be a valid 10-digit Indian mobile number",
-            "string.base": "Phone number must be a string",
+                "Mobile number must be a valid 10-digit Indian mobile number",
+            "string.base": "Mobile number must be a string",
         }),
 
     aadhaarNumber: Joi.string()
@@ -85,11 +85,11 @@ export const UpdateCommissionAgentSchema = Joi.object({
             "string.base": "Aadhaar number must be a string",
         }),
 
-    profileImg: Joi.string()
+    profilePhoto: Joi.string()
         .allow("", null)
         .optional()
         .messages({
-            "string.base": "Profile image must be a string",
+            "string.base": "Profile photo must be a string",
         }),
 
     aadhaarFile: Joi.string()

@@ -29,8 +29,8 @@ export const FIELD_RULES: Record<
     types: ("image" | "pdf" | "video")[];
   }
 > = {
-  profileImg: {
-    label: "Profile image",
+  profilePhoto: {
+    label: "Profile photo",
     types: ["image"],
   },
   aadhaarFile: {

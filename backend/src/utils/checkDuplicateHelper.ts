@@ -4,6 +4,7 @@ interface GenericDuplicateCheckOptions<M extends Model> {
     model: ModelStatic<M>;
     payload: Record<string, any>;
     fields: string[];
+    ignoreCol?: string;      
     ignoreValue?: string | number;
 }
 
@@ -11,6 +12,7 @@ export const checkDuplicateGeneric = async <M extends Model>({
     model,
     payload,
     fields,
+    ignoreCol,
     ignoreValue,
 }: GenericDuplicateCheckOptions<M>) => {
 
@@ -28,10 +30,15 @@ export const checkDuplicateGeneric = async <M extends Model>({
 
         const where: WhereOptions = {
             [field]: value,
-            ...(ignoreValue
-                ? { [primaryKey]: { [Op.ne]: ignoreValue } }
-                : {}),
         };
+
+        if (ignoreValue) {
+            const column = ignoreCol || primaryKey;
+
+            Object.assign(where, {
+                [column]: { [Op.ne]: ignoreValue }
+            });
+        }
 
         const exists = await model.findOne({ where });
 
@@ -42,6 +49,5 @@ export const checkDuplicateGeneric = async <M extends Model>({
             };
         }
     }
-
     return null;
 };
